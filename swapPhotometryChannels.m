@@ -33,9 +33,9 @@ function data = swapPhotometryChannels(data)
             data.(ch2_column)(rows_to_swap) = tmp;
         end
     end
-    for i = 1:length(find(rows_to_swap))
-        found_idx = find(rows_to_swap);
-        disp("Swapped Channels for Row " + string(found_idx(i)));
-    end
+    % for i = 1:length(find(rows_to_swap))
+    %     found_idx = find(rows_to_swap);
+    %     % disp("Swapped Channels for Row " + string(found_idx(i)));
+    % end
 
 end

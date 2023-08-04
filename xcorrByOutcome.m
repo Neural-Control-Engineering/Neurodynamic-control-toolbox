@@ -29,8 +29,13 @@ function xcorrByOutcome(data, session_id)
                 ch1 = ch1(t < 0 & t > -2);
                 ch2 = ch2(t < 0 & t > -2);
                 [c, lag] = xcorr(ch1-mean(ch1), ch2-mean(ch2));
-                lags(i,:) = lag ./ Fs;
-                cs(i,:) = c;
+                try
+                    lags(i,:) = lag ./ Fs;
+                    cs(i,:) = c;
+                catch
+                    lags(i,:) = nan(1, size(lags,2));
+                    cs(i,:) = nan(1,size(cs,2));
+                end
             end
         end
         % mean + sem for those outcomes with multiple trials, just plot otherwise 

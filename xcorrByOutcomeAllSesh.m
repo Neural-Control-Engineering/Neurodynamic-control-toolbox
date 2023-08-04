@@ -3,7 +3,7 @@ function xcorrByOutcomeAllSesh(data)
     
     for i = 1:length(sessions)
         if contains(sessions(i), 'mPFC-S1-NE')
-            fprintf(sessions(i))
+            fprintf('%s\n', sessions(i))
             xcorrByOutcome(data, sessions(i));
         end
     end
