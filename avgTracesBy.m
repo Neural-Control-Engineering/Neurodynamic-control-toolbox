@@ -1,4 +1,11 @@
 function avgTracesBy(data, filterBy, filterValue, sortBy)
+% average photometry data for all trials filtered by a particular feature. 
+%   Example: avgTracesBy(data, 'animal', '109', 'outcome')
+% would plot average photometry traces for animal 109 sorted by categorical
+% outcome, rather than e.g. response (go/no go).
+% Craig Kelley, NEC Lab, 8/7/23
+%     TODO: hadle one or two channels (right now just two)
+
 
     data = swapPhotometryChannels(data);
     data = filterTrials(data, filterBy, filterValue);
