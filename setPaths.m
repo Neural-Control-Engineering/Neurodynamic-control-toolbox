@@ -9,19 +9,11 @@ if ismac
     % Cody's macbook
     if strcmp(convertCharsToStrings(user(1:end-1)),'Cody Slater') % Right now this is a little strange need to account for a newline at end of mac username
         % Path for analysis code repo
-        paths.repo_path = '/Users/codyslater/Documents/GitHub/Neurotransmitter_Exploration';
+        paths.repo_path = '/Users/codyslater/Documents/GitHub/Neurodyanimcs-control-toolbox';
        
         % Drive letter for raw and analyzed data in customary file structure
-         paths.all_data_path = strcat('/Users/codyslater/Library/CloudStorage/GoogleDrive-cs3791@columbia.edu/My Drive/#Projects/',source);
+        paths.all_data_path = strcat('/Users/codyslater/Library/CloudStorage/GoogleDrive-cs3791@columbia.edu/My Drive/#Projects/',source);
     
-    % Camilo's macbook
-    elseif strcmp(convertCharsToStrings(user(1:end-1)),'Camilo Martinez')
-        % Path for analysis code repo
-        paths.repo_path = '/Users/camilomartinez/Documents/GitHub/Neurotransmitter_Exploration';
-
-        % Drive letter for raw and analyzed data in customary file structure
-        paths.all_data_path = strcat('/Volumes/GoogleDrive/.shortcut-targets-by-id/1yB5u8zHl-aBucQQEQZIgnPdQ1Re2j-5E/',source);
-
     % ADD additional mac users here
 
     end
@@ -32,7 +24,7 @@ elseif ispc
     % Cody's primary PC
     if strcmp(getenv("COMPUTERNAME"),'BETADROID') %#ok<BDSCA>
         % Path for analysis code repo
-        paths.repo_path = 'B:\GitHub\Neurotransmitter_Exploration';
+        paths.repo_path = 'B:\GitHub\Neurodyanimcs-control-toolbox';
         paths.scrape_raw_data.behavior_data = "G:\Other computers\Datatron\Raw_Data";
         paths.scrape_raw_data.behavior_metadata = "G:\Other computers\Datatron\Raw_Data_Experimental_Details";
         paths.scrape_raw_data.pupil_data = "G:\Other computers\Datatron\SSD_v2 Raw Pupil Data";
@@ -49,7 +41,7 @@ elseif ispc
     % Cody's lab office PC
     elseif strcmp(getenv("USERNAME"),'TheSingularity') %#ok<BDSCA>
         % Path for analysis code repo
-        paths.repo_path = 'C:\Users\TheSingularity\Documents\GitHub\Neurotransmitter_Exploration';
+        paths.repo_path = 'C:\Users\TheSingularity\Documents\GitHub\Neurodyanimcs-control-toolbox';
     
         % Drive letter for raw and analyzed data in customary file structure
         paths.all_data_path = strcat('G:\My Drive\#Projects\',source);
@@ -61,7 +53,7 @@ elseif ispc
     % Kunpeng's laptop 
     elseif strcmp(getenv("COMPUTERNAME"),'LAPTOP-AOO4UDIG') %#ok<BDSCA>
         % Path for analysis code repo
-        paths.repo_path = 'D:\GitHub\Neurotransmitter_Exploration';
+        paths.repo_path = 'D:\GitHub\Neurodyanimcs-control-toolbox';
     
         % Drive letter for raw and analyzed data in customary file structure
         paths.all_data_path = strcat('H:\.shortcut-targets-by-id\1yB5u8zHl-aBucQQEQZIgnPdQ1Re2j-5E\',source);
@@ -71,7 +63,7 @@ elseif ispc
     % Gabriel's PC 
     elseif strcmp(getenv("COMPUTERNAME"),'DESKTOP-EI7J5NI') %#ok<BDSCA>
         % Path for analysis code repo
-        paths.repo_path = 'C:\Code\Neurotransmitter_Exploration';
+        paths.repo_path = 'C:\Code\Neurodyanimcs-control-toolbox';
     
         % Drive letter for raw and analyzed data in customary file structure
         paths.all_data_path = strcat('G:\.shortcut-targets-by-id\1yB5u8zHl-aBucQQEQZIgnPdQ1Re2j-5E\',source);
@@ -112,15 +104,16 @@ paths.processed_photometry_data = fullfile(paths.all_data_path,'Processed Photom
 paths.processed_pupil_data = fullfile(paths.all_data_path,'Processed Pupil Data');
 paths.processed_whisker_data = fullfile(paths.all_data_path,'Processed Whisker Data');
 paths.processed_neuropixel_data = fullfile(paths.all_data_path,'Processed Neuropixel Data');
+paths.datastore = fullfile(paths.all_data_path,"Datastores");
 
 % Store which project data is actively being used
 paths.data_source = source;
 
 % Store neuropixel related paths
-paths.neuropixel.kilosort_params = fullfile(paths.raw_neuropixel_data,"Kilosort_params");
-paths.neuropixel.npy = fullfile(paths.neuropixel.kilosort_repo,'npy-matlab-master','npy-matlab');
-paths.neuropixel.config = convertStringsToChars(fullfile(paths.raw_neuropixel_data,'Kilosort_params'));
-
-setenv("NEUROPIXEL_MAP_FILE",fullfile(paths.neuropixel.config,"neuropixPhase3A_kilosortChanMap.mat"))
-setenv("KILOSORT_CONFIG_FILE",fullfile(paths.neuropixel.config,"StandardConfig.m"))
+% paths.neuropixel.kilosort_params = fullfile(paths.raw_neuropixel_data,"Kilosort_params");
+% paths.neuropixel.npy = fullfile(paths.neuropixel.kilosort_repo,'npy-matlab-master','npy-matlab');
+% paths.neuropixel.config = convertStringsToChars(fullfile(paths.raw_neuropixel_data,'Kilosort_params'));
+% 
+% setenv("NEUROPIXEL_MAP_FILE",fullfile(paths.neuropixel.config,"neuropixPhase3A_kilosortChanMap.mat"))
+% setenv("KILOSORT_CONFIG_FILE",fullfile(paths.neuropixel.config,"StandardConfig.m"))
 end
