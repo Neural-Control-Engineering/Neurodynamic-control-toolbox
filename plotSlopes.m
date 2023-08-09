@@ -1,5 +1,8 @@
-function plotSlopes(data, sortBy)
-    
+function plotSlopes(data, sortBy, t0, t1, outdir)
+% compute slope of photometery data between times t0 and t1 by fitting a
+% line.  choose to sort by categorical outcome or animal response 
+% Craig Kelley, NEC Lab, 8/9/23
+
     data = swapPhotometryChannels(data);
     fig = figure('Visible', 'off'); hold on;
     colors = ['b', 'r', 'm', 'g', 'y', 'c'];
@@ -28,9 +31,9 @@ function plotSlopes(data, sortBy)
                 ch2 = obj.photometry_ch2{i,1}(:,2);
                 % just two seconds prior to stimulus 
                 t = obj.photometry_ch1{i,1}(:,1) - obj.stimulus_time(i);
-                ch1 = ch1(t < 0 & t > -0.5);
-                ch2 = ch2(t < 0 & t > -0.5);
-                t = t(t < 0 & t > -0.5);
+                ch1 = ch1(t < t1 & t > t0);
+                ch2 = ch2(t < t1 & t > t0);
+                t = t(t < t1 & t > t0);
                 [p1, ~] = polyfit(t, ch1, 1);
                 [p2, ~] = polyfit(t, ch2, 1);
                 slopes(1,i) = p1(1);
@@ -72,9 +75,9 @@ function plotSlopes(data, sortBy)
         xlim([1.5,3.5])
     end
     legend()
-    
-    outdir = sprintf('./Analysis/Slopes/slopes_by_%s/', filterBy);
-    mkdir(outdir)
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
     fname = sprintf('%s%s.png', outdir, animal);
     saveas(fig, fname)
     close()

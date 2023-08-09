@@ -1,4 +1,4 @@
-function xcorrBy(data, filterBy, filterValue, sortBy)
+function xcorrBy(data, filterBy, filterValue, sortBy, t0, t1, outdir)
 % computes and plots average cross correlations across different outcomes
 % or responses. filterBy and filterValue allow for filtering the data based
 % on properties like the animal, session_id, stimulus strength, etc. (see
@@ -14,8 +14,10 @@ function xcorrBy(data, filterBy, filterValue, sortBy)
     % for now, just separate by categorical outcome 
     if strcmp(sortBy, 'outcome')
         outcome_types = unique(data.categorical_outcome);
-        outdir = sprintf('./Xcorrs/%s_avgs-by-outcome/', filterBy);
-        mkdir(outdir)
+        
+        if ~exist(outdir, 'dir')
+            mkdir(outdir)
+        end
         for out_i = 1:length(outcome_types)
             % loop over possible outcomes 
             outcome = outcome_types(out_i);
@@ -31,8 +33,8 @@ function xcorrBy(data, filterBy, filterValue, sortBy)
                     ch2 = data_outcome.photometry_ch2{i,1}(:,2);
                     % just two seconds prior to stimulus 
                     t = data_outcome.photometry_ch1{i,1}(:,1) - data_outcome.stimulus_time(i);
-                    ch1 = ch1(t < 0 & t > -2);
-                    ch2 = ch2(t < 0 & t > -2);
+                    ch1 = ch1(t < t1 & t > t0);
+                    ch2 = ch2(t < t1 & t > t0);
                     [c, lag] = xcorr(ch1-mean(ch1), ch2-mean(ch2));
                     try
                         lags(i,:) = lag ./ Fs;
@@ -54,8 +56,9 @@ function xcorrBy(data, filterBy, filterValue, sortBy)
     elseif strcmp(sortBy, 'response')
         responses = [1,0];
         outcomes = {'go', 'no go'};
-        outdir = sprintf('./Xcorrs/%s_avgs-by-response/', filterBy);
-        mkdir(outdir)
+        if ~exist(outdir, 'dir')
+            mkdir(outdir)
+        end
         for out_i = 1:2
             outcome = outcomes{out_i};
             data_outcome = filterTrials(data, 'go-nogo', responses(out_i));
@@ -70,8 +73,8 @@ function xcorrBy(data, filterBy, filterValue, sortBy)
                     ch2 = data_outcome.photometry_ch2{i,1}(:,2);
                     % just two seconds prior to stimulus 
                     t = data_outcome.photometry_ch1{i,1}(:,1) - data_outcome.stimulus_time(i);
-                    ch1 = ch1(t < 0 & t > -2);
-                    ch2 = ch2(t < 0 & t > -2);
+                    ch1 = ch1(t < t1 & t > t0);
+                    ch2 = ch2(t < t1 & t > t0);
                     [c, lag] = xcorr(ch1-mean(ch1), ch2-mean(ch2));
                     try
                         lags(i,:) = lag ./ Fs;

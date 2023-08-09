@@ -1,4 +1,4 @@
-function avgFftBy(data, filterBy, filterValue, sortBy)
+function avgFftBy(data, filterBy, filterValue, sortBy, t0, t1, outdir)
 % average FFTs of photometry data for all trials filter by a particular feature.
 %   Example: avgFftBy(data, 'animal', '197', 'response')
 % would plot average FFTs of photometry traces for animal 197 sorted by go
@@ -12,8 +12,9 @@ function avgFftBy(data, filterBy, filterValue, sortBy)
     
     if strcmp(sortBy, 'outcome')
         outcome_types = unique(data.categorical_outcome);
-        outdir = sprintf('./FFTS/%s_avgs-by-outcome/', filterBy);
-        mkdir(outdir);
+        if ~exist(outdir, 'dir')
+            mkdir(outdir)
+        end
         for out_i = 1:length(outcome_types)
             outcome = outcome_types(out_i);
             sesh_outcome = filterTrials(data, 'categorical_outcome', outcome);
@@ -30,8 +31,8 @@ function avgFftBy(data, filterBy, filterValue, sortBy)
                 Ys2 = zeros(size(sesh_outcome,1),length(f));
                 for i = 1:size(photo,1)
                     t = photo{i,1}(:,1)-stim_times(i);
-                    y = photo{i,1}((t > -2 & t < 0) ,2);
-                    y2 = photo2{i,1}((t > -2 & t < 0) ,2);
+                    y = photo{i,1}((t > t0 & t < t1) ,2);
+                    y2 = photo2{i,1}((t > t0 & t < t1) ,2);
                     Y = fft(y-mean(y), n);    
                     Y2 = fft(y2-mean(y2), n);
                     Ys(i,:) = abs(Y(1:n/2+1));
@@ -54,8 +55,9 @@ function avgFftBy(data, filterBy, filterValue, sortBy)
     elseif strcmp(sortBy, 'response')
         responses = [1,0];
         outcomes = {'go', 'no go'};
-        outdir = sprintf('./FFTS/%s_avgs-by-response/', filterBy);
-        mkdir(outdir)
+        if ~exist(outdir, 'dir')
+            mkdir(outdir)
+        end
         for out_i = 1:length(outcomes)
             outcome = outcomes(out_i);
             sesh_outcome = filterTrials(data, 'go-nogo', responses(out_i));
@@ -72,8 +74,8 @@ function avgFftBy(data, filterBy, filterValue, sortBy)
                 Ys2 = zeros(size(sesh_outcome,1),length(f));
                 for i = 1:size(photo,1)
                     t = photo{i,1}(:,1)-stim_times(i);
-                    y = photo{i,1}((t > -2 & t < 0) ,2);
-                    y2 = photo2{i,1}((t > -2 & t < 0) ,2);
+                    y = photo{i,1}((t > t0 & t < t1) ,2);
+                    y2 = photo2{i,1}((t > t0 & t < t1) ,2);
                     Y = fft(y-mean(y), n);    
                     Y2 = fft(y2-mean(y2), n);
                     Ys(i,:) = abs(Y(1:n/2+1));
@@ -96,10 +98,16 @@ function avgFftBy(data, filterBy, filterValue, sortBy)
             end
         end
     end
-    t = sprintf('%s %s-%s', strrep(filterValue, '_', '-'), data.photometry_region_ch1{1}, data.photometry_region_ch2{1});
     subplot(2,1,1)
+    n = strsplit(data.session_id(1), '-');
+    animal = n(1);
+    t = sprintf('%s - %s', animal, data.photometry_region_ch1{1});
     title(t)
-    fname = sprintf('%s%s.png', outdir, filterValue);
+    subplot(2,1,2)
+    t = sprintf('%s - %s', animal, data.photometry_region_ch2{1});
+    title(t)
+    fname = sprintf('%s%s.png', outdir, animal);
+    subplot(2,1,2)
     legend()
     xlabel('Frequency (Hz)')
     ylabel('Power (mV^2)')

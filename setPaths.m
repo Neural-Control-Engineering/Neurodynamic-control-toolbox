@@ -91,7 +91,7 @@ elseif ispc
 elseif isunix
     if strcmp(getenv('HOSTNAME'), 'lepidus')
         % Path for analysis code repo
-        paths.repo_path = '/home/craig/Nuerodynamic-control-toolbox/';
+        paths.repo_path = '/home/craig/Neurodynamic-control-toolbox/';
 
         % Path to raw and analyzed data 
         paths.all_data_path = '/home/craig/somat_signal_detect/';
