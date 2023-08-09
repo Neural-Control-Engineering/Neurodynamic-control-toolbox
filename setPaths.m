@@ -96,6 +96,16 @@ elseif ispc
     % Add additional PCs here:
     
     end
+elseif isunix
+    if strcmp(getenv('HOSTNAME'), 'lepidus')
+        % Path for analysis code repo
+        paths.repo_path = '/home/craig/Nuerodynamic-control-toolbox/';
+
+        % Path to raw and analyzed data 
+        paths.all_data_path = '/home/craig/somat_signal_detect/';
+        paths.neuropixel.kilosort_repo = '/home/craig/Kilosort/';
+        paths.neuropixel.workingdir = pwd();
+    end
 end
 
 % Paths for raw data

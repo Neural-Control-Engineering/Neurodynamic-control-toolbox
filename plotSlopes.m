@@ -71,6 +71,7 @@ function plotSlopes(data, sortBy)
         subplot(2,1,2)
         xlim([1.5,3.5])
     end
+    legend()
     
     outdir = sprintf('./Analysis/Slopes/slopes_by_%s/', filterBy);
     mkdir(outdir)
