@@ -63,6 +63,32 @@ for i = 1:length(animals)
     avgTracesBy(data, 'animal', animal, 'response', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/all_stim_strengths/response/')); % separate averages by response (go / no go)
 end
 
+%% PLOT AVERAGED EMA PHOTOMETRY TRACES ALIGNED TO STIMULUS TIME
+% just want animals with recordings from both mPFC and S1 
+data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% get list of animals in filtered dataset 
+animals = fetchAnimals(data);
+% loop through animals, plot averaged trace for each
+t0 = -2; % begining of averaged epoch 
+t1 = 0; % end of average
+for i = 1:length(animals)
+    animal = num2str(animals(i));
+%     avgEMABy(data, 'animal', animal, 'outcome', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/all_stim_strengths/outcome/')); % separate averages by categorical outcome 
+    avgEMABy(data, 'animal', animal, 'response', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/all_stim_strengths/response/')); % separate averages by response (go / no go)
+end
+%% PLOT PHASES FOR PHOTOMETRY TRACES 0.5 s BEFORE STIMULUS
+data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% get list of animals in filtered dataset 
+animals = fetchAnimals(data);
+t0 = -0.5; % begining of averaged epoch 
+t1 = 0; % end of average
+for i = 1:length(animals)
+    animal = num2str(animals(i));
+    tmp = filterTrials(data, 'animal', animal);
+    plotPhases(tmp, 'outcome', t0, t1, fullfile(paths.repo_path,'Analysis/Slopes/all_stim_strength/outcome/'))
+    plotPhases(tmp, 'response', t0, t1, fullfile(paths.repo_path,'Analysis/Slopes/all_stim_strength/response/'))
+end
+
 %% PLOT SLOPES FOR PHOTOMETRY TRACES 0.5 s BEFORE STIMULUS
 % just want animals with recordings from both mPFC and S1 
 data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
