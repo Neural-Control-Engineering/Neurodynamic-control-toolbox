@@ -68,7 +68,7 @@ end
 data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
 % get list of animals in filtered dataset 
 animals = fetchAnimals(data);
-% loop through animals, plot averaged trace for each
+% loop through animals, plot averaged EMA for each
 t0 = -2; % begining of averaged epoch 
 t1 = 0; % end of average
 for i = 1:length(animals)
@@ -76,6 +76,7 @@ for i = 1:length(animals)
 %     avgEMABy(data, 'animal', animal, 'outcome', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/all_stim_strengths/outcome/')); % separate averages by categorical outcome 
     avgEMABy(data, 'animal', animal, 'response', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/all_stim_strengths/response/')); % separate averages by response (go / no go)
 end
+
 %% PLOT PHASES FOR PHOTOMETRY TRACES 0.5 s BEFORE STIMULUS
 data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
 % get list of animals in filtered dataset 
@@ -110,10 +111,11 @@ data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 t0 = -2.0; % begining of averaged epoch 
 t1 = 0; % end of average
+tbounds = [t0, t1];
 for i = 1:length(animals)
     animal = num2str(animals(i));
-    xcorrBy(data, 'animal', animal, 'response', t0, t1, fullfile(paths.repo_path,'Analysis/Xcorr/all_stim_strength/response/'));
-    xcorrBy(data, 'animal', animal, 'outcome', t0, t1, fullfile(paths.repo_path,'Analysis/Xcorr/all_stim_strength/outcome/'));
+    xcorrBy(data, 'animal', animal, 'response', 'stimulus_time', tbounds, fullfile(paths.repo_path,'Analysis/Xcorr/all_stim_strength/response/'));
+    xcorrBy(data, 'animal', animal, 'outcome', 'stimulus_time', tbounds, fullfile(paths.repo_path,'Analysis/Xcorr/all_stim_strength/outcome/'));
 end
 
 %% PLOT FFTS OF 2S OF PHOTOMETRY DATA PRIOR TO STIM AVERAGED ACROSS TRIALS FOR EACH ANIMAL 
@@ -127,3 +129,6 @@ for i = 1:length(animals)
     avgFftBy(data, 'animal', animal, 'response', t0, t1, fullfile(paths.repo_path, 'Analysis/FFTS/all_stim_strength/response/'));
     avgFftBy(data, 'animal', animal, 'outcome', t0, t1, fullfile(paths.repo_path, 'Analysis/FFTS/all_stim_strength/outcome/'));
 end
+
+%% COMPARE CROSS-CORRELATION OF NE RECORDINGS IN mPFC TO THOSE IN S1 DURING SPONTANEOUS AND EVOKED / STIMULUS-RELATED ACTIVITY 
+compareSponToEvokedXcorr(Datastore)
