@@ -6,17 +6,15 @@ import sys
 import matplotlib.pyplot as plt
 import ssm
 import autograd.numpy as np
-from NTEX_glmhmm_Model.LapseModel_ntex import lapse_model
-from NTEX_glmhmm_Model.lapse_utils_ntex import get_parmin, get_parmax, get_parstart, fit_lapse_multiple_init, \
+from LapseModel_ntex import lapse_model
+from lapse_utils_ntex import get_parmin, get_parmax, get_parstart, fit_lapse_multiple_init, \
     calculate_predictive_acc_lapse_model
-from NTEX_glmhmm_Model.glm_utils_ntex import fit_glm, calculate_predictive_acc_glm, \
+from glm_utils_ntex import fit_glm, calculate_predictive_acc_glm, \
     plot_input_vectors, append_zeros, fit_glm_multiple_init
-from NTEX_glmhmm_Model.glm_hmm_utils_ntex import calculate_predictive_acc_glmhmm_ntex_parted, \
+from glm_hmm_utils_ntex import calculate_predictive_acc_glmhmm_ntex_parted, \
     fit_glmhmm_multiple_init, get_posterior_states_labels, get_posterior_states_labels_parted
-from NTEX_glmhmm_Model.plotting_utils_ntex import plot_glmhmm_weights
+from plotting_utils_ntex import plot_glmhmm_weights
 
-# %%
-xxx
 # %% load example data the merged version or the parted version
 container = np.load('../example_data/'
                     'preprocessed_Input_Output_example_merged.npz',
