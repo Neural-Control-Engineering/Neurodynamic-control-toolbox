@@ -12,15 +12,13 @@ function xcorrBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outdir)
     colors = ['b', 'r', 'm', 'g', 'y', 'c'];
     fig = figure('Visible', 'off'); hold on;
 
-    
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
 
     % for now, just separate by categorical outcome 
     if strcmp(sortBy, 'outcome')
         outcome_types = unique(data.categorical_outcome);
-        
-        if ~exist(outdir, 'dir')
-            mkdir(outdir)
-        end
         for out_i = 1:length(outcome_types)
             % loop over possible outcomes 
             outcome = outcome_types(out_i);
@@ -67,9 +65,6 @@ function xcorrBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outdir)
     elseif strcmp(sortBy, 'response')
         responses = [1,0];
         outcomes = {'go', 'no go'};
-        if ~exist(outdir, 'dir')
-            mkdir(outdir)
-        end
         for out_i = 1:2
             outcome = outcomes{out_i};
             data_outcome = filterTrials(data, 'go-nogo', responses(out_i));
