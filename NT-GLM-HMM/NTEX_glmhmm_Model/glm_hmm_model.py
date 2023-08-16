@@ -132,11 +132,7 @@ for j in range(fold):
 print(Acc_HMM_5fold)
 
 plt.plot(Acc_HMM_5fold)
-plt.ion()
-plt.show()
+plt.savefig('accuracy_vs_fold.png')
 
 print("--- %s seconds ---" % (time.time() - start_time))
-                                  
-
-print("--- %s seconds ---" % (time.time() - start_time))
-
+                                
