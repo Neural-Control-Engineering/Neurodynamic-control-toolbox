@@ -20,7 +20,7 @@ from glm_hmm_utils_ntex import calculate_predictive_acc_glmhmm_ntex_parted, \
     fit_glmhmm_multiple_init, get_posterior_states_labels, get_posterior_states_labels_parted
 from plotting_utils_ntex import plot_glmhmm_weights
 
-target = '../../glmhmm_example_trimmed.mat'
+target = '../../glmhmm_example_trimmed_v2.mat'
 
 loaded = scipy.io.loadmat(target)
 loaded_mat_keys = loaded.keys()
