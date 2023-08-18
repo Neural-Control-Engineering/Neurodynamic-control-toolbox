@@ -13,7 +13,7 @@ function db = filterTrials(data, filterBy, value)
         inds = cellfun(@contains, data.session_id, name);
         db = data(inds,:);
     elseif strcmp(filterBy, 'session_id')
-        db = data(data.session_id,:);
+        db = data(data.session_id == value,:);
     elseif strcmp(filterBy, 'categorical_outcome')
         db = data(data.categorical_outcome == value, :);
     elseif strcmp(filterBy, 'go-nogo')

@@ -66,7 +66,7 @@ elseif ispc
         paths.repo_path = 'C:\Code\Neurodyanimcs-control-toolbox';
     
         % Drive letter for raw and analyzed data in customary file structure
-        paths.all_data_path = strcat('G:\.shortcut-targets-by-id\1yB5u8zHl-aBucQQEQZIgnPdQ1Re2j-5E\',source);
+        paths.all_data_path = strcat('G:\.shortcut-targets-by-id\1IEVe17fF9Kk50AdT4RUOVUxy_LJAvmgS\',source);
 
         paths.neuropixel.kilosort_repo = 'C:\Code\Neuropixel_Analysis_Scripts\Kilosort\';
 

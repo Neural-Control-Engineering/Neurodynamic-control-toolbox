@@ -1,4 +1,4 @@
-function avgTracesBy(data, filterBy, filterValue, sortBy, t0, t1, base_path)
+function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outdir)
 % average photometry data for all trials filtered by a particular feature. 
 %   Example: avgTracesBy(data, 'animal', '109', 'outcome')
 % would plot average photometry traces for animal 109 sorted by categorical
@@ -11,28 +11,37 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, t0, t1, base_path)
     colors = ['b', 'r', 'm', 'g', 'y', 'c'];
     fig = figure('Visible', 'off'); hold on;
 
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
+
     if strcmp(sortBy, 'outcome')
         outcome_types = unique(data.categorical_outcome);
-        outdir = base_path;
-        if ~exist(outdir, 'dir')
-            mkdir(outdir)
-        end
+        
         for out_i = 1:length(outcome_types)
             % loop over possible outcomes 
             outcome = outcome_types(out_i);
             data_outcome  = filterTrials(data, 'categorical_outcome', outcome);
             Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
-            ch1mat = zeros(size(data_outcome,1), round(Fs*2));
+            ch1mat = zeros(size(data_outcome,1), round(Fs*diff(tbound)));
             ch2mat = ch1mat;
+
+            % determine alignments 
+            if strcmp(alignTo, 'stimulus_time')
+                starts = data_outcome.stimulus_time;
+            elseif strcmp(alignTo, 'response_time')
+                starts = data_outcome.stimulus_time + data_outcome.response_time;
+            end
+
             if ~isempty(data_outcome)
                 for i = 1:size(data_outcome,1)
                     ch1 = data_outcome.photometry_ch1{i,1}(:,2);
                     ch2 = data_outcome.photometry_ch2{i,1}(:,2);
                     % just two seconds prior to stimulus 
-                    t = data_outcome.photometry_ch1{i,1}(:,1) - data_outcome.stimulus_time(i);
-                    ch1 = ch1(t > t0 & t < t1);
-                    ch2 = ch2(t > t0 & t < t1);
-                    t = t(t > t0 & t < t1);
+                    t = data_outcome.photometry_ch1{i,1}(:,1) - starts(i);
+                    ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+                    ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+                    t = t(t > tbounds(1) & t < tbounds(2));
                     try
                         ch1mat(i,:) = ch1;
                         ch2mat(i,:) = ch2;
@@ -62,25 +71,30 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, t0, t1, base_path)
     elseif strcmp(sortBy, 'response')
         responses = [1,0];
         outcomes = {'go', 'no go'};
-        outdir = base_path;
-        if ~exist(outdir, 'dir')
-            mkdir(outdir)
-        end
+        
         for out_i = 1:2
             outcome = outcomes{out_i};
             data_outcome = filterTrials(data, 'go-nogo', responses(out_i));
             Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
-            ch1mat = zeros(size(data_outcome,1), round(Fs*2));
+            ch1mat = zeros(size(data_outcome,1), round(Fs*diff(tbounds)));
             ch2mat = ch1mat;
+
+            % determine alignments 
+            if strcmp(alignTo, 'stimulus_time')
+                starts = data_outcome.stimulus_time;
+            elseif strcmp(alignTo, 'response_time')
+                starts = data_outcome.stimulus_time + data_outcome.response_time;
+            end
+
             if ~isempty(data_outcome)
                 for i = 1:size(data_outcome,1)
                     ch1 = data_outcome.photometry_ch1{i,1}(:,2);
                     ch2 = data_outcome.photometry_ch2{i,1}(:,2);
                     % just two seconds prior to stimulus 
-                    t = data_outcome.photometry_ch1{i,1}(:,1) - data_outcome.stimulus_time(i);
-                    ch1 = ch1(t > t0 & t < t1);
-                    ch2 = ch2(t > t0 & t < t1);
-                    t = t(t > t0 & t < t1);
+                    t = data_outcome.photometry_ch1{i,1}(:,1) - starts(i);
+                    ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+                    ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+                    t = t(t > tbounds(1) & t < tbounds(2));
                     try
                         ch1mat(i,:) = ch1;
                         ch2mat(i,:) = ch2;
