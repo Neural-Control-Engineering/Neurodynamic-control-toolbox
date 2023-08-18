@@ -149,7 +149,7 @@ compareSponToEvokedXcorr(Datastore)
 %% PLOT AVERAGED PHOTOMETRY TRACES ALIGNED TO STIMULUS TIME ONLY IN PHASE II OR III
 % just want animals with recordings from both mPFC and S1 
 data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
-phases = {'Phase II', 'Phase III'}
+phases = {'Phase II', 'Phase III'};
 % get list of animals in filtered dataset 
 animals = fetchAnimals(data);
 % loop through animals, plot averaged trace for each

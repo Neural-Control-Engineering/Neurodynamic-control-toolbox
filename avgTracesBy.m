@@ -22,8 +22,9 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outd
             % loop over possible outcomes 
             outcome = outcome_types(out_i);
             data_outcome  = filterTrials(data, 'categorical_outcome', outcome);
-            Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
-            ch1mat = zeros(size(data_outcome,1), round(Fs*diff(tbound)));
+            % Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
+            Fss = getFs(data_outcome);
+            ch1mat = zeros(size(data_outcome,1), round(max(Fss)*diff(tbound)));
             ch2mat = ch1mat;
 
             % determine alignments 
@@ -35,17 +36,17 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outd
 
             if ~isempty(data_outcome)
                 for i = 1:size(data_outcome,1)
-                    ch1 = data_outcome.photometry_ch1{i,1}(:,2);
-                    ch2 = data_outcome.photometry_ch2{i,1}(:,2);
-                    % just two seconds prior to stimulus 
-                    t = data_outcome.photometry_ch1{i,1}(:,1) - starts(i);
-                    ch1 = ch1(t > tbounds(1) & t < tbounds(2));
-                    ch2 = ch2(t > tbounds(1) & t < tbounds(2));
-                    t = t(t > tbounds(1) & t < tbounds(2));
-                    try
+                    if Fss(i) == max(Fss)
+                        ch1 = data_outcome.photometry_ch1{i,1}(:,2);
+                        ch2 = data_outcome.photometry_ch2{i,1}(:,2);
+                        % just two seconds prior to stimulus 
+                        t = data_outcome.photometry_ch1{i,1}(:,1) - starts(i);
+                        ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+                        ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+                        t = t(t > tbounds(1) & t < tbounds(2));
                         ch1mat(i,:) = ch1;
                         ch2mat(i,:) = ch2;
-                    catch
+                    else
                         ch1mat(i,:) = nan(1,size(ch1mat,2));
                         ch2mat(i,:) = nan(1,size(ch2mat,2));
                     end
@@ -75,8 +76,9 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outd
         for out_i = 1:2
             outcome = outcomes{out_i};
             data_outcome = filterTrials(data, 'go-nogo', responses(out_i));
-            Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
-            ch1mat = zeros(size(data_outcome,1), round(Fs*diff(tbounds)));
+            % Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
+            Fss = getFs(data_outcome);
+            ch1mat = zeros(size(data_outcome,1), round(max(Fss)*diff(tbounds)));
             ch2mat = ch1mat;
 
             % determine alignments 
@@ -88,17 +90,17 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outd
 
             if ~isempty(data_outcome)
                 for i = 1:size(data_outcome,1)
-                    ch1 = data_outcome.photometry_ch1{i,1}(:,2);
-                    ch2 = data_outcome.photometry_ch2{i,1}(:,2);
-                    % just two seconds prior to stimulus 
-                    t = data_outcome.photometry_ch1{i,1}(:,1) - starts(i);
-                    ch1 = ch1(t > tbounds(1) & t < tbounds(2));
-                    ch2 = ch2(t > tbounds(1) & t < tbounds(2));
-                    t = t(t > tbounds(1) & t < tbounds(2));
-                    try
+                    if Fss(i) == max(Fss)
+                        ch1 = data_outcome.photometry_ch1{i,1}(:,2);
+                        ch2 = data_outcome.photometry_ch2{i,1}(:,2);
+                        % just two seconds prior to stimulus 
+                        t = data_outcome.photometry_ch1{i,1}(:,1) - starts(i);
+                        ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+                        ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+                        t = t(t > tbounds(1) & t < tbounds(2));
                         ch1mat(i,:) = ch1;
                         ch2mat(i,:) = ch2;
-                    catch
+                    else
                         ch1mat(i,:) = nan(1,size(ch1mat,2));
                         ch2mat(i,:) = nan(1,size(ch2mat,2));
                     end
