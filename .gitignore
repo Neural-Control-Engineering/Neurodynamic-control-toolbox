@@ -3,3 +3,5 @@
 neuropixel-utils/
 test_ground.m
 random_licks.m
+NT-GLM-HMM/NTEX_glmhmm_Model/training_cache/
+NT-GLM-HMM/results/
