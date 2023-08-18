@@ -13,9 +13,10 @@ function genHmmGlmData(data, outfile)
     for i = 1:length(sessions)
         tmp = filterTrials(data, 'session_id', sessions{i});
         photo_metrics = getPhotometryMetrics(tmp, 'stimulus_time', [0,1]);
-        preprocessed_input{i,1} = photo_metrics(1:end-1,:);
+        stim_strengths = tmp.stimulus_strength;
+        preprocessed_input{i,1} = [photo_metrics(1:end-1,:), stim_strengths(2:end)];
         preprocessed_session{i,1} = sessions{i};
-        preprocessed_label{i,1} = tmp.go_nogo(2:end);
+        preprocessed_label{i,1} = num2cell(tmp.go_nogo(2:end));
         preprocessed_trial_number{i,1} = tmp.sequential_trial_number(2:end);
     end
 

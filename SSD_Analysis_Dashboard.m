@@ -145,3 +145,19 @@ end
 
 %% COMPARE CROSS-CORRELATION OF NE RECORDINGS IN mPFC TO THOSE IN S1 DURING SPONTANEOUS AND EVOKED / STIMULUS-RELATED ACTIVITY 
 compareSponToEvokedXcorr(Datastore)
+
+%% PLOT AVERAGED PHOTOMETRY TRACES ALIGNED TO STIMULUS TIME ONLY IN PHASE II OR III
+% just want animals with recordings from both mPFC and S1 
+data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+phases = {'Phase II', 'Phase III'};
+% get list of animals in filtered dataset 
+animals = fetchAnimals(data);
+% loop through animals, plot averaged trace for each
+tbounds = [-0.5, 1.0];
+for p = 1:length(phases)
+    tmp = filterTrials(data, 'phase', phases{p});
+    for i = 1:length(animals)
+        animal = num2str(animals(i));
+        avgTracesBy(tmp, 'animal', animal, 'response', 'stimulus_time' ,tbounds, strrep(strcat(paths.repo_path,'Analysis/avgTracesAfterStim/', phases{p},'/'),' ', '_')); % separate averages by response (go / no go)
+    end
+end
