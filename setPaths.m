@@ -97,6 +97,13 @@ elseif isunix
         paths.all_data_path = '/home/craig/somat_signal_detect/';
         paths.neuropixel.kilosort_repo = '/home/craig/Kilosort/';
         paths.neuropixel.workingdir = pwd();
+    elseif strcmp(getenv('HOSTNAME'), 'Genoma')
+        % Path for analysis code repo
+        paths.repo_path = '/home/genoma/Neurodynamic-control-toolbox/';
+        % Path to raw and analyzed data 
+        paths.all_data_path = '/home/genoma/SSD_Data/';
+        paths.neuropixel.kilosort_repo = '/home/genoma/Kilosort/';
+        paths.neuropixel.workingdir = pwd();
     end
 end
 
@@ -114,7 +121,7 @@ paths.processed_photometry_data = fullfile(paths.all_data_path,'Processed Photom
 paths.processed_pupil_data = fullfile(paths.all_data_path,'Processed Pupil Data');
 paths.processed_whisker_data = fullfile(paths.all_data_path,'Processed Whisker Data');
 paths.processed_neuropixel_data = fullfile(paths.all_data_path,'Processed Neuropixel Data');
-paths.datastore = fullfile(paths.all_data_path,"Datastores");
+paths.datastore = fullfile(paths.all_data_path,'Datastores');
 
 % Store which project data is actively being used
 paths.data_source = source;

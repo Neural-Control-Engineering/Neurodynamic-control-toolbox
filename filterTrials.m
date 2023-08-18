@@ -22,6 +22,8 @@ function db = filterTrials(data, filterBy, value)
         db = data(data.stimulus_strength < value, :);
     elseif strcmp(filterBy, 'stim_strength_greater_than')
         db = data(data.stimulus_strength > value, :);
+    elseif strcmp(filterBy, 'phase')
+        db = data(data.phase == value, :);
     elseif strcmp(filterBy, 'recording_location')
         name = cell(size(data,1),1);
         for i = 1:size(data,1)
