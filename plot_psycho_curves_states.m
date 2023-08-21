@@ -8,7 +8,7 @@ hold on;
 
 strengths = [0, 0.2, 0.5, 1, 2, 4];
 cols = ['b', 'r', 'g', 'c', 'y'];
-for i = [0,1,2,3,4]
+for i = [0,1,2]
     tmp = data(find(predicted_states == i),:);
     sessions = unique(tmp.session_id);
     mat = nan(size(sessions,1), length(strengths));
