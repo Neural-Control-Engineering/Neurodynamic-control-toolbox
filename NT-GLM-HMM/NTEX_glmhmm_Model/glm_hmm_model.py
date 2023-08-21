@@ -23,7 +23,10 @@ from plotting_utils_ntex import plot_glmhmm_weights
 import multiprocessing
 
 # target = '../../glmhmm_example_trimmed_v2.mat'
-target = '/home/craig/ntex/GLM_HMM_Data/preprocessed_data/preprocessed_240_241_242_243_Datastore_created_26-Mar-2023.mat'
+# target = '/home/craig/ntex/GLM_HMM_Data/preprocessed_data/preprocessed_240_241_242_243_Datastore_created_26-Mar-2023.mat'
+# target = '../../all_mpfc_s1_glmhmm.mat'
+# target = '../../all_mpfc_s1_glmhmm_spontaneous.mat'
+target = '../../all_mpfc_s1_glmhmm_before_stim.mat'
 
 loaded = scipy.io.loadmat(target)
 loaded_mat_keys = loaded.keys()
@@ -44,7 +47,7 @@ transition_alpha = 1  # Hyperparameter
 prior_sigma = 100  # Hyperparameter
 K_states = 3  # Number of states you wish to observe
 
-n_init = 5 # number of times for independent runs in which the one with the best predictive acc would be selected out
+n_init = 3 # number of times for independent runs in which the one with the best predictive acc would be selected out
 N_em_iters = 500  # number of max iterations for the expectation-maximization algorithm, which is set to prevent non-converging situation
 global_fit = True  # If global_fit true, use GLM parameter as initial params for glmhmm
 # If global_fit false, pretrained glmhmm params are needed and used as as initial params for glmhmm
@@ -60,14 +63,11 @@ M_HMM = N_property  # Number of inputs for each trial for the model
 input_index_hmm = list(range(0, M_HMM))
 
 data_size = len(input_shuffled)
-Acc_GLM_5fold = []
-# Param_GLM_5fold = []
-# Acc_HMM_5fold = []
-# Param_HMM_5fold = []
 
+# generate input and output objects compatible with multiprocessing 
 manager = multiprocessing.Manager()
-return_dict = manager.dict()
-input_data = [(input_shuffled, y_shuffled, M_GLM, M_HMM, C, D, i) for i in range(fold)]
+return_dict = manager.dict() # output 
+input_data = [(input_shuffled, y_shuffled, M_GLM, M_HMM, C, D, i) for i in range(fold)] # list of input tuples
 
 def train(inputs):
     # parse inputs
@@ -124,8 +124,6 @@ def train(inputs):
         input_this_train_glm, y_this_train_glm,
         input_this_test_glm, y_this_test_glm,
         M_GLM, C, n_init)
-    # return_dict['Param_GLM_5fold'] = return_dict['Param_GLM_5fold'] + best_param_glm
-    # return_dict['Param_GLM_5fold'] = return_dict['Param_GLM_5fold'] + best_acc_glm
     tmp_dict = {}
     tmp_dict['Param_GLM_5fold'] = [best_param_glm, best_acc_glm]
 
@@ -154,11 +152,8 @@ Acc_HMM_5fold = [return_dict[key]['Acc_HMM_5fold'] for key in return_dict.keys()
 Param_HMM_5fold = [return_dict[key]['Param_HMM_5fold'] for key in return_dict.keys()]
 Param_GLM_5fold = [return_dict[key]['Param_GLM_5fold'] for key in return_dict.keys()]
 
-# Best_param = Param_HMM_5fold[Acc_HMM_5fold.index(max(Acc_HMM_load))]
 Best_param = Param_HMM_5fold[Acc_HMM_5fold.index(max(Acc_HMM_5fold))]
-K_states = 3
-#input_compatible
-#label_compatible
+
 # states_probs: for each trial what is its probability in state1, state2 and so on
 # predicted_states: basically find the max one among the states_probs for each trial
 # predicted_response_prob: the predicted probability of response
@@ -168,108 +163,24 @@ states_probs, predicted_states, predicted_label, predicted_response_prob = \
         input_compatible, label_compatible,
         Best_param, K_states, range(K_states))
 
+
 results_dir = '../results/'
 time_str =  datetime.now().strftime("%Y-%m-%d-%H%M%S")
-np.savez(results_dir+'predicted_states_and_labels_24x_NEmice_' + time_str + '.npz',
+np.savez(results_dir+'all_mpfc_s1_glmhmm_beforeStim_3state_' + time_str + '.npz',
          states_probs,
          predicted_states,
          predicted_response_prob,
          predicted_label
          )
 # result_dir_2matlab = "/mnt/g/My Drive/#Projects/Project_Neurotransmitter-Exploration/GLM_HMM_Data/GLM_HMM_processed_result/"
-result_dir_2matlab = "./"
-scipy.io.savemat(result_dir_2matlab+'predicted_states_and_labels_24x_NEmice_Python2mat' + time_str +'.mat',
+result_dir_2matlab = results_dir
+scipy.io.savemat(result_dir_2matlab+'all_mpfc_s1_glmhmm_beforeStim_3state_Python2mat' + time_str +'.mat',
                  dict(
                      states_probs = states_probs,
                      predicted_states = predicted_states,
                      predicted_response_prob = predicted_response_prob,
                      predicted_label = predicted_label,
                  ))
-
-# result_dir_2matlab = "/mnt/g/My Drive/#Projects/Project_Neurotransmitter-Exploration/GLM_HMM_Data/GLM_HMM_processed_result/"
-result_dir_2matlab = "./"
-scipy.io.savemat(result_dir_2matlab+'predicted_states_and_labels_24x_NEmice_Python2mat' + time_str +'.mat',
-                 dict(
-                     states_probs = states_probs,
-                     predicted_states = predicted_states,
-                     predicted_response_prob = predicted_response_prob,
-                     predicted_label = predicted_label,
-                 ))
-
-# train(input_data[0])
-
-
-# for j in range(fold):
-#     # get hmm training and test set, for hmm training, the data should be parted into sessions
-#     input_this_test_hmm = [
-#         x[:, input_index_hmm]
-#         for c, x in enumerate(input_shuffled)
-#         if j*len(input_shuffled)/fold <= c <= (j+1)*len(input_shuffled)/fold]
-#     y_this_test_hmm = [
-#         x[:, :]
-#         for c, x in enumerate(y_shuffled)
-#         if j*len(input_shuffled)/fold <= c <= (j+1)*len(input_shuffled)/fold]
-#     input_this_train_hmm = [
-#         x[:, input_index_hmm]
-#         for c, x in enumerate(input_shuffled)
-#         if c < j*len(input_shuffled)/fold or c > (j+1)*len(input_shuffled)/fold]
-#     y_this_train_hmm = [
-#         x[:, :]
-#         for c, x in enumerate(y_shuffled)
-#         if c < j*len(input_shuffled)/fold or c > (j+1)*len(input_shuffled)/fold]
-
-#     # get glm training and test set, for glm training, the data should not be parted, that concatenaed
-#     input_this_test_glm = []
-#     input_this_train_glm = []
-#     y_this_test_glm = []
-#     y_this_train_glm = []
-#     for c, x in enumerate(input_shuffled):
-#         if j*len(input_shuffled)/ fold <= c <= (j + 1)*len(input_shuffled)/ fold:
-#             if len(input_this_test_glm) == 0:
-#                 input_this_test_glm = x[:, input_index_glm]
-#                 y_this_test_glm = y_shuffled[c]
-#             else:
-#                 input_this_test_glm = np.concatenate((
-#                     input_this_test_glm, x[:, input_index_glm]))
-#                 y_this_test_glm = np.concatenate((
-#                     y_this_test_glm, y_shuffled[c]))
-#         else:
-#             if len(input_this_train_glm) == 0:
-#                 input_this_train_glm = x[:, input_index_glm]
-#                 y_this_train_glm = y_shuffled[c]
-#             else:
-#                 input_this_train_glm = np.concatenate((
-#                     input_this_train_glm, x[:, input_index_glm]))
-#                 y_this_train_glm = np.concatenate((
-#                     y_this_train_glm, y_shuffled[c]))
-
-#     # run GLM model training
-#     best_param_glm, best_acc_glm = fit_glm_multiple_init(
-#         input_this_train_glm, y_this_train_glm,
-#         input_this_test_glm, y_this_test_glm,
-#         M_GLM, C, n_init)
-#     Param_GLM_5fold.append(best_param_glm)
-#     Param_GLM_5fold.append(best_acc_glm)
-
-#     # start GLM HMM training
-#     now = datetime.now()
-#     time_str = now.strftime("%Y-%m-%d-%H%M%S")
-#     weights_glmhmm_example, acc_glmhmm_example = fit_glmhmm_multiple_init(
-#         input_this_train_hmm, y_this_train_hmm,
-#         input_this_test_hmm, y_this_test_hmm,
-#         [np.ones([len(x), 1]) for x in y_this_train_hmm],
-#         # this parameter provides a function to exclude some trials, if you want to use all trials,
-#         # create a matrix of ones in the same shape as the y dataset
-#         K_states, D, M_HMM, C, N_em_iters, transition_alpha,
-#         prior_sigma, global_fit, best_param_glm,
-#         'training_cache/glmhmm_' + time_str,
-#         n_init, partition=True)
-#     Param_HMM_5fold.append(weights_glmhmm_example)
-#     Acc_HMM_5fold.append(acc_glmhmm_example)
-# print(Acc_HMM_5fold)
-
-# plt.plot(Acc_HMM_5fold)
-# plt.savefig('accuracy_vs_fold.png')
 
 print("--- %s seconds ---" % (time.time() - start_time))
                                 
