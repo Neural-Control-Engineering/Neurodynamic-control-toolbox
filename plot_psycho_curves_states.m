@@ -1,3 +1,6 @@
+% script for plotting psychometric curves based on states identified by glm-hmm
+% Craig Kelley, NEC Lab, 8/21/23
+
 % load('NT-GLM-HMM/results/all_mpfc_s1_glmhmm_spontaneous_Python2mat2023-08-21-101138.mat')
 % load ('NT-GLM-HMM/results/all_mpfc_s1_glmhmm_spontaneous_4state_Python2mat2023-08-21-105220.mat')
 % load('NT-GLM-HMM/results/all_mpfc_s1_glmhmm_spontaneous_5state_Python2mat2023-08-21-122631.mat')

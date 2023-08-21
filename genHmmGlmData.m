@@ -1,4 +1,8 @@
 function genHmmGlmData(data, outfile, version)
+% function saves input data in a format compatible with glm-hmm.
+% user can specify the type of data to save with *version*.
+% data is saved to *outfile*.
+% Craig Kelley, NEC Lab, 8/21/23
     
     % trial_onset_inds = find(cellfun(@isempty, data.ISI));
     % trial_inds = find(~cellfun(@isempty, data.ISI));
