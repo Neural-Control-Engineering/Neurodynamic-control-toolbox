@@ -161,3 +161,6 @@ for p = 1:length(phases)
         avgTracesBy(tmp, 'animal', animal, 'response', 'stimulus_time' ,tbounds, strrep(strcat(paths.repo_path,'Analysis/avgTracesAfterStim/', phases{p},'/'),' ', '_')); % separate averages by response (go / no go)
     end
 end
+
+%% COMPARE AVG PHOTOMETRY TRACES IN PHASES II VS PHASE III FOR ALL HIT TRIALS
+comparePhaseIItoIIItraces(Datastore)
