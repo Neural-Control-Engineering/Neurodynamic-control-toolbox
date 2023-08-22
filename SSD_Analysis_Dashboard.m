@@ -25,6 +25,9 @@ analysis_params.process_neuropixel = false;
 % Determine which computer is running the script and set the various file locations accordingly
 [paths] = setPaths("Project_Somatosensory-Signal-Detection");
 
+%% Alternatively, if you want to load the second dataset with stimuli of 0, 0.5, 1, 2, 10, 20 psi
+[paths] = setPaths("Project_Neurodynamic-Control");
+
 %% PROCESS RAW DATA FROM SOURCE
 [animals_to_load,analysis_progress,resets,wbar] = selectAnimals(paths);
 
@@ -46,8 +49,23 @@ close(wbar)
 updateDLCData(paths,resets,"pupil");
 
 %% GENERATE DATASTORE OR LOAD DATASTORE
-%[Datastore] = generateDatabase(paths,analysis_params,animals_to_load);
-Datastore = load(fullfile(paths.datastore,"NE_dstore_cleaned02-Aug-2023.mat"));
+
+% Indicate which phases to include and generate new database
+% analysis_params.phase_selection = {'Phase 0','Phase I','Phase II','Phase III'};
+% [Datastore] = generateDatabase(paths,analysis_params,animals_to_load,"combined");
+
+% Clean datastore to the standard version being used in analysis
+% filters.NT = ["NE"];
+% filters.Phase = ["Phase II","Phase III"];
+% NE_dstore = Dstore_fetchSubset(Datastore,filters);
+% save_loc = fullfile(paths.all_data_path,'Datastores');
+% save(fullfile(save_loc,strcat("NE_dstore_",string(datetime("today")),".mat")), 'NE_dstore','-v7.3');
+
+% Load SSDv1 NE data
+%Datastore = load(fullfile(paths.datastore,"NE_dstore_cleaned02-Aug-2023.mat"));
+
+% Load SSDv2 NE data
+Datastore = load(fullfile(paths.datastore,"NE_dstore_cleaned_22-Aug-2023.mat"));
 
 %% PLOT AVERAGED PHOTOMETRY TRACES ALIGNED TO STIMULUS TIME
 % just want animals with recordings from both mPFC and S1 

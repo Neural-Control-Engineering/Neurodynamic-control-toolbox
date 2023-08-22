@@ -2,7 +2,7 @@ function [animals_to_load,analysis_progress,resets,wbar] = selectAnimals(paths)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-if strcmp(paths.data_source,"Project_Neurotransmitter-Exploration")
+if strcmp(paths.data_source,"Project_Neurodynamic-Control")
     animals = dir(fullfile(paths.raw_behavior_data,'*-*.mat'));
     temp_animals = strings(length(animals),1);
 
