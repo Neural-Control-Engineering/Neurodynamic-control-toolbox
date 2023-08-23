@@ -1,6 +1,6 @@
 function fig = comparePhaseIItoIIItraces(Datastore)
     data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
-    data = filterTrials(data, 'categorical_outcome', 'Hit');
+    data = filterTrials(data, 'categorical_outcome', 'Miss');
     phases = {'Phase II', 'Phase III'};
     tbounds = [-0.5, 1.0];
     colors = ['b', 'r'];

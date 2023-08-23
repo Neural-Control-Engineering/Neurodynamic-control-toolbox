@@ -181,4 +181,9 @@ for p = 1:length(phases)
 end
 
 %% COMPARE AVG PHOTOMETRY TRACES IN PHASES II VS PHASE III FOR ALL HIT TRIALS
+x = cellfun(@isempty, Datastore.NE_dstore.photometry_ch1);
+Datastore.NE_dstore(find(x), :) = [];
 comparePhaseIItoIIItraces(Datastore)
+
+%% COMPARE AVG PHOTOMETRY TRACES IN PHASES II VS PHASE III FOR ALL HIT TRIALS
+comparePhaseIItoIIItracesByAnimal(Datastore)
