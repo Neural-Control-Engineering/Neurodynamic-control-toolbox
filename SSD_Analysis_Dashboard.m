@@ -58,6 +58,7 @@ updateDLCData(paths,resets,"pupil");
 % filters.NT = ["NE"];
 % filters.Phase = ["Phase II","Phase III"];
 % NE_dstore = Dstore_fetchSubset(Datastore,filters);
+% Dstore_cleanmissingdata(NE_dstore);
 % save_loc = fullfile(paths.all_data_path,'Datastores');
 % save(fullfile(save_loc,strcat("NE_dstore_",string(datetime("today")),".mat")), 'NE_dstore','-v7.3');
 
