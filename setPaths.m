@@ -95,6 +95,7 @@ elseif isunix
 
         % Path to raw and analyzed data 
         paths.all_data_path = '/home/craig/somat_signal_detect/';
+        % paths.all_data_path = '/home/craig/ntex/';
         paths.neuropixel.kilosort_repo = '/home/craig/Kilosort/';
         paths.neuropixel.workingdir = pwd();
     elseif strcmp(getenv('HOSTNAME'), 'Genoma')

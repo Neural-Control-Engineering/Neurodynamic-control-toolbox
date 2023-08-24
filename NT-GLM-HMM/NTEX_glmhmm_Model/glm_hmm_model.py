@@ -21,12 +21,18 @@ from glm_hmm_utils_ntex import calculate_predictive_acc_glmhmm_ntex_parted, \
     fit_glmhmm_multiple_init, get_posterior_states_labels, get_posterior_states_labels_parted
 from plotting_utils_ntex import plot_glmhmm_weights
 import multiprocessing
+import argparse
 
-# target = '../../glmhmm_example_trimmed_v2.mat'
-# target = '/home/craig/ntex/GLM_HMM_Data/preprocessed_data/preprocessed_240_241_242_243_Datastore_created_26-Mar-2023.mat'
-# target = '../../all_mpfc_s1_glmhmm.mat'
-# target = '../../all_mpfc_s1_glmhmm_spontaneous.mat'
-target = '../../all_mpfc_s1_glmhmm_before_stim.mat'
+# parser command line arguments 
+parser = argparse.ArgumentParser(description = '''Run glm-hmm''')
+parser.add_argument('--target', nargs='?', type=str, default='../../ssd_v2_glm_hmm_spon_data.mat')
+parser.add_argument('--K_states', nargs='?', type=int, default=3)
+parser.add_argument('--results_dir', nargs='?', type=str, default='../results/')
+args = parser.parse_args()
+target = args.target
+K_states = args.K_states
+results_dir = args.results_dir
+
 
 loaded = scipy.io.loadmat(target)
 loaded_mat_keys = loaded.keys()
@@ -45,7 +51,6 @@ C = 2  # number of output types/categories here with only two: response or not
 D = 1  # dimension of data (observations)
 transition_alpha = 1  # Hyperparameter
 prior_sigma = 100  # Hyperparameter
-K_states = 3  # Number of states you wish to observe
 
 n_init = 3 # number of times for independent runs in which the one with the best predictive acc would be selected out
 N_em_iters = 500  # number of max iterations for the expectation-maximization algorithm, which is set to prevent non-converging situation
@@ -54,7 +59,6 @@ global_fit = True  # If global_fit true, use GLM parameter as initial params for
 
 
 # get time now and result storing path to saving data such as the trained glmhmm parameters
-results_dir = '../results/'
 N_property = len(input_shuffled[0][0])
 M_GLM = N_property-1  # Number of inputs for each trial for the model
 # Since GLM model already has the bias colum, so remove this column before feeding to it, which is column 4
@@ -164,23 +168,27 @@ states_probs, predicted_states, predicted_label, predicted_response_prob = \
         Best_param, K_states, range(K_states))
 
 
-results_dir = '../results/'
+results_dir = '../results_v2/'
+fname = target.split('.')[-2].split('/')[-1]
 time_str =  datetime.now().strftime("%Y-%m-%d-%H%M%S")
-np.savez(results_dir+'all_mpfc_s1_glmhmm_beforeStim_3state_' + time_str + '.npz',
+np.savez(results_dir+ fname + '_' + str(K_states) + 'state.npz',
          states_probs,
          predicted_states,
          predicted_response_prob,
-         predicted_label
+         predicted_label,
+         Acc_HMM_5fold
          )
 # result_dir_2matlab = "/mnt/g/My Drive/#Projects/Project_Neurotransmitter-Exploration/GLM_HMM_Data/GLM_HMM_processed_result/"
 result_dir_2matlab = results_dir
-scipy.io.savemat(result_dir_2matlab+'all_mpfc_s1_glmhmm_beforeStim_3state_Python2mat' + time_str +'.mat',
+scipy.io.savemat(result_dir_2matlab + fname + '_' + str(K_states) + 'state_Python2mat.mat',
                  dict(
                      states_probs = states_probs,
                      predicted_states = predicted_states,
                      predicted_response_prob = predicted_response_prob,
                      predicted_label = predicted_label,
+                     accuracy = Acc_HMM_5fold
                  ))
 
+print('%s mean accuracy: %f' % (fname, np.mean(Acc_HMM_5fold)))
 print("--- %s seconds ---" % (time.time() - start_time))
                                 

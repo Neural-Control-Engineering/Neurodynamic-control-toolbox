@@ -1,0 +1,49 @@
+#!/usr/bin/bash 
+source ~/.bashrc
+conda activate glmhmm 
+cd ~/Neurodynamic-control-toolbox/NT-GLM-HMM/NTEX_glmhmm_Model/
+python3 glm_hmm_model.py --target=../animal_data/3316_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/3258_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/3133_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/200_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/199_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/198_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/197_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/196_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/180_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/167_spon_photo_pupil_v2.mat --K_states=5
+python3 glm_hmm_model.py --target=../animal_data/152_spon_photo_pupil_v2.mat --K_states=5
+# python3 glm_hmm_model.py --target=../animal_data/3316_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/3258_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/3133_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/200_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/199_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/198_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/197_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/196_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/180_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/167_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/152_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data/3316_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/3258_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/3133_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/200_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/199_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/198_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/197_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/196_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/180_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/167_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/152_spon_photo_pupil_v2.mat --K_states=3
+# python3 glm_hmm_model.py --target=../animal_data/3316_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/3258_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/3133_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/200_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/199_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/198_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/197_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/196_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/180_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/167_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/152_spon_photo_pupil_v2.mat --K_states=4
+# python3 glm_hmm_model.py --target=../animal_data/151_spon_photo_pupil_v2.mat --K_states=2
