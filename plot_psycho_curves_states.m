@@ -31,7 +31,11 @@ function plot_psycho_curves_states(filename, data, animal, outdir)
         end
         n = length(sessions);
         % semshade(mat(:,2:end), 0.3, cols(i+1), cols(i+1), strengths(2:end), 1, sprintf('State %i (n=%i)', i, n));
-        semshade(mat(:,2:end), 0.3, cols(i+1), cols(i+1), strengths(2:end), 1, sprintf('State %i (n=%i)', i, n));
+        try
+            semshade(mat(:,2:end), 0.3, cols(i+1), cols(i+1), strengths(2:end), 1, sprintf('State %i (n=%i)', i, n));
+        catch
+            plot(strengths(2:end), mat(2:end), 'DisplayName', sprintf('State %i (n=%i)', i, n))
+        end
         hold on
     end
     xlabel('Stimulus Strength (x10 PSI)')
