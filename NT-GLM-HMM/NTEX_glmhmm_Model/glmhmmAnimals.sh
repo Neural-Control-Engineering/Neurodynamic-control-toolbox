@@ -2,22 +2,22 @@
 source ~/.bashrc
 conda activate glmhmm 
 cd ~/Neurodynamic-control-toolbox/NT-GLM-HMM/NTEX_glmhmm_Model/
-python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
-python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=5 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=4 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/243_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/242_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/241_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
+# python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_v2/
 # python3 glm_hmm_model.py --target=../animal_data/3316_spon_photo_pupil_v2.mat --K_states=5
 # python3 glm_hmm_model.py --target=../animal_data/3258_spon_photo_pupil_v2.mat --K_states=5
 # python3 glm_hmm_model.py --target=../animal_data/3133_spon_photo_pupil_v2.mat --K_states=5
@@ -62,4 +62,36 @@ python3 glm_hmm_model.py --target=../animal_data_v2/240_spon_photo_pupil_v2.mat 
 # python3 glm_hmm_model.py --target=../animal_data/180_spon_photo_pupil_v2.mat --K_states=4
 # python3 glm_hmm_model.py --target=../animal_data/167_spon_photo_pupil_v2.mat --K_states=4
 # python3 glm_hmm_model.py --target=../animal_data/152_spon_photo_pupil_v2.mat --K_states=4
-# python3 glm_hmm_model.py --target=../animal_data/151_spon_photo_pupil_v2.mat --K_states=2
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3316_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3258_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3133_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/200_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/199_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/198_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/197_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/196_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/180_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/167_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/152_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3258_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3133_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/200_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/199_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/198_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/197_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/196_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/180_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/167_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/152_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3258_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3133_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/200_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/199_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/198_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/197_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/196_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/180_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/167_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+# python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/152_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/
+python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3316_spon_photo_pupil_v2.mat --K_states=3 --results_dir=../results_shuffle_phys/
+python3 glm_hmm_model.py --target=../animal_data_v1_shuffle/3316_spon_photo_pupil_v2.mat --K_states=2 --results_dir=../results_shuffle_phys/

@@ -1,4 +1,4 @@
-function genHmmGlmData(data, outfile, version)
+function genHmmGlmData(data, outfile, version, shuffle, seed)
 % function saves input data in a format compatible with glm-hmm.
 % user can specify the type of data to save with *version*.
 % data is saved to *outfile*.
@@ -7,6 +7,7 @@ function genHmmGlmData(data, outfile, version)
     % trial_onset_inds = find(cellfun(@isempty, data.ISI));
     % trial_inds = find(~cellfun(@isempty, data.ISI));
 
+    % rng(seed)
     sessions = unique(data.session_id);
     
     preprocessed_input = cell(length(sessions),1);
@@ -38,9 +39,15 @@ function genHmmGlmData(data, outfile, version)
         for i = 1:length(sessions)
             tmp = filterTrials(data, 'session_id', sessions{i});
             metrics = getSpontaneousMetrics(tmp, 'stimulus_time', [-0.5,0]);
-            metrics = [metrics(:,1), metrics(:,3),metrics(:,5)];
             stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
-            preprocessed_input{i,1} = [metrics, stim_strengths];
+            if shuffle
+                metrics = [metrics(randperm(size(metrics,1)),1), metrics(randperm(size(metrics,1)),3),metrics(randperm(size(metrics,1)),5)];
+                % preprocessed_input{i,1} = [metrics, stim_strengths(randperm(size(metrics,1)))];
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            else
+                metrics = [metrics(:,1), metrics(:,3),metrics(:,5)];
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            end
             preprocessed_session{i,1} = sessions{i};
             preprocessed_label{i,1} = num2cell(tmp.go_nogo);
             preprocessed_trial_number{i,1} = tmp.sequential_trial_number;

@@ -23,7 +23,7 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outd
             outcome = outcome_types(out_i);
             data_outcome  = filterTrials(data, 'categorical_outcome', outcome);
             % Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
-            Fss = getFs(data_outcome);
+            Fss = getFs(data_outcome, 'photometry_ch1');
             ch1mat = zeros(size(data_outcome,1), round(max(Fss)*diff(tbounds)));
             ch2mat = ch1mat;
 
@@ -77,7 +77,7 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outd
             outcome = outcomes{out_i};
             data_outcome = filterTrials(data, 'go-nogo', responses(out_i));
             % Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
-            Fss = getFs(data_outcome);
+            Fss = getFs(data_outcome, 'photometry_ch1');
             ch1mat = zeros(size(data_outcome,1), round(max(Fss)*diff(tbounds)));
             ch2mat = ch1mat;
 

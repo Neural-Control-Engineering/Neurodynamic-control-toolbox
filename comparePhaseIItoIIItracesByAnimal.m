@@ -24,7 +24,7 @@ function comparePhaseIItoIIItracesByAnimal(Datastore)
         for p = 1:length(phases)
             % avg photometry traces 
             tmp = filterTrials(animal, 'phase', phases{p});
-            Fss = getFs(tmp);
+            Fss = getFs(tmp, 'photometry_ch1');
             ch1mat = nan(size(tmp,1), round(max(Fss)*diff(tbounds)));
             ch2mat = ch1mat;
             starts = tmp.stimulus_time;

@@ -28,6 +28,7 @@ parser = argparse.ArgumentParser(description = '''Run glm-hmm''')
 parser.add_argument('--target', nargs='?', type=str, default='../../ssd_v2_glm_hmm_spon_data.mat')
 parser.add_argument('--K_states', nargs='?', type=int, default=3)
 parser.add_argument('--results_dir', nargs='?', type=str, default='../results/')
+parser.add_argument('--shuffle_number', nargs='?', type=int, default=None)
 args = parser.parse_args()
 target = args.target
 K_states = args.K_states
@@ -167,9 +168,11 @@ states_probs, predicted_states, predicted_label, predicted_response_prob = \
         input_compatible, label_compatible,
         Best_param, K_states, range(K_states))
 
+if args.shuffle_number:
+    fname = target.split('.')[-2].split('/')[-1] + '_' + str(args.shuffle_number)
+else:
+    fname = target.split('.')[-2].split('/')[-1]
 
-results_dir = '../results_v2/'
-fname = target.split('.')[-2].split('/')[-1]
 time_str =  datetime.now().strftime("%Y-%m-%d-%H%M%S")
 np.savez(results_dir+ fname + '_' + str(K_states) + 'state.npz',
          states_probs,
