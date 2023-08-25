@@ -24,7 +24,7 @@ function avgTracesBy(data, filterBy, filterValue, sortBy, alignTo, tbounds, outd
             data_outcome  = filterTrials(data, 'categorical_outcome', outcome);
             % Fs = 1 / (data_outcome.photometry_ch2{1,1}(2,1) - data_outcome.photometry_ch2{1,1}(1,1));
             Fss = getFs(data_outcome);
-            ch1mat = zeros(size(data_outcome,1), round(max(Fss)*diff(tbound)));
+            ch1mat = zeros(size(data_outcome,1), round(max(Fss)*diff(tbounds)));
             ch2mat = ch1mat;
 
             % determine alignments 
