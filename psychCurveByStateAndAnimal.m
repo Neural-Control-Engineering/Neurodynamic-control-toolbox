@@ -1,3 +1,6 @@
+% script for plotting psychometric curves based on states identified by glm-hmm
+% Craig Kelley, NEC Lab, 8/21/23
+
 ssd_version = 'v2';
 kstates = [2, 3, 4, 5, 6];
 data_versions = {'last_trial_behavior_no_bias', ... 
@@ -25,25 +28,7 @@ for i = 1:length(data_versions)
     fig = plot_psycho_curves_states(fname, tmp, num2str(animal), data_versions{i});
 end
 
-% if ~exist(outdir, 'dir')
-%     mkdir(outdir)
-% end
-
-% for a = animals
-%     tmp = filterTrials(data, 'animal', num2str(a));
-%     for k = kstates
-%         filename = sprintf('%s%i_%s%i%s', results_dir, a, fformat{1}, k, fformat{2});
-%         plot_psycho_curves_states(filename, tmp, num2str(a), outdir)
-%     end
-% end
-
-
-
 function fig = plot_psycho_curves_states(filename, data, animal, data_version)
-    % script for plotting psychometric curves based on states identified by glm-hmm
-    % Craig Kelley, NEC Lab, 8/21/23
-    
-    % load('NT-GLM-HMM/results/3133_spon_photo_pupil_v2_2state_Python2mat_2023-08-24-100620.mat')
     results = load(filename);
     fig = figure('Visible', 'on');
     hold on;
