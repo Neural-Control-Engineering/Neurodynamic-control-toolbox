@@ -1,42 +1,60 @@
-animals = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
-% animals = [240, 241, 242, 243];
-% kstates = [2,3,4,5];
-kstates = [2, 3];
-fformat = {'spon_photo_pupil_v2_', 'state_Python2mat.mat'};
+animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
+animals_v2 = [240, 241, 242, 243];
+animals = animals_v2;
+ssd_version = 'v2';
+kstates = [2, 3, 4, 5, 6];
+data_versions = {'last_trial_behavior_no_bias', ... 
+    'spontaneous_mpfc_s1_pupil_normalized', ... 
+    'last_trial_behavior_drop_stim_no_bias', ...
+    'behavior_pupil_mpfc_s1_combo', ... 
+    'behavior_pupil_mpfc_combo', ... 
+    'behavior_pupil_s1_combo', ...
+    'spontaneous_mpfc_s1_pupil_drop_stim', ...
+    'behavior_mpfc_s1_combo', ...
+    'behavior_mpfc_combo', ...
+    'behavior_s1_combo', ...
+    'behavior_pupil_combo'};
 N_folds = 5;
-%% unshuffled
 
-figure('Visible', 'on')
-hold on
-results_dir = 'NT-GLM-HMM/results_v1/';
-filename = dir(results_dir);
-for a = 1:length(animals)
-    mat = nan(N_folds, length(kstates));
-    for k = 1:length(kstates)
-        fname = sprintf('%s%i_%s%i%s', results_dir, animals(a), fformat{1}, kstates(k), fformat{2});
-        tmp = load(fname);
-        % for f = 1:length(filename)
-        %     if contains(filename(f).name, fname) && contains(filename(f).name, '.mat')
-        %         tmp = load(sprintf('%s%s', results_dir, filename(f).name));
-        %         break
-        %     end
-        % end
-        mat(:,k) = tmp.accuracy';
-    end
-    errorbar(kstates+(rand()-0.5)/10, mean(mat), std(mat), 'DisplayName', num2str(animals(a)))
+for animal = animals
+    fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds);
 end
 
-%% shuffled data
-results_dir = 'NT-GLM-HMM/results_shuffle_phys/';
-for a = 1:length(animals)
-    mat = nan(N_folds, length(kstates));
-    for k = 1:length(kstates)
-        fname = sprintf('%s%i_%s%i%s', results_dir, animals(a), fformat{1}, kstates(k), fformat{2});
-        tmp = load(fname);
-        mat(:,k) = tmp.accuracy';
+
+function fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds)
+    fig = figure('Visible', 'on');
+    hold on
+    for i = 1:length(data_versions)
+        results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ... 
+            ssd_version, data_versions{i});
+        fformat = {data_versions{i}, 'state_Python2mat.mat'};
+        mat = nan(N_folds, length(kstates));
+        for k = 1:length(kstates)
+            fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, kstates(k), fformat{2});
+            tmp = load(fname);
+            mat(:,k) = tmp.accuracy';
+        end
+        errorbar(kstates+(rand()-0.5)/10, mean(mat), std(mat), 'DisplayName', strrep(data_versions{i}, '_', '-'))
+        legend('location', 'southeast')
     end
-    errorbar(kstates+(rand()-0.5)/10, mean(mat), std(mat), '--', 'DisplayName', num2str(animals(a)))
+    title(num2str(animal))
+    xlabel('Number of HMM States')
+    ylabel('Accuracy')
+    xticks(kstates)
 end
-xlabel('K States')
-ylabel('Prediction Accuracy')
-legend('location','southwest')
+
+
+% %% shuffled data
+% results_dir = 'NT-GLM-HMM/results_shuffle_phys/';
+% for a = 1:length(animals)
+%     mat = nan(N_folds, length(kstates));
+%     for k = 1:length(kstates)
+%         fname = sprintf('%s%i_%s%i%s', results_dir, animals(a), fformat{1}, kstates(k), fformat{2});
+%         tmp = load(fname);
+%         mat(:,k) = tmp.accuracy';
+%     end
+%     errorbar(kstates+(rand()-0.5)/10, mean(mat), std(mat), '--', 'DisplayName', num2str(animals(a)))
+% end
+% xlabel('K States')
+% ylabel('Prediction Accuracy')
+% legend('location','southwest')

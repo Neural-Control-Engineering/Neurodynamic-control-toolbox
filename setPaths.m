@@ -94,7 +94,7 @@ elseif isunix
         paths.repo_path = '/home/craig/Neurodynamic-control-toolbox/';
 
         % Path to raw and analyzed data 
-        paths.all_data_path = '/home/craig/somat_signal_detect/';
+        paths.all_data_path = sprintf('/home/craig/%s', source);
         % paths.all_data_path = '/home/craig/ntex/';
         paths.neuropixel.kilosort_repo = '/home/craig/Kilosort/';
         paths.neuropixel.workingdir = pwd();

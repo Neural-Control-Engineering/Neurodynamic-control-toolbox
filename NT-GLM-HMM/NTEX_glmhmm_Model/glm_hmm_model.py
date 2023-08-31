@@ -22,6 +22,7 @@ from glm_hmm_utils_ntex import calculate_predictive_acc_glmhmm_ntex_parted, \
 from plotting_utils_ntex import plot_glmhmm_weights
 import multiprocessing
 import argparse
+from os import mkdir 
 
 # parser command line arguments 
 parser = argparse.ArgumentParser(description = '''Run glm-hmm''')
@@ -34,6 +35,10 @@ target = args.target
 K_states = args.K_states
 results_dir = args.results_dir
 
+try:
+    mkdir(results_dir)
+except:
+    pass
 
 loaded = scipy.io.loadmat(target)
 loaded_mat_keys = loaded.keys()
