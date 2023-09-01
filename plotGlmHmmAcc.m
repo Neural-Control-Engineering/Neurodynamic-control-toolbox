@@ -16,13 +16,14 @@ data_versions = {'last_trial_behavior_no_bias', ...
     'behavior_pupil_combo'};
 N_folds = 5;
 
-for animal = animals
-    fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds);
-end
+% for animal = animals
+%     animalPlot(animal, ssd_version, data_versions, kstates, N_folds, splot);
+% end
 
+fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds);
 
 function fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds)
-    fig = figure('Visible', 'on');
+    fig = figure('Visible', 'on', 'WindowState', 'maximized');
     hold on
     for i = 1:length(data_versions)
         results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ... 
@@ -42,6 +43,43 @@ function fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds)
     ylabel('Accuracy')
     xticks(kstates)
 end
+
+function fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds)
+    fig = figure('Visible', 'on', 'WindowState', 'maximized');
+    tcl = tiledlayout(2,2);
+    cs = distinguishable_colors(length(data_versions));
+    for a = 1:length(animals)
+        animal = animals(a);
+        nexttile(tcl)
+        hold on
+        ebars = zeros(1,length(data_versions));
+        % cmap = colormap(jet(length(data_versions)));
+        % ax = axes('colororder',cmap);
+        for i = 1:length(data_versions)
+            results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ... 
+                ssd_version, data_versions{i});
+            fformat = {data_versions{i}, 'state_Python2mat.mat'};
+            mat = nan(N_folds, length(kstates));
+            for k = 1:length(kstates)
+                fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, kstates(k), fformat{2});
+                tmp = load(fname);
+                mat(:,k) = tmp.accuracy';
+            end
+            ebars(i) = errorbar(kstates+(rand()-0.5)/10, mean(mat), std(mat), ...
+                "-*", 'Color', cs(i,:), 'LineWidth', 2, ... 
+                'DisplayName', strrep(data_versions{i}, '_', '-'));
+        end
+        title(sprintf('Animal %s', num2str(animal)), FontSize=14)
+        xlabel('Number of HMM States', FontSize=14)
+        ylabel('Accuracy', FontSize=14)
+        xticks(kstates)
+        ylim([0.5, 1.0])
+    end
+    
+    hl = legend(ebars);
+    hl.Layout.Tile = 'East';
+end
+
 
 
 % %% shuffled data

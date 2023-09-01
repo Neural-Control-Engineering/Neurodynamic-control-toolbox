@@ -16,7 +16,7 @@ data_versions = {'last_trial_behavior_no_bias', ...
     'behavior_pupil_combo'};
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
-animals = animals_v2(1);
+animal = animals_v2(1);
 k = 4;
 
 for i = 1:length(data_versions)

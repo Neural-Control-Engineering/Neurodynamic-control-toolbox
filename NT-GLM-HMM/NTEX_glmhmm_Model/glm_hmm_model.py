@@ -34,6 +34,12 @@ args = parser.parse_args()
 target = args.target
 K_states = args.K_states
 results_dir = args.results_dir
+result_dir_2matlab = results_dir
+
+if args.shuffle_number:
+    fname = target.split('.')[-2].split('/')[-1] + '_' + str(args.shuffle_number)
+else:
+    fname = target.split('.')[-2].split('/')[-1]
 
 try:
     mkdir(results_dir)
@@ -77,7 +83,8 @@ data_size = len(input_shuffled)
 # generate input and output objects compatible with multiprocessing 
 manager = multiprocessing.Manager()
 return_dict = manager.dict() # output 
-input_data = [(input_shuffled, y_shuffled, M_GLM, M_HMM, C, D, i) for i in range(fold)] # list of input tuples
+fbase = result_dir_2matlab + fname + '_' + str(K_states) + 'state_'
+input_data = [(input_shuffled, y_shuffled, M_GLM, M_HMM, C, D, i, fbase) for i in range(fold)] # list of input tuples
 
 def train(inputs):
     # parse inputs
@@ -88,6 +95,8 @@ def train(inputs):
     C = inputs[4]
     D = inputs[5]
     j = inputs[6]
+    params_file_base = inputs[7]
+    params_file = params_file_base + str(j) + 'fold_params.mat'
     input_this_test_hmm = [
         x[:, input_index_hmm]
         for c, x in enumerate(input_shuffled)
@@ -149,8 +158,7 @@ def train(inputs):
         # create a matrix of ones in the same shape as the y dataset
         K_states, D, M_HMM, C, N_em_iters, transition_alpha,
         prior_sigma, global_fit, best_param_glm,
-        'training_cache/glmhmm_' + time_str,
-        n_init, partition=True)
+        params_file,  n_init, partition=True)
     tmp_dict['Param_HMM_5fold'] =  weights_glmhmm_example
     tmp_dict['Acc_HMM_5fold'] =  acc_glmhmm_example
     return_dict[j] = tmp_dict
@@ -173,28 +181,26 @@ states_probs, predicted_states, predicted_label, predicted_response_prob = \
         input_compatible, label_compatible,
         Best_param, K_states, range(K_states))
 
-if args.shuffle_number:
-    fname = target.split('.')[-2].split('/')[-1] + '_' + str(args.shuffle_number)
-else:
-    fname = target.split('.')[-2].split('/')[-1]
-
 time_str =  datetime.now().strftime("%Y-%m-%d-%H%M%S")
 np.savez(results_dir+ fname + '_' + str(K_states) + 'state.npz',
          states_probs,
          predicted_states,
          predicted_response_prob,
          predicted_label,
-         Acc_HMM_5fold
+         Acc_HMM_5fold,
+         Param_GLM_5fold,
+         Param_HMM_5fold
          )
-# result_dir_2matlab = "/mnt/g/My Drive/#Projects/Project_Neurotransmitter-Exploration/GLM_HMM_Data/GLM_HMM_processed_result/"
-result_dir_2matlab = results_dir
+
 scipy.io.savemat(result_dir_2matlab + fname + '_' + str(K_states) + 'state_Python2mat.mat',
                  dict(
                      states_probs = states_probs,
                      predicted_states = predicted_states,
                      predicted_response_prob = predicted_response_prob,
                      predicted_label = predicted_label,
-                     accuracy = Acc_HMM_5fold
+                     accuracy = Acc_HMM_5fold,
+                     hmm_params = Param_HMM_5fold,
+                     glm_params = Param_GLM_5fold
                  ))
 
 print('%s mean accuracy: %f' % (fname, np.mean(Acc_HMM_5fold)))
