@@ -78,6 +78,9 @@ function fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds)
     
     hl = legend(ebars);
     hl.Layout.Tile = 'East';
+    saveas(fig, sprintf('Analysis/acc_vs_states.svg', animal))
+    saveas(fig, sprintf('Analysis/acc_vs_states.png', animal))
+    saveas(fig, sprintf('Analysis/acc_vs_states.fig', animal))
 end
 
 

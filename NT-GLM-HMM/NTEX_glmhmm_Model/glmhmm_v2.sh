@@ -16,13 +16,6 @@ datavers=('last_trial_behavior_no_bias' \
 'behavior_s1_combo' \
 'behavior_mpfc_s1_combo')
 
-# datavers=('behavior_pupil_combo' \
-# 'behavior_mpfc_combo' \
-# 'behavior_s1_combo' \
-# 'behavior_mpfc_s1_combo')
-
-# datavers=('behavior_mpfc_combo' 'behavior_s1_combo')
-
 animals=(240 241 242 243)
 K_states=(2 3 4 5 6)
 for animal in ${animals[@]}; do 
