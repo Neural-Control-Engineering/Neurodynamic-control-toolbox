@@ -44,9 +44,9 @@ end
 
 hold on;
 if exist('name', 'var')
-    plot(F,amean,linecolor,'linewidth',1, 'DisplayName', name); %% change color or linewidth to adjust mean line
+    plot(F,amean,'Color', linecolor,'linewidth',1, 'DisplayName', name); %% change color or linewidth to adjust mean line
 else
-    plot(F,amean,linecolor,'linewidth',1);
+    plot(F,amean,'Color', linecolor,'linewidth',1);
 end
 
 if check
