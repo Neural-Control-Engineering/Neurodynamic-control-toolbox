@@ -4,17 +4,20 @@ source ~/anaconda3/etc/profile.d/conda.sh
 conda activate glmhmm 
 cd ~/Neurodynamic-control-toolbox/NT-GLM-HMM/NTEX_glmhmm_Model/
 
-datavers=('last_trial_behavior_no_bias' \
-'spontaneous_mpfc_s1_pupil_normalized' \
-'last_trial_behavior_drop_stim_no_bias' \
-'behavior_pupil_mpfc_s1_combo' \
-'behavior_pupil_mpfc_combo' \
-'behavior_pupil_s1_combo' \
-'spontaneous_mpfc_s1_pupil_drop_stim' \
-'behavior_pupil_combo' \
-'behavior_mpfc_combo' \
-'behavior_s1_combo' \
-'behavior_mpfc_s1_combo')
+# datavers=('last_trial_behavior_no_bias' \
+# 'spontaneous_mpfc_s1_pupil_normalized' \
+# 'last_trial_behavior_drop_stim_no_bias' \
+# 'behavior_pupil_mpfc_s1_combo' \
+# 'behavior_pupil_mpfc_combo' \
+# 'behavior_pupil_s1_combo' \
+# 'spontaneous_mpfc_s1_pupil_drop_stim' \
+# 'behavior_pupil_combo' \
+# 'behavior_mpfc_combo' \
+# 'behavior_s1_combo' \
+# 'behavior_mpfc_s1_combo')
+datavers=('spontaneous_mpfc_stim' \
+'spontaneous_s1_stim' \
+'spontaneous_pupil_stim')
 
 animals=(240 241 242 243)
 K_states=(2 3 4 5 6)
