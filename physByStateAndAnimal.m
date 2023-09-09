@@ -16,11 +16,13 @@ data_versions = {'last_trial_behavior_no_bias', ...
     'behavior_mpfc_s1_combo', ...
     'behavior_mpfc_combo', ...
     'behavior_s1_combo', ...
-    'behavior_pupil_combo'};
+    'behavior_pupil_combo', ...
+    'spontaneous_mpfc_stim', ...
+    'spontaneous_s1_stim', ...
+    'spontaneous_pupil_stim'};
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 animals = animals_v2;
-
 
 % p = gcp('nocreate');
 % if isempty(p)
@@ -63,7 +65,7 @@ function plot_phys_by_states(filename, data, animal, k, outdir)
             try
                 semshade(ch1(:,2:end-1), 0.3, cols(i+1,:), cols(i+1,:), t(2:end-1), 1, sprintf('State %i (n=%i)', i, n));
             catch
-                keyboard
+                % keyboard
                 plot(t, ch1, 'DisplayName', sprintf('State %i (n=%i)', i, n))
             end
             subplot(1,3,2)
@@ -71,7 +73,7 @@ function plot_phys_by_states(filename, data, animal, k, outdir)
             try
                 semshade(ch2(:,2:end-1), 0.3, cols(i+1,:), cols(i+1,:), t(2:end-1), 1, sprintf('State %i (n=%i)', i, n));
             catch
-                keyboard
+                % keyboard
                 plot(t, ch2, 'DisplayName', sprintf('State %i (n=%i)', i, n))
             end
             [pupil, t] = avg_pupil_traces(tmp, tbounds);
@@ -81,7 +83,7 @@ function plot_phys_by_states(filename, data, animal, k, outdir)
             try
                 semshade(pupil(:,2:end-1), 0.3, cols(i+1, :), cols(i+1, :), t(2:end-1), 1, sprintf('State %i (n=%i)', i, n));
             catch
-                keyboard
+                % keyboard
                 plot(t, pupil, 'DisplayName', sprintf('State %i (n=%i)', i, n));
             end
             ch1_region = tmp.photometry_region_ch1{1,1};
@@ -107,6 +109,7 @@ function plot_phys_by_states(filename, data, animal, k, outdir)
 end
 
 function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds)
+    % generates averages of photometry traces 
     Fss = getFs(data, 'photometry_ch1');
     ch1mat = zeros(size(data,1), round(max(Fss)*diff(tbounds)));
     ch2mat = ch1mat;
@@ -120,27 +123,14 @@ function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds)
         ch1 = ch1(t > tbounds(1) & t < tbounds(2));
         ch2 = ch2(t > tbounds(1) & t < tbounds(2));
         t = t(t > tbounds(1) & t < tbounds(2));
+        % using interp1 to avoid issues with differing sample rates
         ch1mat(i,:) = interp1(t, ch1, time);
         ch2mat(i,:) = interp1(t, ch2, time);
-        
-        % if Fss(i) == max(Fss)
-        %     ch1 = data.photometry_ch1{i,1}(:,2);
-        %     ch2 = data.photometry_ch2{i,1}(:,2);
-        %     % just two seconds prior to stimulus 
-        %     t = data.photometry_ch1{i,1}(:,1) - starts(i);
-        %     ch1 = ch1(t > tbounds(1) & t < tbounds(2));
-        %     ch2 = ch2(t > tbounds(1) & t < tbounds(2));
-        %     t = t(t > tbounds(1) & t < tbounds(2));
-        %     ch1mat(i,:) = ch1;
-        %     ch2mat(i,:) = ch2;
-        % else
-        %     ch1mat(i,:) = nan(1,size(ch1mat,2));
-        %     ch2mat(i,:) = nan(1,size(ch2mat,2));
-        % end
     end
 end
 
 function [pupil, time] = avg_pupil_traces(data, tbounds)
+    % generates averages of pupil traces
     Fs = 1 / (data.pupil_area{1,1}(2,1)-data.pupil_area{1,1}(1,1));
     pupil = nan(size(data,1), round(Fs*diff(tbounds)));
     starts = data.stimulus_time;
@@ -152,6 +142,7 @@ function [pupil, time] = avg_pupil_traces(data, tbounds)
         p = p(t >= tbounds(1) & t <= tbounds(2));
         t = t(t >= tbounds(1) & t <= tbounds(2));
         try
+            % again with the sample rate issues
             pupil(i,:) = interp1(t,p,time);
         end
     end

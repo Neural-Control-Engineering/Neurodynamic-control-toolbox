@@ -1,5 +1,9 @@
+% Plots the average accuracy vs number of HMM states for each 
+% version of the model and for each animal.
+% Craig Kelley, NEC Lab, 9/9/23
+
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
-animals_v2 = [240, 241, 242, 243];
+animals_v2 = [240, 241, 242, 243]; % version 2 of ssd data 
 animals = animals_v2;
 ssd_version = 'v2';
 kstates = [2, 3, 4, 5, 6];
@@ -16,7 +20,10 @@ kstates = [2, 3, 4, 5, 6];
 %     'behavior_pupil_combo'};
 data_versions = {'last_trial_behavior_no_bias', ... 
     'spontaneous_mpfc_s1_pupil_normalized', ... 
-    'last_trial_behavior_drop_stim_no_bias'};
+    'last_trial_behavior_drop_stim_no_bias', ...
+    'spontaneous_s1_stim', ...
+    'spontaneous_mpfc_stim', ...
+    'spontaneous_pupil_stim'};
 N_folds = 5;
 
 % for animal = animals
@@ -27,6 +34,7 @@ N_folds = 5;
 fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds);
 
 function fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds)
+    % plots accuracy vs number of states for all models versions of single animal 
     fig = figure('Visible', 'on', 'WindowState', 'maximized');
     hold on
     cs = distinguishable_colors(length(data_versions));
@@ -50,6 +58,8 @@ function fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds)
 end
 
 function fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds)
+    % plots accuracy vs number of states for all versions of the model for all 
+    % animals 
     fig = figure('Visible', 'on', 'WindowState', 'maximized');
     tcl = tiledlayout(2,2);
     cs = distinguishable_colors(length(data_versions));
@@ -58,8 +68,6 @@ function fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds)
         nexttile(tcl)
         hold on
         ebars = zeros(1,length(data_versions));
-        % cmap = colormap(jet(length(data_versions)));
-        % ax = axes('colororder',cmap);
         for i = 1:length(data_versions)
             results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ... 
                 ssd_version, data_versions{i});
