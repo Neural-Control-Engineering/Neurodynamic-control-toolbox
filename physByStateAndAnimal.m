@@ -39,12 +39,27 @@ for dv = 1:length(data_versions)
     end
     for a = animals
         tmp = filterTrials(data, 'animal', num2str(a));
+        if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+            tmp = removeFirstTrials(tmp);
+        end
         for k = kstates
             filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
             plot_phys_by_states(filename, tmp, num2str(a), k, outdir)
         end
     end
 end
+
+function data = removeFirstTrials(data)
+    sessions = unique(data.session_id);
+    first_trials = zeros(1,length(sessions));
+    for s = 1:length(sessions)
+        session = sessions{s};
+        trials = find(data.session_id == session);
+        first_trials(s) = min(trials);
+    end
+    data(first_trials, :) = [];
+end
+
 
 function plot_phys_by_states(filename, data, animal, k, outdir)
     results = load(filename);
