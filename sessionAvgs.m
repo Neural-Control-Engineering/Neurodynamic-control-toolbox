@@ -10,8 +10,34 @@ animals_v2 = [240, 241, 242, 243];
 animals = animals_v2;
 base_path = 'Analysis/session_avgs/';
 cols = distinguishable_colors(8);
-tbounds = [-0.5, 1.0];
 
+%% plot avg traces for hits aligned to response 
+tbounds = [-0.5, 0.5];
+for animal = animals 
+    atmp = filterTrials(data, 'animal', num2str(animal));
+    sessions = unique(atmp.session_id);
+    out_path = sprintf('%s/align_to_response/%i/', base_path, animal);
+    if ~exist(out_path, 'dir')
+        mkdir(out_path);
+    end
+    for s = 1:length(sessions)
+        session = sessions{s};
+        tmp = filterTrials(atmp, 'session_id', session);
+        fig = plotByOutcome(tmp, {'Hit'}, tbounds, cols, 'response');
+        saveas(fig, sprintf('%s%s.png', out_path, session));
+        saveas(fig, sprintf('%s%s.fig', out_path, session));
+        saveas(fig, sprintf('%s%s.svg', out_path, session));
+        close(fig);
+    end
+    fig = plotByOutcome(atmp, {'Hit'}, tbounds, cols, 'response');
+    saveas(fig, sprintf('%s%i.png', out_path, animal));
+    saveas(fig, sprintf('%s%i.fig', out_path, animal));
+    saveas(fig, sprintf('%s%i.svg', out_path, animal));
+    close(fig);
+end
+
+%% plot avg traces sorted by outcome and stimulus strength aligned to stimulus
+tbounds = [-0.5, 1.0];
 for animal = animals
     atmp = filterTrials(data, 'animal', num2str(animal));
     stim_strength = unique(atmp.stimulus_strength);
@@ -122,8 +148,11 @@ function fig = plotByStimStrength(data, strengths, tbounds, cols)
 end
     
 
-function fig = plotByOutcome(data, outcomes, tbounds, cols)
+function fig = plotByOutcome(data, outcomes, tbounds, cols, alignTo)
     fig = figure('Visible', 'off', 'WindowState', 'maximized');
+    if ~exist('alignTo', 'var')
+        alignTo = 'stimulus';
+    end
     for i = 1:length(outcomes)
         outcome = outcomes{i};
         if ~strcmp(outcome,'Delayed FA (CR)') && ~strcmp(outcome, 'Near Hit (Miss)')
@@ -132,7 +161,7 @@ function fig = plotByOutcome(data, outcomes, tbounds, cols)
             otmp = [];
         end
         if ~isempty(otmp)
-            [ch1, ch2, tp] = avg_photo_traces(otmp, tbounds);
+            [ch1, ch2, tp] = avg_photo_traces(otmp, tbounds, alignTo);
             n = size(ch1,1);
             subplot(3,1,1)
             hold on 
@@ -154,7 +183,7 @@ function fig = plotByOutcome(data, outcomes, tbounds, cols)
                 plot(tp, ch2, 'DisplayName', ...
                     sprintf('%s (n=%i)', outcome, n))
             end
-            [pupil, t] = avg_pupil_traces(otmp, [-0.6, 1.1]);
+            [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
             % keyboard
             subplot(3,1,3)
             hold on
@@ -178,12 +207,22 @@ function fig = plotByOutcome(data, outcomes, tbounds, cols)
     legend('location', 'southeast')
 end
 
-function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds)
+function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds, alignTo)
     % generates averages of photometry traces 
+    if ~exist('alignTo', 'var')
+        starts = data.stimulus_time;
+    elseif strcmp(alignTo, 'stimulus')
+        starts = data.stimulus_time;
+    elseif strcmp(alignTo, 'response')
+        starts = data.stimulus_time + data.response_time;
+        data(isnan(starts),:) = [];
+        starts = starts(~isnan(starts));
+    else
+        starts = data.stimulus_time;
+    end
     Fss = getFs(data, 'photometry_ch1');
     ch1mat = zeros(size(data,1), round(max(Fss)*diff(tbounds)));
     ch2mat = ch1mat;
-    starts = data.stimulus_time;
     time = linspace(tbounds(1), tbounds(2), round(max(Fss)*diff(tbounds)));
 
     for i = 1:size(data,1)
@@ -199,11 +238,21 @@ function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds)
     end
 end
 
-function [pupil, time] = avg_pupil_traces(data, tbounds)
+function [pupil, time] = avg_pupil_traces(data, tbounds, alignTo)
     % generates averages of pupil traces
+    if ~exist('alignTo', 'var')
+        starts = data.stimulus_time;
+    elseif strcmp(alignTo, 'stimulus')
+        starts = data.stimulus_time;
+    elseif strcmp(alignTo, 'response')
+        starts = data.stimulus_time + data.response_time;
+        data(isnan(starts), :) = [];
+        starts = starts(~isnan(starts));
+    else
+        starts = data.stimulus_time;
+    end
     Fs = 1 / (data.pupil_area{1,1}(2,1)-data.pupil_area{1,1}(1,1));
     pupil = nan(size(data,1), round(Fs*diff(tbounds)));
-    starts = data.stimulus_time;
     time = linspace(tbounds(1), tbounds(2), round(Fs*diff(tbounds)));
 
     for i = 1:size(data,1)
