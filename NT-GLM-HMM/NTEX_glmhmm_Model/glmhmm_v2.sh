@@ -15,9 +15,10 @@ cd ~/Neurodynamic-control-toolbox/NT-GLM-HMM/NTEX_glmhmm_Model/
 # 'behavior_mpfc_combo' \
 # 'behavior_s1_combo' \
 # 'behavior_mpfc_s1_combo')
-datavers=('spontaneous_mpfc_stim' \
-'spontaneous_s1_stim' \
-'spontaneous_pupil_stim')
+# datavers=('spontaneous_mpfc_stim' \
+# 'spontaneous_s1_stim' \
+# 'spontaneous_pupil_stim')
+datavers=('dynamic_state')
 
 animals=(240 241 242 243)
 K_states=(2 3 4 5 6)

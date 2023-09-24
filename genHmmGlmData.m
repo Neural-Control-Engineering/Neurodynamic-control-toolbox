@@ -359,6 +359,7 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             tmp = filterTrials(data, 'session_id', sessions{i});
             stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
             responses = tmp.go_nogo;
+            
             responses = responses(1:end-1);
             reward_states = cellfun(@getRewardState, tmp.categorical_outcome);
             reward_states = reward_states(1:end-1);
@@ -377,6 +378,50 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             preprocessed_label{i,1} = num2cell(tmp.go_nogo(2:end));
             preprocessed_trial_number{i,1} = tmp.sequential_trial_number(2:end);
         end
+    elseif strcmp(version, 'time_series')
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            strength = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            responses = tmp.go_nogo;
+            [mpfc, s1, pupil] = getSpontaneousTimeSeries(tmp, [-0.5, 0], 'stimulus_time');
+            if shuffle
+                preprocessed_input{i,1} = [strength(randperm(length(strength))), ... 
+                responses(randperm(length(responses))), ... 
+                reward_states(randperm(length(reward_states))), ... 
+                metrics(randperm(length(metrics)))];
+            else
+                preprocessed_input{i,1} = [strength, responses, reward_states, metrics];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo(2:end));
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number(2:end);
+        end
+    elseif strcmp(version, 'dynamic_state')
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            strength = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            responses = tmp.go_nogo;
+            metrics = getDynamicState(tmp, [-0.5, 0], 'stimulus_time');
+            if shuffle
+                preprocessed_input{i,1} = [strength(randperm(length(strength))), ... 
+                    responses(randperm(length(responses))), ... 
+                    reward_states(randperm(length(reward_states))), ... 
+                    metrics(randperm(size(metrics,1)),1), ... 
+                    metrics(randperm(size(metrics,1)),2), ... 
+                    metrics(randperm(size(metrics,1)),3), ...
+                    metrics(randperm(size(metrics,1)),4), ... 
+                    metrics(randperm(size(metrics,1)),5), ... 
+                    metrics(randperm(size(metrics,1)),6), ...
+                    metrics(randperm(size(metrics,1)),7), ... 
+                    metrics(randperm(size(metrics,1)),8), ... 
+                    metrics(randperm(size(metrics,1)),9)];
+            else
+                preprocessed_input{i,1} = [strength, responses, reward_states, metrics];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo);
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+        end
     end
 
     save(outfile,"preprocessed_input","preprocessed_label","preprocessed_session","preprocessed_trial_number")
@@ -391,6 +436,72 @@ function out = getRewardState(outcome)
     end
 end
 
+
+function [ch1, ch2, pupil] = getSpontaneousTimeSeries(data, tbounds, alignTo)
+    
+    ne_fs = max(getFs(data, 'photometry_ch1'));
+    p_fs = max(getFs(data, 'pupil_area'));
+    ne_time = linspace(tbounds(1), tbounds(2), ne_fs * diff(tbounds));
+    pupil_time = linspace(tbounds(1), tbounds(2), p_fs * diff(tbounds));
+    ch1 = zeros(size(data,1), length(ne_time));
+    ch2 = ch1;
+    pupil = zeros(size(data,1), length(pupil_time));
+
+    if strcmp(alignTo, 'stimulus_time')
+        starts = data.stimulus_time;
+    elseif strcmp(alignTo, 'response_time')
+        starts = data.stimulus_time + data.response_time;
+    end
+
+    for trial = 1:size(data,1)
+        t = data.photometry_ch1{trial,1}(:,1) - starts(trial);
+        y1 = data.photometry_ch1{trial,1}(:,2);
+        y2 = data.photometry_ch2{trial,1}(:,2);
+        pt = data.pupil_area{trial,1}(:,1) - starts(trial);
+        p = data.pupil_area{trial,1}(:,2);
+        y1 = y1(t > tbounds(1) & t < tbounds(2));
+        y2 = y2(t > tbounds(1) & t < tbounds(2));
+        t = t(t > tbounds(1) & t < tbounds(2));
+        p = p(pt > tbounds(1) & pt < tbounds(2));
+        pt = pt(pt > tbounds(1) & pt < tboudns(2));
+        try
+            ch1(trial,:) = y1;
+            ch2(trial,:) = y2;
+        catch
+            ch1(trial,:) = interp1(t, y1,  ne_time);
+            ch2(trial,:) = interp1(t, y2, ne_time);
+        end
+        try
+            pupil(trial,:) = p;
+        catch
+            pupil(trial,:) = interp1(pt, p, pupil_time);
+        end
+    end
+end
+
+
+function out = getDynamicState(data)
+    out = zeros(size(data,1), 9);
+    for trial = 1:size(data,1)
+        t = data.photometry_ch1{trial,1}(:,1) - starts(trial);
+        y1 = data.photometry_ch1{trial,1}(:,2);
+        y2 = data.photometry_ch2{trial,1}(:,2);
+        pt = data.pupil_area{trial,1}(:,1) - starts(trial);
+        p = data.pupil_area{trial,1}(:,2);
+        y1 = y1(t > tbounds(1) & t < tbounds(2));
+        y2 = y2(t > tbounds(1) & t < tbounds(2));
+        p = p(pt > tbounds(1) & pt < tbounds(2));
+        out(trial, :) = [data.pupil_base_before_stimulus(trial), ...
+            mean(diff(p)), ...
+            mean(diff(diff(p))), ...
+            data.photo_base_before_stim_ch1{trial}, ...
+            mean(diff(y1)), ...
+            mean(diff(diff(y1))), ...
+            data.photo_base_before_stim_ch2{trial}, ...
+            mean(diff(y2)), ...
+            mean(diff(diff(y2)))]
+    end
+end
 
 function out = getSpontaneousMetrics(data, normalize)
     out = zeros(size(data,1), 6);
