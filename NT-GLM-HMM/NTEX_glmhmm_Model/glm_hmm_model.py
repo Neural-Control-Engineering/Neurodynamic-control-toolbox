@@ -163,8 +163,10 @@ def train(inputs):
     tmp_dict['Acc_HMM_5fold'] =  acc_glmhmm_example
     return_dict[j] = tmp_dict
     
-pool = multiprocessing.Pool()
-pool.map(train, input_data)
+# pool = multiprocessing.Pool()
+# pool.map(train, input_data)
+for data in input_data:
+    train(data)
 
 Acc_HMM_5fold = [return_dict[key]['Acc_HMM_5fold'] for key in return_dict.keys()]
 Param_HMM_5fold = [return_dict[key]['Param_HMM_5fold'] for key in return_dict.keys()]

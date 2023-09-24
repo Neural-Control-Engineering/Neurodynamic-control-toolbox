@@ -102,7 +102,7 @@ elseif isunix
         % Path for analysis code repo
         paths.repo_path = '/home/genoma/Neurodynamic-control-toolbox/';
         % Path to raw and analyzed data
-        paths.all_data_path = sprintf('/home/craig/%s', source);
+        paths.all_data_path = sprintf('/home/genoma/%s', source);
         paths.neuropixel.kilosort_repo = '/home/genoma/Kilosort/';
         paths.neuropixel.workingdir = pwd();
     elseif strcmp(getenv('HOSTNAME'), 'craig-ThinkPad-E15')

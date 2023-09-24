@@ -20,7 +20,8 @@ cd ~/Neurodynamic-control-toolbox/NT-GLM-HMM/NTEX_glmhmm_Model/
 # 'spontaneous_pupil_stim')
 datavers=('dynamic_state')
 
-animals=(240 241 242 243)
+# animals=(240 241 242 243)
+animals=(243)
 K_states=(2 3 4 5 6)
 for animal in ${animals[@]}; do 
     echo $animal
