@@ -30,10 +30,20 @@ for i = 1:length(data_versions)
     for a = 1:length(animals)
         animal = num2str(animals(a));
         tmp = filterTrials(data, 'animal', animal);
+        tmp = rmInconsistent(tmp);
         genHmmGlmData(tmp, sprintf('%s%s_%s.mat', outdir, animal, data_version), data_version, false)
     end
 end
 
+function span = vecspan(vec)
+    span = vec(end,1)-vec(1,1);
+end
+
+function data = rmInconsistent(data)
+    photo_dif = cellfun(@vecspan, data.photometry_ch1);
+    pupil_dif = cellfun(@vecspan, data.pupil_area);
+    data((photo_dif-pupil_dif)>1,:) = [];
+end
 %%
 % N_shuffles = 10;
 % for n = 1:N_shuffles

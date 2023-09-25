@@ -417,13 +417,11 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             else
                 preprocessed_input{i,1} = [strength, responses, metrics];
             end
-            if any(isnan(metrics))
-                keyboard
-            end
             preprocessed_session{i,1} = sessions{i};
             preprocessed_label{i,1} = num2cell(tmp.go_nogo);
-            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number; 
         end
+        keyboard
     end
 
     save(outfile,"preprocessed_input","preprocessed_label","preprocessed_session","preprocessed_trial_number")
@@ -483,7 +481,7 @@ end
 
 
 function out = getDynamicState(data, tbounds, alignTo)
-    out = zeros(size(data,1), 9);
+    out = [];
     % determine alignments 
     if strcmp(alignTo, 'stimulus_time')
         starts = data.stimulus_time;
@@ -499,7 +497,7 @@ function out = getDynamicState(data, tbounds, alignTo)
         y1 = y1(t > tbounds(1) & t < tbounds(2));
         y2 = y2(t > tbounds(1) & t < tbounds(2));
         p = p(pt > tbounds(1) & pt < tbounds(2));
-        out(trial, :) = [data.pupil_base_before_stimulus(trial), ...
+        out = [out; data.pupil_base_before_stimulus(trial), ...
             nanmean(diff(p)), ...
             nanmean(diff(diff(p))), ...
             data.photo_base_before_stim_ch1{trial}, ...
