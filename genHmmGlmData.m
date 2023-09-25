@@ -421,7 +421,6 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             preprocessed_label{i,1} = num2cell(tmp.go_nogo);
             preprocessed_trial_number{i,1} = tmp.sequential_trial_number; 
         end
-        keyboard
     end
 
     save(outfile,"preprocessed_input","preprocessed_label","preprocessed_session","preprocessed_trial_number")
