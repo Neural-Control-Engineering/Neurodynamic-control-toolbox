@@ -61,7 +61,24 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
                     metrics(randperm(size(metrics,1)),5)];
                 preprocessed_input{i,1} = [metrics, stim_strengths];
             else
-                metrics = [metrics(:,1), metrics(:,3),metrics(:,5)];
+                metrics = [metrics(:,1), metrics(:,3), metrics(:,5)];
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo);
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+        end
+    elseif strcmp(version, 'spontaneous_mpfc_s1_stim')
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            metrics = getSpontaneousMetrics(tmp, true);
+            stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            if shuffle
+                metrics = [metrics(randperm(size(metrics,1)),1), ...
+                    metrics(randperm(size(metrics,1)),3)];
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            else
+                metrics = [metrics(:,3), metrics(:,5)];
                 preprocessed_input{i,1} = [metrics, stim_strengths];
             end
             preprocessed_session{i,1} = sessions{i};
