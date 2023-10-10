@@ -20,8 +20,9 @@ kstates = [2, 3, 4, 5, 6];
 %     'spontaneous_mpfc_stim', ...
 %     'spontaneous_s1_stim', ...
 %     'spontaneous_pupil_stim'};
-data_versions = {'dynamic_state'};
-data = rmDiscrepantTrials(data);
+% data_versions = {'dynamic_state'};
+data_versions = {'spontaneous_mpfc_s1_stim'};
+% data = rmDiscrepantTrials(data);
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 animals = animals_v2;
