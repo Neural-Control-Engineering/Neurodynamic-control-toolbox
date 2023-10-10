@@ -18,7 +18,8 @@ ssd_version = 'v2';
 % data_versions = {'spontaneous_mpfc_stim', ...
 %                 'spontaneous_s1_stim', ...
 %                 'spontaneous_pupil_stim'};
-data_versions = {'dynamic_state'};
+% data_versions = {'dynamic_state'};
+data_versions = {'spontaneous_mpfc_s1_stim'}
 
 for i = 1:length(data_versions)
     data_version = data_versions{i};
