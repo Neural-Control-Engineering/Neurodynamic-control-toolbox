@@ -26,37 +26,41 @@ animals_v2 = [240, 241, 242, 243];
 %             'ch1 before stim', ... 
 %             'ch2 before stim', ... 
 %             'stimulus strength'};
-features = {'Pupil', ... 
-            'dPupil/dt', ...
-            'd2Pupil/dt2', ...
-            'Ch1', ... 
-            'dCh1/dt', ... 
-            'd2Ch1/dt2', ... 
-            'Ch2', ... 
-            'dCh2/dt', ... 
-            'd2Ch2/dt2', ... 
-            'stimulus strength'};
+% features = {'Pupil', ... 
+%             'dPupil/dt', ...
+%             'd2Pupil/dt2', ...
+%             'Ch1', ... 
+%             'dCh1/dt', ... 
+%             'd2Ch1/dt2', ... 
+%             'Ch2', ... 
+%             'dCh2/dt', ... 
+%             'd2Ch2/dt2', ... 
+%             'stimulus strength'};
+features = {'pupil area', 'stimulus strength'};
 
 % p = gcp('nocreate');
 % if isempty(p)
 %     parpool(11)
 % end
 
+% animal = animals_v2(1);
+animal = 240;
+
 % for dv = 1:length(data_versions)
 % dv = 2;
 % data_ver = data_versions{dv};
 % dv = 2;
-data_ver = data_versions{end};
+% data_ver = data_versions{end};
+data_ver = 'spontaneous_pupil_stim';
 fformat = {data_ver, 'state_Python2mat.mat'};
 results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-% for animal = animals_v2
-animal = animals_v2(1);
 outdir = strcat(results_dir, 'figures/weights/');
 if ~exist(outdir, 'dir')
     mkdir(outdir)
 end
 % for k = kstates
-k = kstates(1);
+% k = kstates(1);
+k = 2;
 fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, k, fformat{2});
 results = load(fname);
 n_features = size(results.glm_params{1,1},3);
@@ -74,9 +78,9 @@ ticks = [];
 labels = [];
 for ik = 1:k
     hold on
-    errorbar([1:n_features] + ik*20, mean(abs(weights(ik,:,:)), 3), std(abs(weights(ik,:,:)), [], 3), '.', 'Color', 'k', 'LineWidth', 2)
-    bar([1:n_features] + ik*20, mean(abs(weights(ik,:,:)),3), 'k') %, 'FaceColor', cols(ik,:), 'EdgeColor', cols(ik,:))
-    ticks = [ticks, [1:n_features] + ik*20];
+    errorbar([1:n_features] + ik*5, mean(abs(weights(ik,:,:)), 3), std(abs(weights(ik,:,:)), [], 3), '.', 'Color', 'k', 'LineWidth', 2)
+    bar([1:n_features] + ik*5, mean(abs(weights(ik,:,:)),3), 'k') %, 'FaceColor', cols(ik,:), 'EdgeColor', cols(ik,:))
+    ticks = [ticks, [1:n_features] + ik*5];
     labels = [labels, features]
     xtickangle(45)
 end
