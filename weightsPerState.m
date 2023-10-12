@@ -3,18 +3,22 @@ animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 ssd_version = 'v2';
 kstates = [2, 3, 4, 5, 6];
+% data_versions = {'last_trial_behavior_no_bias', ... 
+%     'spontaneous_mpfc_s1_pupil_normalized', ... 
+%     'last_trial_behavior_drop_stim_no_bias', ...
+%     'behavior_pupil_mpfc_s1_combo', ... 
+%     'behavior_pupil_mpfc_combo', ... 
+%     'behavior_pupil_s1_combo', ...
+%     'spontaneous_mpfc_s1_pupil_drop_stim', ...
+%     'behavior_mpfc_s1_combo', ...
+%     'behavior_mpfc_combo', ...
+%     'behavior_s1_combo', ...
+%     'behavior_pupil_combo', ...
+%     'dynamic_state'};
 data_versions = {'last_trial_behavior_no_bias', ... 
-    'spontaneous_mpfc_s1_pupil_normalized', ... 
-    'last_trial_behavior_drop_stim_no_bias', ...
-    'behavior_pupil_mpfc_s1_combo', ... 
-    'behavior_pupil_mpfc_combo', ... 
-    'behavior_pupil_s1_combo', ...
-    'spontaneous_mpfc_s1_pupil_drop_stim', ...
-    'behavior_mpfc_s1_combo', ...
-    'behavior_mpfc_combo', ...
-    'behavior_s1_combo', ...
-    'behavior_pupil_combo', ...
-    'dynamic_state'};
+    'spontaneous_mpfc_stim', ...
+    'spontaneous_s1_stim', ...
+    'spontaneous_pupil_stim'};
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 
@@ -36,7 +40,7 @@ animals_v2 = [240, 241, 242, 243];
 %             'dCh2/dt', ... 
 %             'd2Ch2/dt2', ... 
 %             'stimulus strength'};
-features = {'pupil area', 'stimulus strength'};
+features = {{'Prev. Reward', 'Prev. Response', 'Stim.'}, {'mPFC NE', 'Stim. Strength'}, {'S1 NE', 'Stim.'}, {'Pupil Area', 'Stim.'}};
 
 % p = gcp('nocreate');
 % if isempty(p)
@@ -44,50 +48,64 @@ features = {'pupil area', 'stimulus strength'};
 % end
 
 % animal = animals_v2(1);
-animal = 240;
+animal = 241;
+k = 5;
+fig = figure('Visible', 'on');
 
 % for dv = 1:length(data_versions)
 % dv = 2;
 % data_ver = data_versions{dv};
 % dv = 2;
 % data_ver = data_versions{end};
-data_ver = 'spontaneous_pupil_stim';
-fformat = {data_ver, 'state_Python2mat.mat'};
-results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-outdir = strcat(results_dir, 'figures/weights/');
-if ~exist(outdir, 'dir')
-    mkdir(outdir)
-end
-% for k = kstates
-% k = kstates(1);
-k = 2;
-fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, k, fformat{2});
-results = load(fname);
-n_features = size(results.glm_params{1,1},3);
-weights = nan(k, n_features, 5);
-for i = 1:5
-    w = reshape(results.hmm_params{i,3},[k, n_features]);
-    for ik = 1:k
-        weights(ik, :, i) = w(ik,:);
+% data_ver = 'spontaneous_pupil_stim';
+for dv = 1:length(data_versions)
+    data_ver = data_versions{dv};
+    fformat = {data_ver, 'state_Python2mat.mat'};
+    results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+    % outdir = strcat(results_dir, 'figures/weights/');
+    % if ~exist(outdir, 'dir')
+    %     mkdir(outdir)
+    % end
+    fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, k, fformat{2});
+    results = load(fname);
+    n_features = size(results.glm_params{1,1},3);
+    weights = nan(k, n_features, 5);
+    for i = 1:5
+        w = reshape(results.hmm_params{i,3},[k, n_features]);
+        for ik = 1:k
+            if dv == 1
+                weights(ik, :, i) = fliplr(w(ik,:));
+            else
+                weights(ik, :, i) = w(ik,:);
+            end
+        end
     end
-end
 
-fig = figure('Visible', 'on');
-cols = distinguishable_colors(n_features);
-ticks = [];
-labels = [];
-for ik = 1:k
+    ticks = [];
+    labels = [];
+    subplot(length(data_versions), 1, dv)
     hold on
-    errorbar([1:n_features] + ik*5, mean(abs(weights(ik,:,:)), 3), std(abs(weights(ik,:,:)), [], 3), '.', 'Color', 'k', 'LineWidth', 2)
-    bar([1:n_features] + ik*5, mean(abs(weights(ik,:,:)),3), 'k') %, 'FaceColor', cols(ik,:), 'EdgeColor', cols(ik,:))
-    ticks = [ticks, [1:n_features] + ik*5];
-    labels = [labels, features]
-    xtickangle(45)
+    for ik = 1:k
+        errorbar([1:n_features] + ik*5, mean(abs(weights(ik,:,:)), 3), std(abs(weights(ik,:,:)), [], 3), '.', 'Color', 'k', 'LineWidth', 2)
+        bar([1:n_features] + ik*5, mean(abs(weights(ik,:,:)),3), 'k') %, 'FaceColor', cols(ik,:), 'EdgeColor', cols(ik,:))
+        ticks = [ticks, [1:n_features] + ik*5];
+        labels = [labels, features{dv}];
+        xtickangle(45)
+    end
+    xticks(ticks)
+    xticklabels(labels)
 end
-xticks(ticks)
-xticklabels(labels)
-a = get(gca,'XTickLabel');
-set(gca,'XTickLabel',a,'fontsize',14)
+for dv = 1:length(data_versions)
+    subplot(length(data_versions),1,dv)
+    set(gca, 'Yscale', 'log')
+    a = get(gca,'XTickLabel');
+    set(gca,'XTickLabel',a,'fontsize',14)
+    ylabel('|Weight|')
+    ylim([0,100])
+end
+xlabel('Feature')
+% a = get(gca,'XTickLabel');
+% set(gca,'XTickLabel',a,'fontsize',14)
 % xlabel('Feature')
 % ylabel('Weight')
 % xlim([0.5, n_features+.5])

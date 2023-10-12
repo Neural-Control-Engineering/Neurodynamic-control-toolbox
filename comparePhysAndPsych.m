@@ -12,8 +12,8 @@ animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 animals = animals_v2;
 
-animal = 240;
-k = 4;
+animal = 241;
+k = 5;
 fig = figure('Visible', 'on', 'WindowState', 'maximized');
 hold on;
 

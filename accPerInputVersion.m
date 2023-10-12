@@ -12,8 +12,8 @@ data_versions = {'last_trial_behavior_no_bias', ...
     'spontaneous_s1_stim', ...
     'spontaneous_pupil_stim'};
 N_folds = 5;
-animal = 240;
-k = 4;
+animal = 241;
+k = 5;
 animalPlot(animal, ssd_version, data_versions, k, N_folds);
 
 
