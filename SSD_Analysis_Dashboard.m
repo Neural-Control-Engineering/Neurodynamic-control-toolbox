@@ -23,7 +23,8 @@ opt_windows.MA_window = 0.15;
 analysis_params.process_neuropixel = false;
 
 % Determine which computer is running the script and set the various file locations accordingly
-[paths] = setPaths("Project_Somatosensory-Signal-Detection");
+[paths] = setPaths('Wang/somat_signal_detect/');
+% [paths] = setPaths("Project_Somatosensory-Signal-Detection");
 
 %% PROCESS RAW DATA FROM SOURCE
 [animals_to_load,analysis_progress,resets,wbar] = selectAnimals(paths);
