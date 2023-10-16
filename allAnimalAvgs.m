@@ -3,32 +3,74 @@ animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 tbounds = [-0.5, 4.0];
 
-% separate by outcome 
-outcome_types = unique(data.categorical_outcome);
-cols = distinguishable_colors(length(outcome_types));
-plotByOutcome(data, outcome_types, tbounds, cols, 'stimulus');
-% % two outcomes
-outcome_types = {'FA', 'Hit'};
-plotByOutcome(data, outcome_types, tbounds, {'r', 'b'}, 'response');
-% plot physiology separated by stim strength
-outcome_types = 'Hit';
-plotByStimStrength(data, tbounds, 'stimulus');
-tmp = filterTrials(data, 'categorical_outcome', outcome_types);
-plotByStimStrength(tmp, tbounds, 'response');
-% plot avg psychometric curve 
-avgPsychCurve(data);
-% plot avg phys separated by stim strength and outcome
-outcome_types = {'FA', 'Hit'};
-tmp = filterTrials(data, 'categorical_outcome', outcome_types);
-plotByStimStratByOutcome(data, tbounds, 'stimulus');
-plotByStimStratByOutcome(tmp, tbounds, 'response');
-% plot hit rate vs false alarm rate for all sessions 
-plotFAvsHitRates(data)
-% plot histogram of first licks 
-plotFirstLickHist(data)
-% plot phys based on response time
-plotPhysByResponseTime(data, tbounds, 'stimulus')
-plotPhysByResponseTime(data, tbounds, 'response')
+% % separate by outcome 
+% outcome_types = unique(data.categorical_outcome);
+% cols = distinguishable_colors(length(outcome_types));
+% plotByOutcome(data, outcome_types, tbounds, cols, 'stimulus');
+% % % two outcomes
+% outcome_types = {'FA', 'Hit'};
+% plotByOutcome(data, outcome_types, tbounds, {'r', 'b'}, 'response');
+% % plot physiology separated by stim strength
+% outcome_types = 'Hit';
+% plotByStimStrength(data, tbounds, 'stimulus');
+% tmp = filterTrials(data, 'categorical_outcome', outcome_types);
+% plotByStimStrength(tmp, tbounds, 'response');
+% % plot avg psychometric curve 
+% avgPsychCurve(data);
+% % plot avg phys separated by stim strength and outcome
+% outcome_types = {'FA', 'Hit'};
+% tmp = filterTrials(data, 'categorical_outcome', outcome_types);
+% plotByStimStratByOutcome(data, tbounds, 'stimulus');
+% plotByStimStratByOutcome(tmp, tbounds, 'response');
+% % plot hit rate vs false alarm rate for all sessions 
+% plotFAvsHitRates(data)
+% % plot histogram of first licks 
+% plotFirstLickHist(data)
+% % plot phys based on response time
+% plotPhysByResponseTime(data, tbounds, 'stimulus')
+% plotPhysByResponseTime(data, tbounds, 'response')
+% psychometric curves separated by baseline pupil quintile 
+psychCurveByPupil(data)
+
+function psychCurveByPupil(data)
+    ptiles = 20:20:100;
+    low = prctile(data.pupil_base_before_stimulus, 0);
+    stim_strengths = unique(data.stimulus_strength);
+    cols = distinguishable_colors(5);
+    fig = figure();
+    for i = 1:length(ptiles)
+        ptile = ptiles(i);
+        high = prctile(data.response_time, ptile);
+        x = data.pupil_base_before_stimulus >= low & data.pupil_base_before_stimulus <= high;
+        low = high;
+        tmp = data(x,:);
+        mat = nan(size(tmp,1), length(stim_strengths));
+        for trial = 1:size(tmp,1)
+            ind = find(stim_strengths == tmp.stimulus_strength(trial));
+            if strcmp(tmp.categorical_outcome{trial}, 'Hit') || strcmp(tmp.categorical_outcome{trial}, 'CR')
+                mat(trial, ind) = 1;
+            else
+                mat(trial, ind) = 0;
+            end
+        end
+        switch i 
+            case 1  
+                l = sprintf('%ist quintile', i);
+            case 2
+                l = sprintf('%ind quintile', i);
+            case 3
+                l = sprintf('%ird quintile', i);
+            otherwise
+                l = sprintf('%ith quintile', i);
+        end
+        n = size(mat,1);
+        semshade(mat(:,2:end), 0.3, cols(i,:), cols(i,:), stim_strengths(2:end) .* 10, 1, sprintf('%s (n=%i)', l, n));
+        hold on
+    end
+    xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
+    ylabel('Performance', 'FontSize', 14)
+    legend()
+end
 
 function plotPhysByResponseTime(data, tbounds, alignTo)
     outcomes = {'Hit', 'FA'};
