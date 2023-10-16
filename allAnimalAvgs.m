@@ -1,31 +1,31 @@
 data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
-tbounds = [-0.5, 1.0];
+tbounds = [-0.5, 4.0];
 
-% % separate by outcome 
-% outcome_types = unique(data.categorical_outcome);
-% cols = distinguishable_colors(length(outcome_types));
-% plotByOutcome(data, outcome_types, tbounds, cols, 'stimulus');
-% % % two outcomes
-% outcome_types = {'FA', 'Hit'};
-% plotByOutcome(data, outcome_types, tbounds, {'r', 'b'}, 'response');
-% % % plot physiology separated by stim strength
-% outcome_types = 'Hit';
-% plotByStimStrength(data, tbounds, 'stimulus');
-% tmp = filterTrials(data, 'categorical_outcome', outcome_types);
-% plotByStimStrength(tmp, tbounds, 'response');
-% % plot avg psychometric curve 
-% avgPsychCurve(data);
-% % plot avg phys separated by stim strength and outcome
-% outcome_types = {'FA', 'Hit'};
-% tmp = filterTrials(data, 'categorical_outcome', outcome_types);
-% plotByStimStratByOutcome(data, tbounds, 'stimulus');
-% plotByStimStratByOutcome(tmp, tbounds, 'response');
-% % plot hit rate vs false alarm rate for all sessions 
-% plotFAvsHitRates(data)
-% % plot histogram of first licks 
-% plotFirstLickHist(data)
+% separate by outcome 
+outcome_types = unique(data.categorical_outcome);
+cols = distinguishable_colors(length(outcome_types));
+plotByOutcome(data, outcome_types, tbounds, cols, 'stimulus');
+% % two outcomes
+outcome_types = {'FA', 'Hit'};
+plotByOutcome(data, outcome_types, tbounds, {'r', 'b'}, 'response');
+% plot physiology separated by stim strength
+outcome_types = 'Hit';
+plotByStimStrength(data, tbounds, 'stimulus');
+tmp = filterTrials(data, 'categorical_outcome', outcome_types);
+plotByStimStrength(tmp, tbounds, 'response');
+% plot avg psychometric curve 
+avgPsychCurve(data);
+% plot avg phys separated by stim strength and outcome
+outcome_types = {'FA', 'Hit'};
+tmp = filterTrials(data, 'categorical_outcome', outcome_types);
+plotByStimStratByOutcome(data, tbounds, 'stimulus');
+plotByStimStratByOutcome(tmp, tbounds, 'response');
+% plot hit rate vs false alarm rate for all sessions 
+plotFAvsHitRates(data)
+% plot histogram of first licks 
+plotFirstLickHist(data)
 % plot phys based on response time
 plotPhysByResponseTime(data, tbounds, 'stimulus')
 plotPhysByResponseTime(data, tbounds, 'response')
@@ -97,6 +97,7 @@ function plotPhysByResponseTime(data, tbounds, alignTo)
         ylim([-0.2, 0.7])
         plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
     end
+    xlim([tbounds(1), tbounds(2)])
     subplot(1,3,2)
     xlabel('Time (s)', 'FontSize', 14)
     ylabel('S1 NE', 'FontSize', 14)
@@ -107,9 +108,10 @@ function plotPhysByResponseTime(data, tbounds, alignTo)
         ylim([-0.2, 0.7])
         plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
     end
+    xlim([tbounds(1), tbounds(2)])
     subplot(1,3,3)
     if strcmp(alignTo, 'stimulus')
-        ylim([-0.4, 0.3])
+        ylim([-0.35, 0.5])
         plot([0,0], [-0.4, 0.3], 'k:', 'HandleVisibility', 'off')
     else
         ylim([-0.4, 0.5])
@@ -118,6 +120,7 @@ function plotPhysByResponseTime(data, tbounds, alignTo)
     xlabel('Time (s)', 'FontSize', 14)
     ylabel('Pupil Area', 'FontSize', 14)
     legend('location', 'southeast')
+    xlim([tbounds(1), tbounds(2)])
 end
 
 
@@ -133,6 +136,7 @@ function plotFAvsHitRates(data)
         fas = filterTrials(tmp, 'categorical_outcome', 'FA');
         far(s) = size(fas,1) / size(tmp,1);
     end
+    figure()
     scatter(far, hr)
     hold on
     plot([0,1], [0,1], 'k:', 'HandleVisibility', 'off')
@@ -141,6 +145,7 @@ function plotFAvsHitRates(data)
 end
 
 function plotFirstLickHist(data)
+    figure()
     outcomes = {'Hit', 'FA'};
     data = filterTrials(data, 'categorical_outcome', outcomes);
     histogram(data.response_time, 20)
@@ -160,7 +165,7 @@ function fig = plotByStimStratByOutcome(data, tbounds, alignTo)
         outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     else
         % outcomes = unique(data.categorical_outcome);
-        outcomes = {'Hit', 'FA'}
+        outcomes = {'Hit', 'FA'};
     end
     cols = distinguishable_colors(length(stim_strengths)+1);
     % if strcmp(alignTo, 'stimulus')
@@ -178,7 +183,7 @@ function fig = plotByStimStratByOutcome(data, tbounds, alignTo)
         if ~isempty(tmp)
             for i = 1:length(stim_strengths)
                 stim = stim_strengths(i);
-                l = sprintf('%.1f PSI', stim);
+                l = sprintf('%.2f PSI', stim);
                 otmp = filterTrials(tmp, 'stim_strength', stim);
                 if ~isempty(otmp)
                     [ch1, ch2, tp] = avg_photo_traces(otmp, tbounds, alignTo);
@@ -211,7 +216,6 @@ function fig = plotByStimStratByOutcome(data, tbounds, alignTo)
                     % keyboard
                     subplot(length(outcomes),3,(count*3-3)+3)
                     hold on
-                    disp(outcome)
                     try
                         semshade(pupil(:,2:end-1), 0.3, cols(i, :), cols(i, :), ...
                             t(2:end-1), 1, sprintf('%s (n=%i)', l, n));
@@ -231,6 +235,7 @@ function fig = plotByStimStratByOutcome(data, tbounds, alignTo)
                 ylim([-0.4,0.8])
                 plot([0,0], [-0.4, 0.8], 'k:', 'HandleVisibility', 'off')
             end
+            xlim([tbounds(1), tbounds(2)])
             subplot(length(outcomes),3,(count*3-3)+2)
             ylabel('S1 NE', 'FontSize', 14)
             title(outcome, 'FontSize', 16, 'FontWeight', 'bold')
@@ -241,6 +246,7 @@ function fig = plotByStimStratByOutcome(data, tbounds, alignTo)
                 ylim([-0.4,0.8])
                 plot([0,0], [-0.4, 0.8], 'k:', 'HandleVisibility', 'off')
             end
+            xlim([tbounds(1), tbounds(2)])
             subplot(length(outcomes),3,(count*3-3)+3)
             ylabel('Pupil Area', 'FontSize', 14)
             if length(outcomes) > 2
@@ -251,6 +257,7 @@ function fig = plotByStimStratByOutcome(data, tbounds, alignTo)
                 plot([0,0], [-0.5, 0.5], 'k:', 'HandleVisibility', 'off')
             end
             legend('location', 'southeast')
+            xlim([tbounds(1), tbounds(2)])
         end
         subplot(length(outcomes),3,(count*3-3)+1)
         xlabel('Time (s)', 'FontSize', 14)
@@ -274,7 +281,7 @@ function fig = plotByStimStrength(data, tbounds, alignTo)
     if ~isempty(data)
         for i = 1:length(stim_strengths)
             stim = stim_strengths(i);
-            l = sprintf('%.1f PSI', stim);
+            l = sprintf('%.2f PSI', stim);
             otmp = filterTrials(data, 'stim_strength', stim);
             [ch1, ch2, tp] = avg_photo_traces(otmp, tbounds, alignTo);
             n = size(ch1,1);
@@ -317,13 +324,16 @@ function fig = plotByStimStrength(data, tbounds, alignTo)
     subplot(1,3,1)
     ylabel('mPFC NE', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
+    xlim([tbounds(1), tbounds(2)])
     subplot(1,3,2)
     ylabel('S1 NE', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
+    xlim([tbounds(1), tbounds(2)])
     subplot(1,3,3)
     ylabel('Pupil Area', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
     legend('location', 'southeast')
+    xlim([tbounds(1), tbounds(2)])
 end
 
 
@@ -381,13 +391,16 @@ function fig = plotByOutcome(data, outcomes, tbounds, cols, alignTo)
     subplot(1,3,1)
     ylabel('mPFC NE', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
+    xlim([tbounds(1), tbounds(2)])
     subplot(1,3,2)
     ylabel('S1 NE', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
+    xlim([tbounds(1), tbounds(2)])
     subplot(1,3,3)
     ylabel('Pupil Area', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
     legend('location', 'southeast')
+    xlim([tbounds(1), tbounds(2)])
 end
 
 function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds, alignTo)
@@ -466,4 +479,6 @@ function avgPsychCurve(data)
     figure()
     n = size(mat,1);
     semshade(mat(:,2:end), 0.3, 'b', 'b', stim_strengths(2:end) .* 10, 1, sprintf('(n=%i)', i, n));
+    xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
+    ylabel('Performance', 'FontSize', 14)
 end
