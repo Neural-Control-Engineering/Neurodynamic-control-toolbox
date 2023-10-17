@@ -30,7 +30,52 @@ tbounds = [-0.5, 4.0];
 % plotPhysByResponseTime(data, tbounds, 'stimulus')
 % plotPhysByResponseTime(data, tbounds, 'response')
 % psychometric curves separated by baseline pupil quintile 
-psychCurveByPupil(data)
+% psychCurveByPupil(data)
+[Sm, Ss, Sp] = baselinesVsReactionTime(data);
+
+function [Sm, Ss, Sp] = baselinesVsReactionTime(data)
+    outcomes = {'Hit', 'FA'};
+    cols = distinguishable_colors(5);
+    data = filterTrials(data, 'categorical_outcome', outcomes);
+    starts = data.stimulus_time + data.response_time;
+    data(isnan(starts),:) = [];
+    [ch1, ch2, ~] = avg_photo_traces(data, [-0.5, 0], 'stimulus');
+    mpfc = nanmean(ch1,2);
+    s1 = nanmean(ch2,2);
+    [p, ~] = avg_pupil_traces(data, [-0.5, 0], 'stimulus');
+    pupil = nanmean(p,2);
+    figure()
+    subplot(1,3,1)
+    hold on
+    scatter(mpfc, data.response_time, 'ko')
+    [pm, Sm] = polyfit(mpfc, data.response_time, 1);
+    ym = polyval(pm, linspace(min(mpfc), max(mpfc), 10));
+    plot(linspace(min(mpfc), max(mpfc), 10), ym, 'r')
+    mpfc_R_squared = 1 - (Sm.normr/norm(ym - mean(ym)))^2
+    xlabel('Baseline mPFC NE', 'FontSize', 14)
+    ylabel('Reaction Time (s)', 'FontSize', 14)
+    % keyboard
+    subplot(1,3,2)
+    hold on
+    scatter(s1, data.response_time, 'ko')
+    [ps, Ss] = polyfit(s1, data.response_time, 1);
+    ys = polyval(ps, linspace(min(s1), max(s1), 10));
+    s1_R_squared = 1 - (Ss.normr/norm(ys - mean(ys)))^2
+    plot(linspace(min(s1), max(s1), 10), ys, 'r')
+    xlabel('Baseline S1 NE', 'FontSize', 14)
+    ylabel('Reaction Time (s)', 'FontSize', 14)
+    subplot(1,3,3)
+    hold on
+    scatter(pupil, data.response_time, 'ko')    
+    [pp, Sp] = polyfit(s1, data.response_time, 1);
+    yp = polyval(pp, linspace(min(pupil), max(pupil), 10));
+    plot(linspace(min(pupil), max(pupil), 10), yp, 'r')
+    pupil_R_squared = 1 - (Sp.normr/norm(yp - mean(yp)))^2
+    xlabel('Baseline Pupil', 'FontSize', 14)
+    ylabel('Reaction Time (s)', 'FontSize', 14)
+end
+    
+    
 
 function psychCurveByPupil(data)
     ptiles = 20:20:100;
@@ -102,7 +147,7 @@ function plotPhysByResponseTime(data, tbounds, alignTo)
             semshade(ch1(:,2:end-1), 0.3, cols(i,:), cols(i,:), ...
                 tp(2:end-1), 1, sprintf('%s (n=%i)', l, n));
         catch
-            keyboard
+            % keyboard
             semshade(ch1(:,2:end-1), 0.3, cols{i}, cols{i}, ...
                 tp(2:end-1), 1, sprintf('%s (n=%i)', l, n));
         end
