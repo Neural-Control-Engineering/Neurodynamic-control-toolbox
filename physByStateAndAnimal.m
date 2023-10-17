@@ -32,25 +32,34 @@ animals = animals_v2;
 %     parpool(11)
 % end
 
-for dv = 1:length(data_versions)
-    data_ver = data_versions{dv};
-    fformat = {data_ver, 'state_Python2mat.mat'};
-    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-    outdir = strcat(base_path, 'figures/phys_by_state/');
-    if ~exist(outdir, 'dir')
-        mkdir(outdir)
-    end
-    for a = animals
-        tmp = filterTrials(data, 'animal', num2str(a));
-        if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
-            tmp = removeFirstTrials(tmp);
-        end
-        for k = kstates
-            filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
-            plot_phys_by_states(filename, tmp, num2str(a), k, outdir)
-        end
-    end
-end
+data_ver = data_versions{1};
+% data_ver = data_versions{1};
+k = 5;
+fformat = {data_ver, 'state_Python2mat.mat'};
+base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+a = 241;
+filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
+plot_phys_by_states_outcomes(filename, data, a, k)
+
+% for dv = 1:length(data_versions)
+%     data_ver = data_versions{dv};
+%     fformat = {data_ver, 'state_Python2mat.mat'};
+%     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+%     outdir = strcat(base_path, 'figures/phys_by_state/');
+%     if ~exist(outdir, 'dir')
+%         mkdir(outdir)
+%     end
+%     for a = animals
+%         tmp = filterTrials(data, 'animal', num2str(a));
+%         if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+%             tmp = removeFirstTrials(tmp);
+%         end
+%         for k = kstates
+%             filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
+%             plot_phys_by_states(filename, tmp, num2str(a), k, outdir)
+%         end
+%     end
+% end
 
 function data = removeFirstTrials(data)
     sessions = unique(data.session_id);
@@ -62,6 +71,65 @@ function data = removeFirstTrials(data)
     end
     data(first_trials, :) = [];
 end
+
+function plot_phys_by_states_outcomes(filename, data, animal, k)
+    results = load(filename);
+    fig = figure('Visible', 'on', 'WindowState', 'maximized');
+    hold on;
+    states = 0:k-1;
+    tbounds = [-0.5, 1.0];
+    outcomes = {'Hit', 'Miss', 'CR'};
+    cols = distinguishable_colors(length(outcomes));
+    for i = states
+        tmp = data(results.predicted_states == i,:);
+        % outcomes = unique(tmp.categorical_outcome);
+        for o = 1:length(outcomes)
+            outcome = outcomes{o};
+            otmp = filterTrials(tmp, 'categorical_outcome', outcome);
+            if ~isempty(otmp)
+                [ch1, ch2, t] = avg_photo_traces(otmp, tbounds);
+                n = size(ch1,1);
+                subplot(length(states), 3, ((i+1)*3-3)+1)
+                hold on 
+                try
+                    semshade(ch1(:,2:end-1), 0.3, cols(o,:), cols(o,:), t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
+                catch
+                    % keyboard
+                    plot(t, ch1, 'DisplayName',sprintf('%s (n=%i)', outcome, n));
+                end
+                subplot(length(states), 3,((i+1)*3-3)+2)
+                hold on 
+                try
+                    semshade(ch2(:,2:end-1), 0.3, cols(o,:), cols(o,:), t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
+                catch
+                    % keyboard
+                    plot(t, ch2, 'DisplayName', sprintf('%s (n=%i)', outcome, n));
+                end
+                [pupil, t] = avg_pupil_traces(otmp, tbounds);
+                subplot(length(states), 3,((i+1)*3-3)+3)
+                hold on
+                try
+                    semshade(pupil(:,2:end-1), 0.3, cols(o, :), cols(o, :), t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
+                catch
+                    % keyboard
+                    plot(t, pupil, 'DisplayName', sprintf('State %i (n=%i)', i, n));
+                end
+            end
+        end
+        subplot(length(states),3,((i+1)*3-3)+1)
+        xlabel('Time (s)', 'FontSize', 14)
+        ylabel('mPFC NE', 'FontSize', 14)
+        subplot(length(states),3,((i+1)*3-3)+2)
+        xlabel('Time (s)', 'FontSize', 14)
+        ylabel('S1 NE', 'FontSize', 14)
+        title(sprintf('State %i',i), 'FontSize', 14)
+        subplot(length(states),3,((i+1)*3-3)+3)
+        xlabel('Time (s)', 'FontSize', 14)
+        ylabel('Pupil Area', 'FontSize', 14)
+        legend()
+    end
+end
+
 
 
 function plot_phys_by_states(filename, data, animal, k, outdir)
