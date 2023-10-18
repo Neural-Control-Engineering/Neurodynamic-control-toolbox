@@ -15,8 +15,8 @@ tbounds = [-0.5, 6.0];
 % plotByStimStrength(data, tbounds, 'stimulus');
 % tmp = filterTrials(data, 'categorical_outcome', outcome_types);
 % plotByStimStrength(tmp, tbounds, 'response');
-% % plot avg psychometric curve 
-% avgPsychCurve(data);
+% plot avg psychometric curve 
+avgPsychCurve(data);
 % % plot avg phys separated by stim strength and outcome
 % outcome_types = {'FA', 'Hit'};
 % tmp = filterTrials(data, 'categorical_outcome', outcome_types);
@@ -556,6 +556,26 @@ function [pupil, time] = avg_pupil_traces(data, tbounds, alignTo)
 end
 
 function avgPsychCurve(data)
+    figure()
+    animals = fetchAnimals(data);
+    cols = {'b', 'r', 'g', 'm'};
+    for a = 1:length(animals)
+        animal = animals(a);
+        tmp = filterTrials(data, 'animal', num2str(animal));
+        stim_strengths = unique(tmp.stimulus_strength);
+        mat = nan(size(tmp,1), length(stim_strengths));
+        for trial = 1:size(tmp,1)
+            ind = find(stim_strengths == tmp.stimulus_strength(trial));
+            if strcmp(tmp.categorical_outcome{trial}, 'Hit') || strcmp(tmp.categorical_outcome{trial}, 'CR')
+                mat(trial, ind) = 1;
+            else
+                mat(trial, ind) = 0;
+            end
+        end
+        sessions = unique(tmp.session_id);
+        semshade(mat(:,2:end), 0.3, cols{a}, cols{a}, stim_strengths(2:end) .* 10, 1, sprintf('(N_{sessions}=%i)', length(sessions)));
+        hold on
+    end
     stim_strengths = unique(data.stimulus_strength);
     mat = nan(size(data,1), length(stim_strengths));
     for trial = 1:size(data,1)
@@ -568,11 +588,11 @@ function avgPsychCurve(data)
     end
     % keyboard
     % mat = nansum(mat,1) ./ sum(~isnan(mat),1);
-    figure()
     n = size(mat,1);
-    semshade(mat(:,2:end), 0.3, 'b', 'b', stim_strengths(2:end) .* 10, 1, sprintf('(n=%i)', i, n));
+    semshade(mat(:,2:end), 0.3, 'k', 'k', stim_strengths(2:end) .* 10, 1, sprintf('Mean: (N_{animals}=%i)', length(animals)));
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Performance', 'FontSize', 14)
+    legend()
 end
 
 function checkPhotoBleach(data)
