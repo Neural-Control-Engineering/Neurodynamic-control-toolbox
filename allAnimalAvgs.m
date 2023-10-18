@@ -1,7 +1,7 @@
 data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
-tbounds = [-0.5, 4.0];
+tbounds = [-0.5, 6.0];
 
 % % separate by outcome 
 % outcome_types = unique(data.categorical_outcome);
@@ -29,9 +29,12 @@ tbounds = [-0.5, 4.0];
 % % plot phys based on response time
 % plotPhysByResponseTime(data, tbounds, 'stimulus')
 % plotPhysByResponseTime(data, tbounds, 'response')
-% psychometric curves separated by baseline pupil quintile 
+% % psychometric curves separated by baseline pupil quintile 
 % psychCurveByPupil(data)
-[Sm, Ss, Sp] = baselinesVsReactionTime(data);
+% [Sm, Ss, Sp] = baselinesVsReactionTime(data);
+% % check for photobleaching 
+% checkPhotoBleach(data)
+
 
 function [Sm, Ss, Sp] = baselinesVsReactionTime(data)
     outcomes = {'Hit', 'FA'};
@@ -177,24 +180,26 @@ function plotPhysByResponseTime(data, tbounds, alignTo)
     subplot(1,3,1)
     xlabel('Time (s)', 'FontSize', 14)
     ylabel('mPFC NE', 'FontSize', 14)
-    if strcmp(alignTo, 'stimulus')
-        ylim([-0.2, 0.7])
-        plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
-    else
-        ylim([-0.2, 0.7])
-        plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
-    end
+    % if strcmp(alignTo, 'stimulus')
+    %     ylim([-0.2, 0.7])
+    %     plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
+    % else
+    %     ylim([-0.2, 0.7])
+    %     plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
+    % end
+    ylim([-0.2, 0.7])
+    plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
     xlim([tbounds(1), tbounds(2)])
     subplot(1,3,2)
     xlabel('Time (s)', 'FontSize', 14)
     ylabel('S1 NE', 'FontSize', 14)
-    if strcmp(alignTo, 'stimulus')
-        ylim([-0.2, 0.7])
-        plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
-    else
-        ylim([-0.2, 0.7])
-        plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
-    end
+    % if strcmp(alignTo, 'stimulus')
+    %     ylim([-0.2, 0.7])
+    %     plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
+    % else
+    %     ylim([-0.2, 0.7])
+    %     plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
+    % end
     xlim([tbounds(1), tbounds(2)])
     subplot(1,3,3)
     if strcmp(alignTo, 'stimulus')
@@ -569,3 +574,24 @@ function avgPsychCurve(data)
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Performance', 'FontSize', 14)
 end
+
+function checkPhotoBleach(data)
+    animals = fetchAnimals(data);
+    animal = animals(3);
+    tmp = filterTrials(data, 'animal', num2str(animal));
+    sessions = unique(tmp.session_id);
+    for s = 1:length(sessions)
+        session = sessions{s};
+        stmp = filterTrials(tmp, 'session_id', session);
+        figure()
+        for t = 1:size(stmp)
+            subplot(1,2,1)
+            hold on
+            plot(data.photometry_ch1{t,1}(:,1), data.photometry_ch1{t,1}(:,2), 'k')
+            subplot(1,2,2)
+            hold on
+            plot(data.photometry_ch2{t,1}(:,1), data.photometry_ch2{t,1}(:,2), 'k')
+        end
+    end
+end
+
