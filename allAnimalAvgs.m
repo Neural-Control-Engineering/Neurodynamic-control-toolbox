@@ -16,7 +16,7 @@ tbounds = [-0.5, 6.0];
 % tmp = filterTrials(data, 'categorical_outcome', outcome_types);
 % plotByStimStrength(tmp, tbounds, 'response');
 % plot avg psychometric curve 
-avgPsychCurve(data);
+% avgPsychCurve(data);
 % % plot avg phys separated by stim strength and outcome
 % outcome_types = {'FA', 'Hit'};
 % tmp = filterTrials(data, 'categorical_outcome', outcome_types);
@@ -29,12 +29,178 @@ avgPsychCurve(data);
 % % plot phys based on response time
 % plotPhysByResponseTime(data, tbounds, 'stimulus')
 % plotPhysByResponseTime(data, tbounds, 'response')
-% % psychometric curves separated by baseline pupil quintile 
+% psychometric curves separated by baseline pupil quintile 
 % psychCurveByPupil(data)
 % [Sm, Ss, Sp] = baselinesVsReactionTime(data);
 % % check for photobleaching 
 % checkPhotoBleach(data)
+% reactionTimeVsStimStrength(data)
 
+% timeToThreshold(data, 0.3)
+
+figure2(data)
+
+function figure2(data)
+    pupilDilationByOutcome(data)
+    baslinePupilByOutcome(data)
+    avgPsychCurve(data)
+    reactionTimeVsStimStrength(data)
+    plotFirstLickHist(data)
+    tbounds = [-0.5, 6.0];
+    pupilByOutcome(data, tbounds, 'stimulus')
+    pupilByStimStrength(data, tbounds, 'stimulus')
+end
+
+function pupilByOutcome(data, tbounds, alignTo)
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    fig = figure('Visible', 'on', 'WindowState', 'maximized');
+    if ~exist('alignTo', 'var')
+        alignTo = 'stimulus';
+    end
+    cols = distinguishable_colors(length(outcomes));
+    for o = 1:length(outcomes)
+        outcome = outcomes{o};
+        otmp = filterTrials(data, 'categorical_outcome', outcome);
+        [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
+        subplot(1,length(outcomes),o)
+        axis square
+        hold on
+        n = size(pupil,1);
+        try
+            semshade(pupil(:,2:end-1), 0.3, 'k', 'k', ...
+                t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
+        catch
+            semshade(pupil(:,2:end-1), 0.3, cols{i}, cols{i}, ...
+            t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
+        end
+        title(outcome, 'FontSize', 16)
+        ylim([-0.5,0.5])
+        xlim(tbounds)
+    end
+    subplot(1,length(outcomes),1)
+    ylabel('Pupil Area (z-score)', 'FontSize', 14)
+end
+
+function pupilByStimStrength(data, tbounds, alingTo)
+    fig = figure('Visible', 'on', 'WindowState', 'maximized');
+    if ~exist('alignTo', 'var')
+        alignTo = 'stimulus';
+    end
+    stim_strengths = unique(data.stimulus_strength);
+    % outcomes = unique(data.categorical_outcome);
+    if length(unique(data.categorical_outcome)) > 2
+        outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    else
+        % outcomes = unique(data.categorical_outcome);
+        outcomes = {'Hit', 'FA'};
+    end
+    cols = distinguishable_colors(length(stim_strengths)+1);
+    % if strcmp(alignTo, 'stimulus')
+    %     cols = cols(2:end,:);
+    % end
+    count = 0;
+    for o = 1:length(outcomes)
+        outcome = outcomes{o};
+        if ~strcmp(outcome,'Delayed FA (CR)') && ~strcmp(outcome, 'Near Hit (Miss)')
+            tmp = filterTrials(data, 'categorical_outcome', outcome);
+            count = count + 1;
+        else
+            tmp = [];
+        end
+        if ~isempty(tmp)
+            for i = 1:length(stim_strengths)
+                stim = stim_strengths(i);
+                l = sprintf('%.2f PSI', stim);
+                otmp = filterTrials(tmp, 'stim_strength', stim);
+                if ~isempty(otmp)
+                    [pupil, t] = avg_pupil_traces(otmp, [-0.5, 6.0], alignTo);
+                    subplot(1,length(outcomes),o)
+                    axis square
+                    hold on
+                    n = size(pupil,1);
+                    try
+                        semshade(pupil(:,2:end-1), 0.3, cols(i,:), cols(i,:), ...
+                            t(2:end-1), 1, sprintf('%s (n=%i)', l, n));
+                    catch
+                        % keyboard
+                        semshade(pupil(:,2:end-1), 0.3, cols{i}, cols{i}, ...
+                        t(2:end-1), 1, sprintf('%s (n=%i)', l, n));
+                    end
+                end
+                ylim([-0.6, 1.2])
+            end
+        end
+        title(outcome, 'FontSize', 16)
+    end
+    subplot(1,length(outcomes),1)
+    ylabel('Pupil Area (z-score)', 'FontSize', 14)
+end
+
+    
+
+function reactionTimeVsStimStrength(data)
+    outcomes = 'Hit';
+    data = filterTrials(data, 'categorical_outcome', outcomes);
+    starts = data.stimulus_time + data.response_time;
+    data(isnan(starts),:) = [];
+    stim_strengths = unique(data.stimulus_strength);
+    avgs = zeros(1,length(stim_strengths));
+    stds = zeros(1,length(stim_strengths));
+    for i = 1:length(stim_strengths)
+        rts = data.response_time(data.stimulus_strength == stim_strengths(i));
+        avgs(i) = mean(rts);
+        stds(i) = std(rts) ./ length(rts);
+    end
+    figure()
+    errorbar(1:length(avgs), avgs, stds, 'k.')
+    hold on
+    bar(1:length(avgs), avgs, 'k')
+    xticks(1:length(avgs))
+    labels = {};
+    for i = 1:length(stim_strengths)
+        labels{i} = sprintf('%.1f',stim_strengths(i)*10);
+    end
+    xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
+    ylabel('Reaction Time (s)', 'FontSize', 14)
+    xticklabels(labels)
+end
+
+function timeToThreshold(data, threshold)
+    outcome = 'Hit';
+    data = filterTrials(data, 'categorical_outcome', outcome);
+    starts = data.stimulus_time + data.response_time;
+    data(isnan(starts),:) = [];
+    [ch1, ch2, t] = avg_photo_traces(data, [-0.5, 0], 'response');
+    ch1_thresh = zeros(1,size(ch1,1));
+    ch2_thresh = zeros(1,size(ch2,1));
+    for trial = 1:size(ch1,1)
+        ind = find(smooth(ch1(trial,:),10) > threshold, 1);
+        if isempty(ind)
+            ch1_thresh(trial) = nan;
+        else
+            ch1_thresh(trial) = t(ind);
+        end
+        ind = find(smooth(ch2(trial,:),10) > threshold, 1);
+        if isempty(ind)
+            ch2_thresh(trial) = nan;
+        else
+            ch2_thresh(trial) = t(ind);
+        end
+    end
+    figure()
+    subplot(1,2,1)
+    scatter(data.response_time, ch1_thresh)
+    hold on
+    [m, S] = polyfit(data.response_time(~isnan(ch1_thresh)), ch1_thresh(~isnan(ch1_thresh)), 1);
+    y = polyval(m, linspace(min(data.response_time), max(data.response_time), 10));
+    plot(linspace(min(data.response_time), max(data.response_time), 10), y, 'r')
+    subplot(1,2,2)
+    scatter(data.response_time(~isnan(ch2_thresh)), ch2_thresh(~isnan(ch2_thresh)))
+    hold on
+    [m, S] = polyfit(data.response_time(~isnan(ch2_thresh)), ch2_thresh(~isnan(ch2_thresh)), 1);
+    y = polyval(m, linspace(min(data.response_time), max(data.response_time), 10));
+    plot(linspace(min(data.response_time), max(data.response_time), 10), y, 'r')
+end
 
 function [Sm, Ss, Sp] = baselinesVsReactionTime(data)
     outcomes = {'Hit', 'FA'};
@@ -78,7 +244,73 @@ function [Sm, Ss, Sp] = baselinesVsReactionTime(data)
     ylabel('Reaction Time (s)', 'FontSize', 14)
 end
     
-    
+function pupilDilationByOutcome(data)
+    % outcomes = unique(data.categorical_outcome);
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    dilations = zeros(2,length(outcomes));
+    for o = 1:length(outcomes)
+        outcome = outcomes{o};
+        tmp = filterTrials(data, 'categorical_outcome', outcome);
+        [pupil, ~] = avg_pupil_traces(tmp, [0,6.0], 'stimulus');
+        [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+        dilations(1,o) = nanmean(nanmean(pupil))-nanmean(nanmean(baseline));
+        dilations(2,o) = nanstd(nanmean(pupil,2)-nanmean(pupil,2)) / size(pupil,1);
+    end
+    figure()
+    errorbar(1:size(dilations,2), dilations(1,:), dilations(2,:), 'k.')
+    bar(1:size(dilations,2), dilations(1,:), 'k')
+    hold on
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    action_dilations = zeros(2,length(action_outcomes));
+    for ao = 1:length(action_outcomes)
+        outcome = action_outcomes{ao};
+        tmp = filterTrials(data, 'categorical_outcome', outcome);
+        [pupil, ~] = avg_pupil_traces(tmp, [0,6.0], 'stimulus');
+        [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+        action_dilations(1,ao) = nanmean(nanmean(pupil))-nanmean(nanmean(baseline));
+        action_dilations(2,ao) = nanstd(nanmean(pupil,2)-nanmean(pupil,2)) / size(pupil,1);
+    end
+    x = size(dilations,2)+2:size(dilations,2)+1+size(action_dilations,2);
+    errorbar(x, action_dilations(1,:), action_dilations(2,:), 'k.')
+    bar(x, action_dilations(1,:), 'k')
+    xticks([1:size(dilations,2), x])
+    labels = [outcomes, {'Responded', 'Withheld'}]
+    xticklabels(labels)
+    ylabel('Mean Pupil Dilation (z-score)')
+end
+        
+
+function baslinePupilByOutcome(data)
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    baselines = zeros(2,length(outcomes));
+    for o = 1:length(outcomes)
+        outcome = outcomes{o};
+        tmp = filterTrials(data, 'categorical_outcome', outcome);
+        [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+        baselines(1,o) = nanmean(nanmean(baseline));
+        baselines(2,o) = nanstd(nanmean(baseline,2)) / size(baseline,1);
+    end
+    figure()
+    errorbar(1:size(baselines,2), baselines(1,:), baselines(2,:), 'k.')
+    bar(1:size(baselines,2), baselines(1,:), 'k')
+    hold on
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    action_baselines = zeros(2,length(action_outcomes));
+    for ao = 1:length(action_outcomes)
+        outcome = action_outcomes{ao};
+        tmp = filterTrials(data, 'categorical_outcome', outcome);
+        [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+        action_baselines(1,ao) = nanmean(nanmean(baseline));
+        action_baselines(2,ao) = nanstd(nanmean(baseline,2)) / size(baseline,1);
+    end
+    x = size(baselines,2)+2:size(baselines,2)+1+size(action_baselines,2);
+    errorbar(x, action_baselines(1,:), action_baselines(2,:), 'k.')
+    bar(x, action_baselines(1,:), 'k')
+    xticks([1:size(baselines,2), x])
+    labels = [outcomes, {'Responded', 'Withheld'}];
+    xticklabels(labels)
+    ylabel('Mean Baseline Pupil Area (z-score)')
+end
 
 function psychCurveByPupil(data)
     ptiles = 20:20:100;
@@ -573,7 +805,7 @@ function avgPsychCurve(data)
             end
         end
         sessions = unique(tmp.session_id);
-        semshade(mat(:,2:end), 0.3, cols{a}, cols{a}, stim_strengths(2:end) .* 10, 1, sprintf('(N_{sessions}=%i)', length(sessions)));
+        semshade(mat(:,2:end), 0.3, cols{a}, cols{a}, stim_strengths(2:end) .* 10, 1, sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
         hold on
     end
     stim_strengths = unique(data.stimulus_strength);
@@ -589,10 +821,11 @@ function avgPsychCurve(data)
     % keyboard
     % mat = nansum(mat,1) ./ sum(~isnan(mat),1);
     n = size(mat,1);
-    semshade(mat(:,2:end), 0.3, 'k', 'k', stim_strengths(2:end) .* 10, 1, sprintf('Mean: (N_{animals}=%i)', length(animals)));
+    % semshade(mat(:,2:end), 0.3, 'k', 'k', stim_strengths(2:end) .* 10, 1, sprintf('Mean: (N_{animals}=%i)', length(animals)));
+    plot(stim_strengths(2:end) .* 10, nanmean(mat(:,2:end)), 'k--', 'LineWidth', 2, 'DisplayName', sprintf('Mean: (N_{animals}=%i)', length(animals)))
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Performance', 'FontSize', 14)
-    legend()
+    legend('location', 'southeast')
 end
 
 function checkPhotoBleach(data)
