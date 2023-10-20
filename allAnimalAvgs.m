@@ -41,7 +41,12 @@ tbounds = [-0.5, 6.0];
 %% figures
 % figure2(data)
 % figure3(data)
-checkTraces(data)
+session = '243-R-mPFC-S1-NE_2023_01_09';
+lickRasterHist(data, session)
+
+function figure1(data)
+    example_traces(data)
+end
 
 function figure3(data)
     tbounds = [-1, 1];
@@ -66,41 +71,93 @@ function figure2(data)
     pupilByReactionTime(data, tbounds, 'response')
 end
 
-function checkTraces(data)
-    % data = filterTrials(data, 'categorical_outcome', 'Hit');
-    [ch1, ch2, t] = avg_photo_traces(data, [-5.0, 6.0], 'stimulus');
-    [pupil, tp] = avg_pupil_traces(data, [-5.0, 6.0], 'stimulus');
-    for i = 900
-        subplot(2,1,1)
-        hold on
-        plot(t, smooth(ch1(i,:),30), 'b')
-        plot(t, smooth(ch2(i,:),30), 'r')
-        subplot(2,1,2)
-        plot(tp, pupil(i,:))
+function lickRasterHist(data, session)
+    data = filterTrials(data, 'session_id', session);
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    tl = tiledlayout(2,length(outcomes),'TileSpacing','Compact');
+    axs = zeros(2,length(outcomes));
+    for r = 1:2
+        for c = 1:length(outcomes)
+            axs(r,c) = nexttile;
+        end
     end
+    for o = 1:length(outcomes)
+        outcome = outcomes{o};
+        tmp = filterTrials(data, 'categorical_outcome', outcome);
+        axes(axs(1,o))
+        hold on
+        fill([-2,0,0,-2],[0,0,size(tmp,1),size(tmp,1)],'r', 'FaceAlpha', 0.3)
+        fill([0,0.8,0.8,0],[0,0,size(tmp,1),size(tmp,1)],'g', 'FaceAlpha', 0.3)
+        fill([0.8,2.0,2.0,0.8],[0,0,size(tmp,1),size(tmp,1)],'w', 'FaceAlpha', 0.3)
+        binned_licks = zeros(1,10);
+        highs = linspace(0.08,0.8,10);
+        lows = linspace(0,0.72,10);
+        for trial = 1:size(tmp,1)
+            licks = tmp.lick_times{trial,1}-tmp.stimulus_time(trial);
+            good_licks = licks(licks>0 & licks<=0.8);
+            bad_licks = licks(licks<0 | licks>0.8);
+            plot(good_licks, repmat(trial, 1, length(good_licks)), 'k.')
+            plot(bad_licks, repmat(trial, 1, length(bad_licks)), '.', 'Color', [0.5,0.5,0.5])
+            for i = 1:length(highs)
+                binned_licks(i) = binned_licks(i) + length(good_licks(good_licks>=lows(i) & good_licks<=highs(i)));
+            end
+        end
+        xlim([-2,2])
+        ylim([0,size(tmp,1)])
+        title(outcome, 'FontSize', 16)
+        xticks([])
+        axes(axs(2,o))
+        hold on
+        fill([-2,0,0,-2],[0,0,max(binned_licks)+10,max(binned_licks)+10],'r', 'FaceAlpha', 0.3)
+        fill([0,0.8,0.8,0],[0,0,max(binned_licks)+10,max(binned_licks)+10],'g', 'FaceAlpha', 0.3)
+        fill([0.8,2.0,2.0,0.8],[0,0,max(binned_licks)+10,max(binned_licks)+10],'w', 'FaceAlpha', 0.3)
+        bar(highs-0.04, binned_licks, 'k')
+        xlim([-2,2])
+        ylim([0,max(binned_licks)+10])
+        yticks([])
+    end
+    axes(axs(1,1))
+    ylabel('Trial', 'FontSize', 14)
+    axes(axs(2,1))
+    ylabel('Binned Responses', 'FontSize', 14)
+    xlabel(tl, 'Time (s)', 'FontSize', 14)
 end
 
-        % subplot(2,1,1)
-        % plot(data.photometry_ch1{i,1}(:,1), smooth(data.photometry_ch1{i,1}(:,2),360), 'b')
-        % hold on
-        % plot(data.photometry_ch2{i,1}(:,1), smooth(data.photometry_ch2{i,1}(:,2),360), 'r')
-        % plot([data.stimulus_time(i), data.stimulus_time(i)], [-3,3], 'k:')
-        % title(num2str(i))
-        % subplot(2,1,2)
-        % hold on
-        % plot(data.pupil_area{i,1}(:,1), data.pupil_area{i,1}(:,2), 'm')
-        % plot([data.stimulus_time(i), data.stimulus_time(i)], [-2,2], 'k:')
-        % if ~isempty(data.distractor_times{i})
-        %     for j = 1:length(data.distractor_times{i})
-        %         d = data.distractor_times{i}(j);
-        %         subplot(2,1,1)
-        %         plot([d,d],[-4,4],'g:')
-        %         subplot(2,1,2)
-        %         plot([d,d],[-2,2],'g:')
-        %     end
-        % end
-%     end
-% end
+
+
+function example_traces(data)
+    i = 900;
+    mpfc = smooth(data.photometry_ch1{i,1}(:,2),60);
+    s1 = smooth(data.photometry_ch2{i,1}(:,2),60);
+    t = data.photometry_ch1{i,1}(:,1);
+    t = t-min(t);
+    mpfc = mpfc(t>4);
+    s1 = s1(t>4);
+    t = t(t>4);
+    t = t-min(t);
+    pupil = data.pupil_area{i,1}(:,2);
+    tp = data.pupil_area{i,1}(:,1);
+    tp = tp-min(tp);
+    pupil = pupil(tp>4);
+    tp = tp(tp>4);
+    tp = tp-min(tp);
+    fig = figure();
+    tl = tiledlayout(2,1,'TileSpacing', 'Compact');
+    axs = zeros(2,1);
+    axs(1) = nexttile;
+    plot(t, mpfc, 'b', 'DisplayName', 'mPFC NE')
+    hold on
+    plot(t, s1, 'r', 'DisplayName', 'S1 NE')
+    ylabel('Cortical NE (z-score)', 'FontSize', 14)
+    xlim([0,50])
+    leg = legend('location', 'southeast');
+    axs(2) = nexttile;
+    plot(tp, pupil, 'k', 'LineWidth', 2)
+    ylabel('Pupil Area (z-score)', 'FontSize', 14)
+    xlabel(tl, 'Time (s)', 'FontSize', 14)
+    xlim([0,50])
+    ylim([-2,2])
+end
 
 function increaseInNE(data)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
