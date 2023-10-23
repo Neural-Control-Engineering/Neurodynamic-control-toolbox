@@ -40,31 +40,18 @@ tbounds = [-0.5, 6.0];
 
 %% figures
 % figure2(data)
-% figure3(data)
-neAlignToDistractor(data)
+figure3(data)
+% figure1(data)
 
-function neAlignToDistractor(data)
+function pupilAlignedToDistractor(data)
     [starts, durs] = distractorToNextStim(data);
     pupil = [];
-    ch1mat = [];
-    ch2mat = [];
     Fss = getFs(data, 'photometry_ch1');
     tbounds = [-0.5,6.0];
-    time = linspace(-0.5, 6.0, round(max(Fss)*diff(tbounds)));
-    Fss = getFs(data, 'pupil_area');
     pupil_time = linspace(-0.5, 6.0, round(max(Fss)*diff(tbounds)));
     pupil = [];
     for i = 1:length(durs)
         if durs(i) > 6.0
-            t = data.photometry_ch1{i,1}(:,1) - starts(i);
-            ch1 = data.photometry_ch1{i,1}(:,2);
-            ch2 = data.photometry_ch2{i,1}(:,2);
-            ch1 = ch1(t > tbounds(1) & t < tbounds(2));
-            ch2 = ch2(t > tbounds(1) & t < tbounds(2));
-            t = t(t > tbounds(1) & t < tbounds(2));
-            % using interp1 to avoid issues with differing sample rates
-            ch1mat = [ch1mat; interp1(t, ch1, time)];
-            ch2mat = [ch2mat; interp1(t, ch2, time)];
             tp = data.pupil_area{i,1}(:,1) - starts(i);
             p = data.pupil_area{i,1}(:,2);
             p = p(tp > tbounds(1)-0.1 & tp < tbounds(2)+0.1);
@@ -76,6 +63,36 @@ function neAlignToDistractor(data)
             end
         end
     end
+    fig2 = figure();
+    hold on 
+    semshade(pupil(:,2:end-1), 0.3, 'k', 'k', ...
+                pupil_time(2:end-1), 1);
+    plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+    xlabel('Time (s)', 'FontSize', 14)
+    ylabel('Pupil Area (z-score)', 'FontSize', 14)
+end
+
+function neAlignToDistractor(data)
+    [starts, durs] = distractorToNextStim(data);
+    ch1mat = [];
+    ch2mat = [];
+    Fss = getFs(data, 'photometry_ch1');
+    tbounds = [-0.5,6.0];
+    time = linspace(-0.5, 6.0, round(max(Fss)*diff(tbounds)));
+    Fss = getFs(data, 'pupil_area');
+    for i = 1:length(durs)
+        if durs(i) > 6.0
+            t = data.photometry_ch1{i,1}(:,1) - starts(i);
+            ch1 = data.photometry_ch1{i,1}(:,2);
+            ch2 = data.photometry_ch2{i,1}(:,2);
+            ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+            ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+            t = t(t > tbounds(1) & t < tbounds(2));
+            % using interp1 to avoid issues with differing sample rates
+            ch1mat = [ch1mat; interp1(t, ch1, time)];
+            ch2mat = [ch2mat; interp1(t, ch2, time)];
+        end
+    end
     fig = figure();
     tl = tiledlayout(1,2,'TileSpacing','Compact')
     axs = zeros(1,2);
@@ -85,6 +102,7 @@ function neAlignToDistractor(data)
                 time(2:end-1), 1);
     ylabel('mPFC NE (z-score)', 'FontSize', 14)
     plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+    xlim([-0.1, 6.0])
     axs(2) = nexttile;
     hold on
     semshade(ch2mat(:,2:end-1), 0.3, 'k', 'k', ...
@@ -92,11 +110,7 @@ function neAlignToDistractor(data)
     ylabel('S1 NE (z-score)', 'FontSize', 14)
     plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
     xlabel(tl, 'Time (s)', 'FontSize', 14)
-    fig2 = figure();
-    hold on 
-    semshade(pupil(:,2:end-1), 0.3, 'k', 'k', ...
-                pupil_time(2:end-1), 1);
-    plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+    xlim([-0.1, 6.0])
 end    
 
 function figure1(data)
@@ -113,6 +127,7 @@ function figure3(data)
     neByOutcome(data, tbounds, 'stimulus')
     baselineNeByOutcome(data)
     increaseInNE(data)
+    neAlignToDistractor(data)
 end
 
 function figure2(data)
@@ -126,6 +141,7 @@ function figure2(data)
     pupilByStimStrength(data, tbounds, 'stimulus')
     tbounds = [-1, 1];
     pupilByReactionTime(data, tbounds, 'response')
+    pupilAlignedToDistractor(data)
 end
 
 function [starts, durs] = distractorToNextStim(data)
@@ -154,6 +170,7 @@ end
 function lickRasterHist(data, session)
     data = filterTrials(data, 'session_id', session);
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    fig = figure();
     tl = tiledlayout(2,length(outcomes),'TileSpacing','Compact');
     axs = zeros(2,length(outcomes));
     for r = 1:2
@@ -203,17 +220,21 @@ function lickRasterHist(data, session)
     xlabel(tl, 'Time (s)', 'FontSize', 14)
 end
 
-
-
 function example_traces(data)
     i = 900;
+    distractors = data.distractor_times{i,1};
+    stim_time = data.stimulus_time(i);
     mpfc = smooth(data.photometry_ch1{i,1}(:,2),60);
     s1 = smooth(data.photometry_ch2{i,1}(:,2),60);
     t = data.photometry_ch1{i,1}(:,1);
+    distractors = distractors - min(t);
+    stim_time = stim_time - min(t);
     t = t-min(t);
     mpfc = mpfc(t>4);
     s1 = s1(t>4);
     t = t(t>4);
+    distractors = distractors - min(t);
+    stim_time = stim_time - min(t);
     t = t-min(t);
     pupil = data.pupil_area{i,1}(:,2);
     tp = data.pupil_area{i,1}(:,1);
@@ -222,19 +243,39 @@ function example_traces(data)
     tp = tp(tp>4);
     tp = tp-min(tp);
     fig = figure();
-    tl = tiledlayout(2,1,'TileSpacing', 'Compact');
-    axs = zeros(2,1);
-    axs(1) = nexttile;
+    % tl = tiledlayout(3,1,'TileSpacing', 'Compact');
+    % axs = zeros(3,1);
+    % axs(1) = nexttile;
+    subplot(9,1,1)
+    hold on
+    for d = 1:length(distractors)
+        distractor = distractors(d);
+        if d == 1
+            plot([distractor, distractor], [-1,1], 'g', 'DisplayName', 'Distractors', 'LineWidth',3)
+        else
+            plot([distractor, distractor], [-1,1], 'g', 'HandleVisibility', 'off', 'LineWidth',3)
+        end
+    end
+    plot([stim_time, stim_time], [-1,1], 'k', 'DisplayName', 'True Stimulus', 'LineWidth',3)
+    ylabel('Stimuli', 'FontSize', 14)
+    xlim([0,50])
+    xticks([])
+    yticks([])
+    leg = legend();
+    % axs(2) = nexttile;
+    subplot(3,1,2)
     plot(t, mpfc, 'b', 'DisplayName', 'mPFC NE')
     hold on
     plot(t, s1, 'r', 'DisplayName', 'S1 NE')
     ylabel('Cortical NE (z-score)', 'FontSize', 14)
     xlim([0,50])
+    xticks([])
     leg = legend('location', 'southeast');
-    axs(2) = nexttile;
+    % axs(3) = nexttile;
+    subplot(3,1,3)
     plot(tp, pupil, 'k', 'LineWidth', 2)
     ylabel('Pupil Area (z-score)', 'FontSize', 14)
-    xlabel(tl, 'Time (s)', 'FontSize', 14)
+    xlabel('Time (s)', 'FontSize', 14)
     xlim([0,50])
     ylim([-2,2])
 end
@@ -350,7 +391,7 @@ function baselineNeByOutcome(data)
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Mean Baseline mPFC NE (z-score)', 'FontSize', 14)
+    ylabel('Mean Baseline S1 NE (z-score)', 'FontSize', 14)
 end    
 
 function neByOutcome(data, tbounds, alignTo)
