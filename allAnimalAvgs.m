@@ -39,9 +39,9 @@ tbounds = [-0.5, 6.0];
 % timeToThreshold(data, 0.3)
 
 %% figures
+figure1(data)
 % figure2(data)
-figure3(data)
-% figure1(data)
+% figure3(data)
 
 function pupilAlignedToDistractor(data)
     [starts, durs] = distractorToNextStim(data);
@@ -224,17 +224,20 @@ function example_traces(data)
     i = 900;
     distractors = data.distractor_times{i,1};
     stim_time = data.stimulus_time(i);
+    licks = data.lick_times{i,1};
     mpfc = smooth(data.photometry_ch1{i,1}(:,2),60);
     s1 = smooth(data.photometry_ch2{i,1}(:,2),60);
     t = data.photometry_ch1{i,1}(:,1);
     distractors = distractors - min(t);
     stim_time = stim_time - min(t);
+    licks = licks - min(t);
     t = t-min(t);
     mpfc = mpfc(t>4);
     s1 = s1(t>4);
     t = t(t>4);
     distractors = distractors - min(t);
     stim_time = stim_time - min(t);
+    licks = licks - min(t);
     t = t-min(t);
     pupil = data.pupil_area{i,1}(:,2);
     tp = data.pupil_area{i,1}(:,1);
@@ -262,6 +265,16 @@ function example_traces(data)
     xticks([])
     yticks([])
     leg = legend();
+    subplot(9,1,2)
+    hold on
+    for d = 1:length(licks)
+        lick = licks(d);
+        plot([lick, lick], [-1,1], 'k', 'DisplayName', 'Distractors', 'LineWidth',0.5)
+    end
+    ylabel('Stimuli', 'FontSize', 14)
+    xlim([0,50])
+    xticks([])
+    yticks([])
     % axs(2) = nexttile;
     subplot(3,1,2)
     plot(t, mpfc, 'b', 'DisplayName', 'mPFC NE')
