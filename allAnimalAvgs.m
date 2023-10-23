@@ -41,11 +41,68 @@ tbounds = [-0.5, 6.0];
 %% figures
 % figure2(data)
 % figure3(data)
-session = '243-R-mPFC-S1-NE_2023_01_09';
-lickRasterHist(data, session)
+neAlignToDistractor(data)
+
+function neAlignToDistractor(data)
+    [starts, durs] = distractorToNextStim(data);
+    pupil = [];
+    ch1mat = [];
+    ch2mat = [];
+    Fss = getFs(data, 'photometry_ch1');
+    tbounds = [-0.5,6.0];
+    time = linspace(-0.5, 6.0, round(max(Fss)*diff(tbounds)));
+    Fss = getFs(data, 'pupil_area');
+    pupil_time = linspace(-0.5, 6.0, round(max(Fss)*diff(tbounds)));
+    pupil = [];
+    for i = 1:length(durs)
+        if durs(i) > 6.0
+            t = data.photometry_ch1{i,1}(:,1) - starts(i);
+            ch1 = data.photometry_ch1{i,1}(:,2);
+            ch2 = data.photometry_ch2{i,1}(:,2);
+            ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+            ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+            t = t(t > tbounds(1) & t < tbounds(2));
+            % using interp1 to avoid issues with differing sample rates
+            ch1mat = [ch1mat; interp1(t, ch1, time)];
+            ch2mat = [ch2mat; interp1(t, ch2, time)];
+            tp = data.pupil_area{i,1}(:,1) - starts(i);
+            p = data.pupil_area{i,1}(:,2);
+            p = p(tp > tbounds(1)-0.1 & tp < tbounds(2)+0.1);
+            tp = tp(tp > tbounds(1)-0.1 & tp < tbounds(2)+0.1);
+            try
+                pupil = [pupil; interp1(tp, p, pupil_time)];
+            catch 
+                pupil = [pupil; nan(size(pupil_time))];
+            end
+        end
+    end
+    fig = figure();
+    tl = tiledlayout(1,2,'TileSpacing','Compact')
+    axs = zeros(1,2);
+    axs(1) = nexttile;
+    hold on
+    semshade(ch1mat(:,2:end-1), 0.3, 'k', 'k', ...
+                time(2:end-1), 1);
+    ylabel('mPFC NE (z-score)', 'FontSize', 14)
+    plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+    axs(2) = nexttile;
+    hold on
+    semshade(ch2mat(:,2:end-1), 0.3, 'k', 'k', ...
+                time(2:end-1), 1);
+    ylabel('S1 NE (z-score)', 'FontSize', 14)
+    plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+    xlabel(tl, 'Time (s)', 'FontSize', 14)
+    fig2 = figure();
+    hold on 
+    semshade(pupil(:,2:end-1), 0.3, 'k', 'k', ...
+                pupil_time(2:end-1), 1);
+    plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+end    
 
 function figure1(data)
     example_traces(data)
+    session = '243-R-mPFC-S1-NE_2023_01_09';
+    lickRasterHist(data, session)
 end
 
 function figure3(data)
@@ -70,6 +127,29 @@ function figure2(data)
     tbounds = [-1, 1];
     pupilByReactionTime(data, tbounds, 'response')
 end
+
+function [starts, durs] = distractorToNextStim(data)
+    difs = zeros(1,size(data,1));
+    durs = zeros(1,size(data,1));
+    starts = zeros(1,size(data,1));
+    for trial = 1:size(data,1)
+        if ~isempty(data.distractor_times{trial,1})
+            difs(trial) = data.stimulus_time(trial) - data.distractor_times{trial,1}(1);
+        else
+            difs(trial) = nan;
+        end
+        if ~isnan(difs(trial)) && difs(trial)>0
+            stims = [data.stimulus_time(trial); data.distractor_times{trial,1}];
+            stims = sort(stims);
+            durs(trial) = stims(2)-stims(1);
+            starts(trial) = data.distractor_times{trial,1}(1);
+        else
+            durs(trial) = nan;
+            starts(trial) = nan;
+        end
+    end
+end
+
 
 function lickRasterHist(data, session)
     data = filterTrials(data, 'session_id', session);
