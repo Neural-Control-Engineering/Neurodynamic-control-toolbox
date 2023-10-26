@@ -12,7 +12,7 @@ end
 session_names = {behavior_data_dir.name}';
 
 % Find name and date details for each session
-if strcmp(paths.data_source,"Project_Neurotransmitter-Exploration") | strcmp(paths.data_source,"Project_Somatosensory-Signal-Detection")
+if strcmp(paths.data_source,"Project_Neurodynamic-Control") || strcmp(paths.data_source,"Project_Somatosensory-Signal-Detection")
     for i = 1:height(session_names)
     
         dividers = strfind(session_names{i,1},'_');
