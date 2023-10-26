@@ -8,6 +8,7 @@ from lapse_utils import load_session_fold_lookup, load_data, \
     get_parmin, get_parmax, get_parstart, calculate_std
 
 np.random.seed(65)
+import IPython; IPython.embed()
 
 if __name__ == '__main__':
 
@@ -24,6 +25,7 @@ if __name__ == '__main__':
 
     for fold in range(num_folds):
         inpt, y, session = load_data(animal_file)
+        import IPython; IPython.embed()
         labels_for_plot = ['flashes', 'P_C', 'WSLS', 'bias']
         y = y.astype('int')
 

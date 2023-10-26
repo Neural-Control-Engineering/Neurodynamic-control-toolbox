@@ -94,15 +94,23 @@ elseif isunix
         paths.repo_path = '/home/craig/Neurodynamic-control-toolbox/';
 
         % Path to raw and analyzed data 
-        paths.all_data_path = '/home/craig/somat_signal_detect/';
+        paths.all_data_path = sprintf('/home/craig/%s', source);
+        % paths.all_data_path = '/home/craig/ntex/';
         paths.neuropixel.kilosort_repo = '/home/craig/Kilosort/';
         paths.neuropixel.workingdir = pwd();
     elseif strcmp(getenv('HOSTNAME'), 'Genoma')
         % Path for analysis code repo
         paths.repo_path = '/home/genoma/Neurodynamic-control-toolbox/';
-        % Path to raw and analyzed data 
-        paths.all_data_path = '/home/genoma/SSD_Data/';
+        % Path to raw and analyzed data
+        paths.all_data_path = sprintf('/home/genoma/%s', source);
         paths.neuropixel.kilosort_repo = '/home/genoma/Kilosort/';
+        paths.neuropixel.workingdir = pwd();
+    elseif strcmp(getenv('HOSTNAME'), 'craig-ThinkPad-E15')
+        % Path for analysis code repo
+        paths.repo_path = '/home/craig/Wang/Neurodynamic-control-toolbox/';
+        % Path to raw and analyzed data 
+        paths.all_data_path = '/home/craig/Wang/somat_signal_detect/';
+        paths.neuropixel.kilosort_repo = '/home/craig/Wang/Kilosort/';
         paths.neuropixel.workingdir = pwd();
     end
 end

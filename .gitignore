@@ -6,3 +6,5 @@ random_licks.m
 NT-GLM-HMM/NTEX_glmhmm_Model/training_cache/
 NT-GLM-HMM/results/
 Analysis/
+NT-GLM-HMM/__pycache__
+NT-GLM-HMM/NTEX_glmhmm_Model/__pycache__

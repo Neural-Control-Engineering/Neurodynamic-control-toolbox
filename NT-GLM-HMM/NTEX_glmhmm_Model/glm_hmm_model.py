@@ -1,6 +1,7 @@
 """Copy of Model_based_on_mat.ipynb, but setup to train the model with metrics from 
 photometry data of the previous trial
 Craig Kelley, NEC Lab, 8/16/23"""
+
 import time
 start_time = time.time()
 import scipy.io
@@ -19,8 +20,31 @@ from glm_utils_ntex import fit_glm, calculate_predictive_acc_glm, \
 from glm_hmm_utils_ntex import calculate_predictive_acc_glmhmm_ntex_parted, \
     fit_glmhmm_multiple_init, get_posterior_states_labels, get_posterior_states_labels_parted
 from plotting_utils_ntex import plot_glmhmm_weights
+import multiprocessing
+import argparse
+from os import mkdir 
 
-target = '../../glmhmm_example_trimmed_v2.mat'
+# parser command line arguments 
+parser = argparse.ArgumentParser(description = '''Run glm-hmm''')
+parser.add_argument('--target', nargs='?', type=str, default='../../ssd_v2_glm_hmm_spon_data.mat')
+parser.add_argument('--K_states', nargs='?', type=int, default=3)
+parser.add_argument('--results_dir', nargs='?', type=str, default='../results/')
+parser.add_argument('--shuffle_number', nargs='?', type=int, default=None)
+args = parser.parse_args()
+target = args.target
+K_states = args.K_states
+results_dir = args.results_dir
+result_dir_2matlab = results_dir
+
+if args.shuffle_number:
+    fname = target.split('.')[-2].split('/')[-1] + '_' + str(args.shuffle_number)
+else:
+    fname = target.split('.')[-2].split('/')[-1]
+
+try:
+    mkdir(results_dir)
+except:
+    pass
 
 loaded = scipy.io.loadmat(target)
 loaded_mat_keys = loaded.keys()
@@ -39,16 +63,14 @@ C = 2  # number of output types/categories here with only two: response or not
 D = 1  # dimension of data (observations)
 transition_alpha = 1  # Hyperparameter
 prior_sigma = 100  # Hyperparameter
-K_states = 3  # Number of states you wish to observe
 
-n_init = 5 # number of times for independent runs in which the one with the best predictive acc would be selected out
+n_init = 3 # number of times for independent runs in which the one with the best predictive acc would be selected out
 N_em_iters = 500  # number of max iterations for the expectation-maximization algorithm, which is set to prevent non-converging situation
 global_fit = True  # If global_fit true, use GLM parameter as initial params for glmhmm
 # If global_fit false, pretrained glmhmm params are needed and used as as initial params for glmhmm
 
 
 # get time now and result storing path to saving data such as the trained glmhmm parameters
-results_dir = '../results/'
 N_property = len(input_shuffled[0][0])
 M_GLM = N_property-1  # Number of inputs for each trial for the model
 # Since GLM model already has the bias colum, so remove this column before feeding to it, which is column 4
@@ -57,13 +79,24 @@ M_HMM = N_property  # Number of inputs for each trial for the model
 input_index_hmm = list(range(0, M_HMM))
 
 data_size = len(input_shuffled)
-Acc_GLM_5fold = []
-Param_GLM_5fold = []
-Acc_HMM_5fold = []
-Param_HMM_5fold = []
 
-for j in range(fold):
-    # get hmm training and test set, for hmm training, the data should be parted into sessions
+# generate input and output objects compatible with multiprocessing 
+manager = multiprocessing.Manager()
+return_dict = manager.dict() # output 
+fbase = result_dir_2matlab + fname + '_' + str(K_states) + 'state_'
+input_data = [(input_shuffled, y_shuffled, M_GLM, M_HMM, C, D, i, fbase) for i in range(fold)] # list of input tuples
+
+def train(inputs):
+    # parse inputs
+    input_shuffled = inputs[0]
+    y_shuffled = inputs[1]
+    M_GLM = inputs[2]
+    M_HMM = inputs[3]
+    C = inputs[4]
+    D = inputs[5]
+    j = inputs[6]
+    params_file_base = inputs[7]
+    params_file = params_file_base + str(j) + 'fold_params.mat'
     input_this_test_hmm = [
         x[:, input_index_hmm]
         for c, x in enumerate(input_shuffled)
@@ -80,7 +113,7 @@ for j in range(fold):
         x[:, :]
         for c, x in enumerate(y_shuffled)
         if c < j*len(input_shuffled)/fold or c > (j+1)*len(input_shuffled)/fold]
-
+    
     # get glm training and test set, for glm training, the data should not be parted, that concatenaed
     input_this_test_glm = []
     input_this_train_glm = []
@@ -105,14 +138,14 @@ for j in range(fold):
                     input_this_train_glm, x[:, input_index_glm]))
                 y_this_train_glm = np.concatenate((
                     y_this_train_glm, y_shuffled[c]))
-
     # run GLM model training
     best_param_glm, best_acc_glm = fit_glm_multiple_init(
         input_this_train_glm, y_this_train_glm,
         input_this_test_glm, y_this_test_glm,
         M_GLM, C, n_init)
-    Param_GLM_5fold.append(best_param_glm)
-    Param_GLM_5fold.append(best_acc_glm)
+    tmp_dict = {}
+    tmp_dict['Param_GLM_5fold'] = [best_param_glm, best_acc_glm]
+
 
     # start GLM HMM training
     now = datetime.now()
@@ -125,14 +158,53 @@ for j in range(fold):
         # create a matrix of ones in the same shape as the y dataset
         K_states, D, M_HMM, C, N_em_iters, transition_alpha,
         prior_sigma, global_fit, best_param_glm,
-        'training_cache/glmhmm_' + time_str,
-        n_init, partition=True)
-    Param_HMM_5fold.append(weights_glmhmm_example)
-    Acc_HMM_5fold.append(acc_glmhmm_example)
-print(Acc_HMM_5fold)
+        params_file,  n_init, partition=True)
+    tmp_dict['Param_HMM_5fold'] =  weights_glmhmm_example
+    tmp_dict['Acc_HMM_5fold'] =  acc_glmhmm_example
+    return_dict[j] = tmp_dict
+    
+pool = multiprocessing.Pool()
+pool.map(train, input_data)
+# for data in input_data:
+#     train(data)
 
-plt.plot(Acc_HMM_5fold)
-plt.savefig('accuracy_vs_fold.png')
+Acc_HMM_5fold = [return_dict[key]['Acc_HMM_5fold'] for key in return_dict.keys()]
+Param_HMM_5fold = [return_dict[key]['Param_HMM_5fold'] for key in return_dict.keys()]
+Param_GLM_5fold = [return_dict[key]['Param_GLM_5fold'] for key in return_dict.keys()]
 
+Best_param = Param_HMM_5fold[Acc_HMM_5fold.index(max(Acc_HMM_5fold))]
+
+# states_probs: for each trial what is its probability in state1, state2 and so on
+# predicted_states: basically find the max one among the states_probs for each trial
+# predicted_response_prob: the predicted probability of response
+# predicted_label: If predicted_response_prob > 50, labeled as response trial, otherwise no-response trial
+states_probs, predicted_states, predicted_label, predicted_response_prob = \
+    get_posterior_states_labels_parted(
+        input_compatible, label_compatible,
+        Best_param, K_states, range(K_states))
+
+time_str =  datetime.now().strftime("%Y-%m-%d-%H%M%S")
+np.savez(results_dir+ fname + '_' + str(K_states) + 'state.npz',
+         states_probs,
+         predicted_states,
+         predicted_response_prob,
+         predicted_label,
+         Acc_HMM_5fold,
+         Param_GLM_5fold,
+         Param_HMM_5fold
+         )
+
+scipy.io.savemat(result_dir_2matlab + fname + '_' + str(K_states) + 'state_Python2mat.mat',
+                 dict(
+                     states_probs = states_probs,
+                     predicted_states = predicted_states,
+                     predicted_response_prob = predicted_response_prob,
+                     predicted_label = predicted_label,
+                     accuracy = Acc_HMM_5fold,
+                     hmm_params = Param_HMM_5fold,
+                     glm_params = Param_GLM_5fold
+                 ))
+
+print('%s mean accuracy: %f' % (fname, np.mean(Acc_HMM_5fold)))
 print("--- %s seconds ---" % (time.time() - start_time))
                                 

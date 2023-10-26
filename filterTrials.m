@@ -15,13 +15,20 @@ function db = filterTrials(data, filterBy, value)
     elseif strcmp(filterBy, 'session_id')
         db = data(data.session_id == value,:);
     elseif strcmp(filterBy, 'categorical_outcome')
-        db = data(data.categorical_outcome == value, :);
+        if ischar(value)
+            db = data(data.categorical_outcome == value, :);
+        else
+            x = data.categorical_outcome == value{1} | data.categorical_outcome == value{2};
+            db = data(x,:);
+        end
     elseif strcmp(filterBy, 'go-nogo')
         db = data(data.go_nogo == value, :);
     elseif strcmp(filterBy, 'stim_strength_less_than')
         db = data(data.stimulus_strength < value, :);
     elseif strcmp(filterBy, 'stim_strength_greater_than')
         db = data(data.stimulus_strength > value, :);
+    elseif strcmp(filterBy, 'stim_strength')
+        db = data(data.stimulus_strength == value, :);
     elseif strcmp(filterBy, 'phase')
         db = data(data.phase == value, :);
     elseif strcmp(filterBy, 'recording_location')
@@ -31,6 +38,9 @@ function db = filterTrials(data, filterBy, value)
         end
         inds = cellfun(@contains, data.session_id, name);
         db = data(inds,:);
+    elseif strcmp(filterBy, 'response_time')
+        x = data.response_time >= value(1) & data.response_time <= value(2);
+        db = data(x,:);
     else
         fprintf('Invalid filter method\n')
     end

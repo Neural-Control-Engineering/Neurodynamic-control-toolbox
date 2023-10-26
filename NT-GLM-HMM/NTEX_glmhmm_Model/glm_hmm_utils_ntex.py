@@ -3,6 +3,7 @@ import sys
 import ssm
 import autograd.numpy as np
 import autograd.numpy.random as npr
+from scipy.io import savemat 
 
 
 def get_posterior_states_labels(input, output, hmm_params, K, permutation):
@@ -127,7 +128,8 @@ def fit_glm_hmm_ntex(datas, inputs, masks, K, D, M, C, N_em_iters,
                        initialize=False,
                        tolerance=10 ** -4)
     # Save raw parameters of HMM, as well as loglikelihood during training
-    np.savez(save_title, this_hmm.params, lls)
+    # np.savez(save_title, this_hmm.params, lls)
+    savemat(save_title, {'params' : this_hmm.params})
     return this_hmm.params, lls
 
 

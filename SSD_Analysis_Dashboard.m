@@ -23,7 +23,8 @@ opt_windows.MA_window = 0.15;
 analysis_params.process_neuropixel = false;
 
 % Determine which computer is running the script and set the various file locations accordingly
-[paths] = setPaths("Project_Somatosensory-Signal-Detection");
+[paths] = setPaths('Wang/somat_signal_detect/');
+% [paths] = setPaths("Project_Somatosensory-Signal-Detection");
 
 %% Alternatively, if you want to load the second dataset with stimuli of 0, 0.5, 1, 2, 10, 20 psi
 [paths] = setPaths("Project_Neurodynamic-Control");
