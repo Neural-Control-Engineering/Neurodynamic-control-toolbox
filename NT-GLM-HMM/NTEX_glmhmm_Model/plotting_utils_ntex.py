@@ -68,6 +68,25 @@ def load_lapse_params(lapse_file):
     return lapse_loglikelihood, lapse_glm_weights, lapse_glm_weights_std, \
            lapse_p, lapse_p_std
 
+def calculate_predictive_acc_lapse_model(lapse_glm_weights, lapse_p,
+                                         num_lapse_params, inpt, y,
+                                         idx_to_exclude):
+    M = inpt.shape[1]
+    from LapseModel_ntex import lapse_model
+    new_lapse_model = lapse_model(M, num_lapse_params)
+    if num_lapse_params == 1:
+        new_lapse_model.params = [lapse_glm_weights, np.array([lapse_p])]
+    else:
+        new_lapse_model.params = [lapse_glm_weights, lapse_p]
+    prob_right = np.exp(new_lapse_model.calculate_logits(inpt))
+    prob_right = prob_right[:, 1]
+    # Get the predicted label for each time step:
+    predicted_label = np.around(prob_right, decimals=0).astype('int')
+    # Examine at appropriate idx
+    predictive_acc = np.sum(
+        y[idx_to_exclude,
+          0] == predicted_label[idx_to_exclude]) / len(idx_to_exclude)
+    return predictive_acc
 
 def load_cv_arr(file):
     container = np.load(file, allow_pickle=True)
