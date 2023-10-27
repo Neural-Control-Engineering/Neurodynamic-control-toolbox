@@ -13,10 +13,10 @@ np.random.seed(65)
 if __name__ == '__main__':
 
     data_dir = '../../data/ibl/data_for_cluster/'
-    # input_ver = 'last_trial_behavior_no_bias'
+    input_ver = 'last_trial_behavior_no_bias'
     # input_ver = 'spontaneous_pupil_stim'
     # input_ver = 'spontaneous_s1_stim'
-    input_ver = 'random'
+    # input_ver = 'random'
     results_dir = '/home/craig/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/' + input_ver + '/'
 
     num_lapse_params = 1
@@ -47,7 +47,7 @@ if __name__ == '__main__':
             start = fin 
             fin = fin + plus
 
-
+        test_acc = []
         for fold in range(num_folds):
             # inpt, y, session = load_data(animal_file)
             # labels_for_plot = ['flashes', 'P_C', 'WSLS', 'bias']
@@ -65,6 +65,8 @@ if __name__ == '__main__':
             #                                   session[idx_this_fold]
             this_inpt = inpt[fold_lookup == fold, :]
             this_y = y[fold_lookup == fold]
+            test_inpt = inpt[fold_lookup != fold, :]
+            test_y = y[fold_lookup != fold, :]
 
             M = this_inpt.shape[1]
             loglikelihood_train_vector = []
@@ -91,7 +93,7 @@ if __name__ == '__main__':
             hessians = []
 
             for init in range(num_initializations):
-                print("Current initialization = " + str(init))
+                # print("Current initialization = " + str(init))
                 parstart = parmin_grid + np.random.rand(
                     parmin_grid.size) * (parmax_grid - parmin_grid)
                 # Instantiate new model
@@ -99,20 +101,41 @@ if __name__ == '__main__':
                 new_model = lapse_model(M, num_lapse_params)
                 # Initialize parameters as parstart
                 new_model.params = [parstart[range(M + 1)], parstart[(M + 1):]]
+                # # Fit model, and obtain loglikelihood and parameters
+                # new_model.fit_lapse_model(datas=[this_y],
+                #                         inputs=[this_inpt],
+                #                         masks=None,
+                #                         tags=None)
+                # # Loglikelihood
+                # final_ll = new_model.log_marginal(datas=[this_y],
+                #                                 inputs=[this_inpt],
+                #                                 masks=None,
+                #                                 tags=None)
                 # Fit model, and obtain loglikelihood and parameters
-                new_model.fit_lapse_model(datas=[this_y],
-                                        inputs=[this_inpt],
+                new_model.fit_lapse_model(datas=[test_y],
+                                        inputs=[test_inpt],
                                         masks=None,
                                         tags=None)
                 # Loglikelihood
-                final_ll = new_model.log_marginal(datas=[this_y],
-                                                inputs=[this_inpt],
+                final_ll = new_model.log_marginal(datas=[test_y],
+                                                inputs=[test_inpt],
                                                 masks=None,
                                                 tags=None)
                 log_likelihoods[init] = final_ll
                 # Parameters
                 pars.append([new_model.params])
                 hessians.append([new_model.hessian])
+                # # evaluate model
+                # state, pred = new_model.sample(test_inpt)
+                # print('%.1f%% Accuracy' % (sum(pred == test_y) / test_y.shape[0] * 100)[0])
+                # # print('%.1f%% trials in state 1' % (sum(state.reshape(pred.shape) == 0) / pred.shape[0]))
+                # print(np.unique(state))
+                # evaluate model
+                state, pred = new_model.sample(this_inpt)
+                # print('%.1f%% Accuracy' % (sum(pred == this_y) / this_y.shape[0] * 100)[0])
+                # # print('%.1f%% trials in state 1' % (sum(state.reshape(pred.shape) == 0) / pred.shape[0]))
+                # print(np.unique(state))
+                test_acc.append(sum(pred == this_y) / this_y.shape[0] * 100)
 
             ordered_initializations = np.argsort(-log_likelihoods)
 
@@ -134,7 +157,7 @@ if __name__ == '__main__':
             glm_weights_for_plotting = []
 
             for j, init in enumerate(ordered_initializations[range(3)]):
-                print("best init: " + str(init))
+                # print("best init: " + str(init))
                 plt.subplot(1, 4 + num_lapse_params, j + 1)
                 these_pars = pars[init]
                 glm_weights = these_pars[0][0]
@@ -261,3 +284,4 @@ if __name__ == '__main__':
                     "Initializations \n All Animals",
                     fontsize=15)
                 # fig.savefig(figure_directory + 'lapse_model_fit_2_param.png')
+        print('Animal %i: Acc=%.1f%%' % (animal, np.mean(test_acc)))

@@ -53,6 +53,7 @@ if __name__ == '__main__':
         # create train test idx
         trial_fold_lookup_table = create_train_test_trials_for_pred_acc(
             y, num_folds=5)
+        import IPython; IPython.embed()
 
         # Lapse Model fit:
         # for num_lapse_params in [1, 2]:
