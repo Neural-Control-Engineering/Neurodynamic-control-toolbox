@@ -6,30 +6,24 @@ import matplotlib.pyplot as plt
 from LapseModel_ntex import lapse_model
 from lapse_utils_ntex import load_session_fold_lookup, load_data, \
     get_parmin, get_parmax, get_parstart, calculate_std
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 
 np.random.seed(65)
 
 if __name__ == '__main__':
 
-    data_dir = '../../data/ibl/data_for_cluster/'
-    input_ver = 'last_trial_behavior_no_bias'
-    # input_ver = 'spontaneous_pupil_stim'
+    # input_ver = 'last_trial_behavior_no_bias'
+    input_ver = 'spontaneous_pupil_stim'
     # input_ver = 'spontaneous_s1_stim'
     # input_ver = 'random'
     results_dir = '/home/craig/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/' + input_ver + '/'
 
-    num_lapse_params = 1
-    num_folds = 5
-
-    # Fit GLM to all data
-    animal_file = data_dir + 'all_animals_concat.npz'
-
-    # session_fold_lookup_table = load_session_fold_lookup(
-    #     data_dir + 'all_animals_concat_session_fold_lookup.npz')
-    
+    num_lapse_params = 2
+    num_folds = 5    
 
     animals = [240,241,242,243]
+    acc_by_animal = []
+    best_model_each_animal = []
     for animal in animals:
 
         loaded = loadmat('/home/craig/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/'+input_ver+'/'+str(animal)+'_' + input_ver + '.mat')
@@ -48,6 +42,7 @@ if __name__ == '__main__':
             fin = fin + plus
 
         test_acc = []
+        models = []
         for fold in range(num_folds):
             # inpt, y, session = load_data(animal_file)
             # labels_for_plot = ['flashes', 'P_C', 'WSLS', 'bias']
@@ -97,20 +92,9 @@ if __name__ == '__main__':
                 parstart = parmin_grid + np.random.rand(
                     parmin_grid.size) * (parmax_grid - parmin_grid)
                 # Instantiate new model
-                # import IPython; IPython.embed()
                 new_model = lapse_model(M, num_lapse_params)
                 # Initialize parameters as parstart
                 new_model.params = [parstart[range(M + 1)], parstart[(M + 1):]]
-                # # Fit model, and obtain loglikelihood and parameters
-                # new_model.fit_lapse_model(datas=[this_y],
-                #                         inputs=[this_inpt],
-                #                         masks=None,
-                #                         tags=None)
-                # # Loglikelihood
-                # final_ll = new_model.log_marginal(datas=[this_y],
-                #                                 inputs=[this_inpt],
-                #                                 masks=None,
-                #                                 tags=None)
                 # Fit model, and obtain loglikelihood and parameters
                 new_model.fit_lapse_model(datas=[test_y],
                                         inputs=[test_inpt],
@@ -125,16 +109,9 @@ if __name__ == '__main__':
                 # Parameters
                 pars.append([new_model.params])
                 hessians.append([new_model.hessian])
-                # # evaluate model
-                # state, pred = new_model.sample(test_inpt)
-                # print('%.1f%% Accuracy' % (sum(pred == test_y) / test_y.shape[0] * 100)[0])
-                # # print('%.1f%% trials in state 1' % (sum(state.reshape(pred.shape) == 0) / pred.shape[0]))
-                # print(np.unique(state))
+                models.append(new_model)
                 # evaluate model
                 state, pred = new_model.sample(this_inpt)
-                # print('%.1f%% Accuracy' % (sum(pred == this_y) / this_y.shape[0] * 100)[0])
-                # # print('%.1f%% trials in state 1' % (sum(state.reshape(pred.shape) == 0) / pred.shape[0]))
-                # print(np.unique(state))
                 test_acc.append(sum(pred == this_y) / this_y.shape[0] * 100)
 
             ordered_initializations = np.argsort(-log_likelihoods)
@@ -284,4 +261,12 @@ if __name__ == '__main__':
                     "Initializations \n All Animals",
                     fontsize=15)
                 # fig.savefig(figure_directory + 'lapse_model_fit_2_param.png')
-        print('Animal %i: Acc=%.1f%%' % (animal, np.mean(test_acc)))
+        print('Animal %i: Mean Acc=%.1f%%' % (animal, np.mean(test_acc)))
+        print('Animal %i: Best Acc=%.1f%%' % (animal, np.max(test_acc)))
+        best_model = models[np.argmax(test_acc)]
+        best_model_each_animal.append(best_model)
+        acc_by_animal.append(test_acc)
+        states, pred = best_model.sample(inpt)
+        savemat(results_dir + "Lapse_Model/" + str(animal) + '/results.mat', 
+                {'predicted_states' : states, 'predicted_action' : pred,
+                 'accuracy' : test_acc})
