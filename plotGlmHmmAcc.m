@@ -28,6 +28,7 @@ kstates = [2,3,4,5];
 %     'dynamic_state'};
 data_versions = {'last_trial_behavior_no_bias', ... 
     'spontaneous_pupil_stim', ...
+    'last_trial_behavior_drop_stim_no_bias', ...
      };
 N_folds = 5;
 
@@ -41,7 +42,7 @@ best_fig = combineAnimals(animals, data_versions, kstates, 'best');
 all_fig = combineAnimals(animals, data_versions, kstates, 'all');
 
 function fig = combineAnimals(animals, data_versions, kstates, lapse_ver)
-    fig = figure('Visible', 'on', 'WindowState', 'maximized');
+    fig = figure('Visible', 'on');
     hold on
     cs = distinguishable_colors(length(data_versions));
     avgs = zeros(1,length(kstates)+1);

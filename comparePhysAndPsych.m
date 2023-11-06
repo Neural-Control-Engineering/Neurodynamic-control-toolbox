@@ -17,24 +17,24 @@ animals = animals_v2;
 animal = 242;
 k = 3;
 
-% fig = figure('Visible', 'on', 'WindowState', 'maximized');
-% hold on;
-% for dv = 1:length(data_versions)
-%     data_ver = data_versions{dv};
-%     fformat = {data_ver, 'state_Python2mat.mat'};
-%     results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-%     tmp = filterTrials(data, 'animal', num2str(animal));
-%     if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
-%         tmp = removeFirstTrials(tmp);
-%     end    
-%     fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, k, fformat{2});
-%     subplot(length(data_versions), 4, (dv-1)*4+1)
-%     hold on
-%     plot_psycho_curves_states(fname, tmp, num2str(animal), k, data_ver);
-%     xlabel('Stimulus Strength (PSI)', 'FontSize', 14, 'FontWeight', 'bold')
-%     ylabel('Performance', 'FontSize', 14, 'FontWeight', 'bold')
-%     plot_phys_by_states(fname, tmp, num2str(animal), k, length(data_versions), 4, (dv-1)*4+2)
-% end
+fig = figure('Visible', 'on', 'WindowState', 'maximized');
+hold on;
+for dv = 1:length(data_versions)
+    data_ver = data_versions{dv};
+    fformat = {data_ver, 'state_Python2mat.mat'};
+    results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+    tmp = filterTrials(data, 'animal', num2str(animal));
+    if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+        tmp = removeFirstTrials(tmp);
+    end    
+    fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, k, fformat{2});
+    subplot(length(data_versions), 4, (dv-1)*4+1)
+    hold on
+    plot_psycho_curves_states(fname, tmp, num2str(animal), k, data_ver);
+    xlabel('Stimulus Strength (PSI)', 'FontSize', 14, 'FontWeight', 'bold')
+    ylabel('Performance', 'FontSize', 14, 'FontWeight', 'bold')
+    plot_phys_by_states(fname, tmp, num2str(animal), k, length(data_versions), 4, (dv-1)*4+2)
+end
 
 % for dv = 1:length(data_versions)
 %     data_ver = data_versions{dv};
@@ -48,10 +48,49 @@ k = 3;
 %     % dilationByState(tmp, fname, k, data_ver)
 %     baselinePupilByState(tmp, fname, k, data_ver)
 % end
-baselinePupilByState(data, k, data_versions, animal)
-dilationByState(data, k, data_versions, animal)
-baselineNeByState(data, k, data_versions, animal)
 
+[base_fig, base_axs] = baselineBarGraphs(data, k, data_versions, animal);
+[evoked_fig, evoked_axs] = evokedBarGraphs(data, k, data_versions, animal);
+
+function [fig, axs] = evokedBarGraphs(data, k, data_versions, animal);
+    fig = figure('Visible', 'on', 'WindowState', 'maximized');
+    axs = zeros(2,3);
+    tl = tiledlayout(2,3,'TileSpacing','Compact');
+    for r = 1:2
+        for c = 1:3
+            axs(r,c) = nexttile;
+        end
+    end
+    dilationByState(data, k, data_versions, animal, axs(:,1))
+    increaseInNeByState(data, k, data_versions, animal, axs(:,2:3))
+    axes(axs(1,1))
+    ylim([-0.5,1.2])
+    axes(axs(2,1))
+    ylim([-0.5,1.2])
+    axes(axs(1,3))
+    ylim([-0.3,0.7])
+    axes(axs(2,3))
+    ylim([-0.3,0.7])
+end
+
+function [fig, axs] = baselineBarGraphs(data, k, data_versions, animal)
+    fig = figure('Visible', 'on', 'WindowState', 'maximized');
+    axs = zeros(2,3);
+    tl = tiledlayout(2,3,'TileSpacing','Compact');
+    for r = 1:2
+        for c = 1:3
+            axs(r,c) = nexttile;
+        end
+    end
+    baselinePupilByState(data, k, data_versions, animal, axs(:,1))
+    baselineNeByState(data, k, data_versions, animal, axs(:,2:3))
+    axes(axs(1,1))
+    ylim([-1,1])
+    axes(axs(2,2))
+    ylim([-1.2,0.2])
+    axes(axs(2,3))
+    ylim([-0.5,0.3])
+end
 
 function plot_psycho_curves_states(filename, data, animal, k, data_version)
     % identifies all sessions in which a particular state occurs, generates a 
@@ -253,14 +292,14 @@ function [pupil, time] = avg_pupil_traces(data, tbounds, alignTo)
     end
 end
 
-function dilationByState(data, k, data_versions, animal)
+function dilationByState(data, k, data_versions, animal, axs)
     data = filterTrials(data, 'animal', num2str(animal));
-    fig = figure();
-    tl = tiledlayout(length(data_versions),1);
-    axs = zeros(length(data_versions),1);
-    for i = 1:length(data_versions)
-        axs(i) = nexttile;
-    end
+    % fig = figure();
+    % tl = tiledlayout(length(data_versions),1);
+    % axs = zeros(length(data_versions),1);
+    % for i = 1:length(data_versions)
+    %     axs(i) = nexttile;
+    % end
     states = 0:k-1;
     cols = distinguishable_colors(length(states));
     for dv = 1:length(data_versions)
@@ -285,15 +324,48 @@ function dilationByState(data, k, data_versions, animal)
     end
 end
 
-function baselineNeByState(data, k, data_versions, animal)
+function increaseInNeByState(data, k, data_versions, animal, axs)
     data = filterTrials(data, 'animal', num2str(animal));
-    fig = figure();
-    tl = tiledlayout(length(data_versions),2);
-    axs = zeros(length(data_versions),2);
-    for i = 1:length(data_versions)
-        axs(i,1) = nexttile;
-        axs(i,2) = nexttile;
+    % fig = figure();
+    % tl = tiledlayout(length(data_versions),2);
+    % axs = zeros(length(data_versions),2);
+    % for i = 1:length(data_versions)
+    %     axs(i,1) = nexttile;
+    %     axs(i,2) = nexttile;
+    % end
+    states = 0:k-1;
+    cols = distinguishable_colors(length(states));
+    for dv = 1:length(data_versions)
+        data_ver = data_versions{dv};
+        fformat = {data_ver, 'state_Python2mat.mat'};
+        results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', 'v2', data_ver);
+        fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, k, fformat{2});
+        if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+           tmp = removeFirstTrials(data);
+        else
+           tmp = data;
+        end
+        results = load(fname);
+        offset = -0.2;
+        for i = states
+            stmp = tmp(results.predicted_states == i,:);
+            if ~isempty(stmp)
+                increaseInNE(stmp, offset, axs(dv,:), cols(i+1,:))
+                offset = offset + 0.2;
+            end
+        end
     end
+end
+
+function baselineNeByState(data, k, data_versions, animal, axs)
+    data = filterTrials(data, 'animal', num2str(animal));
+    % fig = figure();
+    % tl = tiledlayout(length(data_versions),2);
+    % axs = zeros(length(data_versions),2);
+    % for i = 1:length(data_versions)
+    %     axs(i,1) = nexttile;
+    %     axs(i,2) = nexttile;
+    % end
     states = 0:k-1;
     cols = distinguishable_colors(length(states));
     for dv = 1:length(data_versions)
@@ -318,14 +390,14 @@ function baselineNeByState(data, k, data_versions, animal)
     end
 end
 
-function baselinePupilByState(data, k, data_versions, animal)
+function baselinePupilByState(data, k, data_versions, animal, axs)
     data = filterTrials(data, 'animal', num2str(animal));
-    fig = figure();
-    tl = tiledlayout(length(data_versions),1);
-    axs = zeros(length(data_versions),1);
-    for i = 1:length(data_versions)
-        axs(i) = nexttile;
-    end
+    % fig = figure();
+    % tl = tiledlayout(length(data_versions),1);
+    % axs = zeros(length(data_versions),1);
+    % for i = 1:length(data_versions)
+    %     axs(i) = nexttile;
+    % end
     states = 0:k-1;
     cols = distinguishable_colors(length(states));
     for dv = 1:length(data_versions)
@@ -505,19 +577,26 @@ function baselineNeByOutcome(data, offset, ax, c)
     ylabel('Mean Baseline S1 NE (z-score)', 'FontSize', 14)
 end    
 
-function increaseInNE(data)
+function increaseInNE(data, offset, ax, c)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     mpfc = zeros(2,length(outcomes));
     s1 = mpfc;
     for o = 1:length(outcomes)
         outcome = outcomes{o};
         tmp = filterTrials(data, 'categorical_outcome', outcome);
-        [ch1, ch2, ~] = avg_photo_traces(tmp, [0,4.0], 'stimulus');
-        [ch1b, ch2b, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
-        mpfc(1,o) = nanmean(nanmean(ch1))-nanmean(nanmean(ch1b));
-        mpfc(2,o) = nanstd(nanmean(ch1,2)-nanmean(ch1,2)) / size(ch1,1);
-        s1(1,o) = nanmean(nanmean(ch2))-nanmean(nanmean(ch2b));
-        s1(2,o) = nanstd(nanmean(ch2,2)-nanmean(ch2b,2)) / size(ch2,1);
+        if ~isempty(tmp)
+            [ch1, ch2, ~] = avg_photo_traces(tmp, [0,4.0], 'stimulus');
+            [ch1b, ch2b, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
+            mpfc(1,o) = nanmean(nanmean(ch1))-nanmean(nanmean(ch1b));
+            mpfc(2,o) = nanstd(nanmean(ch1,2)-nanmean(ch1,2)) / size(ch1,1);
+            s1(1,o) = nanmean(nanmean(ch2))-nanmean(nanmean(ch2b));
+            s1(2,o) = nanstd(nanmean(ch2,2)-nanmean(ch2b,2)) / size(ch2,1);
+        else
+            mpfc(1,o) = nan;
+            mpfc(2,o) = nan;
+            s1(1,o) = nan;
+            s1(2,o) = nan;
+        end
     end
     action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
     action_mpfc = zeros(2,length(action_outcomes));
@@ -525,35 +604,39 @@ function increaseInNE(data)
     for ao = 1:length(action_outcomes)
         outcome = action_outcomes{ao};
         tmp = filterTrials(data, 'categorical_outcome', outcome);
-        [ch1, ch2, ~] = avg_photo_traces(tmp, [0,6.0], 'stimulus');
-        [ch1b, ch2b, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
-        action_mpfc(1,ao) = nanmean(nanmean(ch1))-nanmean(nanmean(ch1b));
-        action_mpfc(2,ao) = nanstd(nanmean(ch1,2)-nanmean(ch1b,2)) / size(ch1,1);
-        action_s1(1,ao) = nanmean(nanmean(ch2))-nanmean(nanmean(ch2b));
-        action_s1(2,ao) = nanstd(nanmean(ch2,2)-nanmean(ch2b,2)) / size(ch2,1);
+        if ~isempty(tmp)
+            [ch1, ch2, ~] = avg_photo_traces(tmp, [0,6.0], 'stimulus');
+            [ch1b, ch2b, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
+            action_mpfc(1,ao) = nanmean(nanmean(ch1))-nanmean(nanmean(ch1b));
+            action_mpfc(2,ao) = nanstd(nanmean(ch1,2)-nanmean(ch1b,2)) / size(ch1,1);
+            action_s1(1,ao) = nanmean(nanmean(ch2))-nanmean(nanmean(ch2b));
+            action_s1(2,ao) = nanstd(nanmean(ch2,2)-nanmean(ch2b,2)) / size(ch2,1);
+        else
+            action_mpfc(1,ao) = nan;
+            action_mpfc(2,ao) = nan;
+            action_s1(1,ao) = nan;
+            action_s1(2,ao) = nan;
+        end
     end
     x = size(mpfc,2)+2:size(mpfc,2)+1+size(action_mpfc,2);
-    fig = figure();
-    fig.Position = [1308, 1301, 1405, 573];
-    tl = tiledlayout(1,2,'TileSpacing','Compact');
-    axs = zeros(1,2);
-    axs(1) = nexttile;
+    x = x + offset;
+    axes(ax(1))
     hold on
-    errorbar(1:size(mpfc,2), mpfc(1,:), mpfc(2,:), 'k.')
-    bar(1:size(mpfc,2), mpfc(1,:), 'k')
-    errorbar(x, action_mpfc(1,:), action_mpfc(2,:), 'k.')
-    bar(x, action_mpfc(1,:), 'k')
+    errorbar([1:size(mpfc,2)]+offset, mpfc(1,:), mpfc(2,:), '.', 'Color', c)
+    bar([1:size(mpfc,2)]+offset, mpfc(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    errorbar(x, action_mpfc(1,:), action_mpfc(2,:), '.', 'Color', c)
+    bar(x, action_mpfc(1,:), 'FaceColor', c, 'BarWidth', 0.2)
     xticks([1:size(mpfc,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
     xtickangle(45)
     ylabel('Mean Evoked mPFC NE (z-score)', 'FontSize', 14)
-    axs(2) = nexttile;
+    axes(ax(2))
     hold on
-    errorbar(1:size(s1,2), s1(1,:), s1(2,:), 'k.')
-    bar(1:size(s1,2), s1(1,:), 'k')
-    errorbar(x, action_s1(1,:), action_s1(2,:), 'k.')
-    bar(x, action_s1(1,:), 'k')
+    errorbar([1:size(s1,2)]+offset, s1(1,:), s1(2,:), '.', 'Color', c)
+    bar([1:size(s1,2)]+offset, s1(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    errorbar(x, action_s1(1,:), action_s1(2,:), '.', 'Color', c)
+    bar(x, action_s1(1,:), 'FaceColor', c, 'BarWidth', 0.2)
     xticks([1:size(s1,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)

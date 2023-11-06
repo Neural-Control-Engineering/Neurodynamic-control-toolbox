@@ -13,7 +13,8 @@ np.random.seed(65)
 if __name__ == '__main__':
 
     # input_ver = 'last_trial_behavior_no_bias'
-    input_ver = 'spontaneous_pupil_stim'
+    # input_ver = 'spontaneous_pupil_stim'
+    input_ver = 'last_trial_behavior_drop_stim_no_bias'
     # input_ver = 'spontaneous_s1_stim'
     # input_ver = 'random'
     results_dir = '/home/craig/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/' + input_ver + '/'
