@@ -37,11 +37,83 @@ tbounds = [-0.5, 6.0];
 % reactionTimeVsStimStrength(data)
 
 % timeToThreshold(data, 0.3)
+% distractorVsTarget(data)
 
 %% figures
 figure1(data)
-% figure2(data)
-% figure3(data)
+figure2(data)
+figure3(data)
+
+function distractorVsTarget(data)
+    [starts, durs] = distractorToNextStim(data);
+    ch1mat = [];
+    ch2mat = [];
+    Fss = getFs(data, 'photometry_ch1');
+    tbounds = [-0.5,6.0];
+    time = linspace(-0.5, 6.0, round(max(Fss)*diff(tbounds)));
+    Fss = getFs(data, 'pupil_area');
+    for i = 1:length(durs)
+        if durs(i) > 6.0
+            t = data.photometry_ch1{i,1}(:,1) - starts(i);
+            ch1 = data.photometry_ch1{i,1}(:,2);
+            ch2 = data.photometry_ch2{i,1}(:,2);
+            ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+            ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+            t = t(t > tbounds(1) & t < tbounds(2));
+            % using interp1 to avoid issues with differing sample rates
+            ch1mat = [ch1mat; interp1(t, ch1, time)];
+            ch2mat = [ch2mat; interp1(t, ch2, time)];
+        end
+    end
+    fig = figure();
+    tl = tiledlayout(1,2,'TileSpacing','Compact');
+    axs = zeros(1,2);
+    axs(1) = nexttile;
+    hold on
+    semshade(ch1mat(:,2:end-1), 0.3, 'r', 'r', ...
+                time(2:end-1), 1, 'Distractor');
+    plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+    xlim([-0.1, 6.0])
+    axs(2) = nexttile;
+    hold on
+    semshade(ch2mat(:,2:end-1), 0.3, 'r', 'r', ...
+                time(2:end-1), 1, sprintf('Distractor (n=%i)', size(ch2mat,1)));
+    plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
+    xlim([-0.1, 6.0])
+
+    otmp = filterTrials(data, 'categorical_outcome', {'Hit', 'Miss'});
+    [ch1, ch2, tp] = avg_photo_traces(otmp, [tbounds(1), tbounds(2)], 'stimulus');
+    axes(axs(1));
+    hold on
+    try
+        semshade(ch1(:,2:end-1), 0.3, 'b', 'b', ...
+            tp(2:end-1), 1, 'Target');
+    catch
+        semshade(ch1(:,2:end-1), 0.3, 'b', 'b', ...
+            tp(2:end-1), 1);
+    end
+    xlim(tbounds)
+    plot([0,0], [-0.5,0.6], 'k:', 'HandleVisibility', 'off')
+    axes(axs(2));
+    hold on
+    try
+        semshade(ch2(:,2:end-1), 0.3, 'b', 'b', ...
+            tp(2:end-1), 1, sprintf('Target (n=%i)', size(ch2,1)));
+    catch
+        semshade(ch2(:,2:end-1), 0.3, 'b', 'k', ...
+            tp(2:end-1), 1);
+    end
+    xlim(tbounds)
+    plot([0,0], [-0.5,0.6], 'k:', 'HandleVisibility', 'off')
+    axes(axs(1))
+    ylabel('mPFC NE (z-score)', 'FontSize', 14)
+    ylim([-0.1,0.4])
+    axes(axs(2))
+    ylabel('S1 NE (z-score)', 'FontSize', 14)
+    ylim([-0.1,0.4])
+    xlabel(tl, 'Time (s)', 'FontSize', 14)
+    leg = legend()
+end
 
 function pupilAlignedToDistractor(data)
     [starts, durs] = distractorToNextStim(data);
