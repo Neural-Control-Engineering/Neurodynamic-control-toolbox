@@ -48,7 +48,7 @@ xcorrs(data)
 
 function xcorrs(data)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
-    fig = figure();
+    fig = figure('Position', [404,166,1252,766]);
     tl = tiledlayout(3,4,'TileSpacing','Compact');
     axs = zeros(3,4);
     for r  = 1:3
@@ -76,7 +76,7 @@ function xcorrs(data)
             [c, lag] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
             try
                 lags(i,:) = lag ./ Fs;
-                cs(i,:) = c;
+                cs(i,:) = c ./ length(ch1(2:end-1));
             catch
                 lags(i,:) = nan(1, size(lags,2));
                 cs(i,:) = nan(1,size(cs,2));
@@ -86,7 +86,7 @@ function xcorrs(data)
             [c, lag] = xcorr(p(3:end-1), x(3:end-1));
             try
                 ls(i,:) = lag ./ 12;
-                mp(i,:) = c;
+                mp(i,:) = c ./ length(p(3:end-1));
             catch
                 ls(i,:) = nan(1, size(ls,2));
                 mp(i,:) = nan(1,size(mp,2));
@@ -95,7 +95,7 @@ function xcorrs(data)
             x = decimate(s1(1,:), 12, 'fir');
             [c, ~] = xcorr(p(3:end-1), x(3:end-1));
             try
-                sp(i,:) = c;
+                sp(i,:) = c ./ length(p(3:end-1));
             catch
                 sp(i,:) = nan(1,size(mp,2));
             end
@@ -103,21 +103,21 @@ function xcorrs(data)
         axes(axs(1,o))
         hold on
         semshade(cs, 0.3, 'k', 'k', lags(1,:), 1);
-        plot([0,0],[-15,30], 'k:', 'HandleVisibility','off')
-        ylim([-15,30])
+        plot([0,0],[-0.6,0.6], 'k:', 'HandleVisibility','off')
+        ylim([-0.06,0.06])
         xlim([-4,4])
         title(outcomes{o}, 'FontSize', 16)
         axes(axs(2,o))
         hold on
         semshade(mp, 0.3, 'k', 'k', ls(1,:), 1);
-        plot([0,0],[-15,30], 'k:', 'HandleVisibility', 'off')
-        ylim([-2,2])
+        plot([0,0],[-0.6,0.6], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.06,0.06])
         xlim([-4,4])
         axes(axs(3,o))
         hold on
         semshade(sp, 0.3, 'k', 'k', ls(1,:), 1);
-        plot([0,0],[-15,30], 'k:', 'HandleVisibility', 'off')
-        ylim([-2,2])
+        plot([0,0],[-0.6,0.6], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.06,0.06])
         xlim([-4,4])
     end
     axes(axs(1,1))
@@ -127,6 +127,24 @@ function xcorrs(data)
     axes(axs(3,1))
     ylabel('S1 x Pupil Area', 'FontSize', 16)
     xlabel(tl, 'Lag (s)', 'FontSize', 16)
+    for r = 1:3
+        for c = 2:4
+            axes(axs(r,c))
+            yticks([])
+        end
+    end
+    for r = 1:2
+        for c = 1:4
+            axes(axs(r,c))
+            xticks([])
+        end
+    end
+    ylabel(tl, 'Normalized Cross Correlation', 'FontSize', 16)
+    % for r = 1:3
+    %     axes(axs(r,1))
+    %     yticks([-0.5,0,0.5])
+    %     yticklabels(['-0.5', '0', '0.5'])
+    % end
 end
 
 
