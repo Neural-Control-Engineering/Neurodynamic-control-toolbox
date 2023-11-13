@@ -34,6 +34,8 @@ for dv = 1:length(data_versions)
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14, 'FontWeight', 'bold')
     ylabel('Performance', 'FontSize', 14, 'FontWeight', 'bold')
     plot_phys_by_states(fname, tmp, num2str(animal), k, length(data_versions), 4, (dv-1)*4+2)
+    annotation('textbox', [0.4, 0.87, 0.1, 0.1], 'String', 'Prev. Trial Behavior + Stim. Strength', 'FontSize', 16)
+    annotation('textbox', [0.43, 0.4, 0.1, 0.1], 'String', 'Pupil Area + Stim. Strength', 'FontSize', 16)
 end
 
 % for dv = 1:length(data_versions)
@@ -67,6 +69,18 @@ function [fig, axs] = evokedBarGraphs(data, k, data_versions, animal);
     title('Prev. Trial Behavior + Stim. Strength', 'FontSize', 14)
     axes(axs(2,2))
     title('Pupil Area + Stim. Strength', 'FontSize', 14)
+    for c = 1:3
+        ys = zeros(2,2);
+        for r = 1:2 
+            axes(axs(r,c))
+            ys(r,:) = ylim;
+        end
+        for r = 1:2 
+            axes(axs(r,c))
+            ylim([min(ys(:,1))-0.05, max(ys(:,2))+0.05])
+        end
+    end
+        
     % 242 - 3 states 
     % axes(axs(1,1))
     % ylim([-0.5,1.2])
@@ -77,18 +91,18 @@ function [fig, axs] = evokedBarGraphs(data, k, data_versions, animal);
     % axes(axs(2,3))
     % ylim([-0.3,0.7])
     % 240 - 4 states 
-    axes(axs(1,1))
-    ylim([-1,1])
-    axes(axs(2,1))
-    ylim([-1,1])
-    axes(axs(1,2))
-    ylim([-0.3,0.3])
-    axes(axs(2,2))
-    ylim([-0.3,0.3])
-    axes(axs(1,3))
-    ylim([-0.3,0.5])
-    axes(axs(2,3))
-    ylim([-0.3,0.5])
+    % axes(axs(1,1))
+    % ylim([-1,1])
+    % axes(axs(2,1))
+    % ylim([-1,1])
+    % axes(axs(1,2))
+    % ylim([-0.3,0.3])
+    % axes(axs(2,2))
+    % ylim([-0.3,0.3])
+    % axes(axs(1,3))
+    % ylim([-0.3,0.5])
+    % axes(axs(2,3))
+    % ylim([-0.3,0.5])
 end
 
 function [fig, axs] = baselineBarGraphs(data, k, data_versions, animal)
@@ -106,8 +120,29 @@ function [fig, axs] = baselineBarGraphs(data, k, data_versions, animal)
     title('Prev. Trial Behavior + Stim. Strength', 'FontSize', 16)
     axes(axs(2,2))
     title('Pupil Area + Stim. Strength', 'FontSize', 16)
+    for c = 1:3
+        ys = zeros(2,2);
+        for r = 1:2 
+            axes(axs(r,c))
+            ys(r,:) = ylim;
+        end
+        for r = 1:2 
+            axes(axs(r,c))
+            ylim([min(ys(:,1))-0.05, max(ys(:,2))+0.05])
+        end
+    end
     % axes(axs(1,1))
     % ylim([-1,1])
+    % axes(axs(2,1))
+    % ylim([-1,1])
+    % axes(axs(1,2))
+    % % ylim([-1.2,1.2])
+    % % axes(axs(2,2))
+    % % ylim([-1.2,1.2])
+    % axes(axs(1,3))
+    % ylim([-0.5,0.3])
+    % axes(axs(2,3))
+    % ylim([-0.5,0.3])
     % axes(axs(2,2))
     % ylim([-1.2,0.2])
     % axes(axs(2,3))
