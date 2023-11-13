@@ -14,8 +14,8 @@ animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 animals = animals_v2;
 
-animal = 242;
-k = 3;
+animal = 240;
+k = 4;
 
 fig = figure('Visible', 'on', 'WindowState', 'maximized');
 hold on;
@@ -63,14 +63,32 @@ function [fig, axs] = evokedBarGraphs(data, k, data_versions, animal);
     end
     dilationByState(data, k, data_versions, animal, axs(:,1))
     increaseInNeByState(data, k, data_versions, animal, axs(:,2:3))
+    axes(axs(1,2))
+    title('Prev. Trial Behavior + Stim. Strength', 'FontSize', 14)
+    axes(axs(2,2))
+    title('Pupil Area + Stim. Strength', 'FontSize', 14)
+    % 242 - 3 states 
+    % axes(axs(1,1))
+    % ylim([-0.5,1.2])
+    % axes(axs(2,1))
+    % ylim([-0.5,1.2])
+    % axes(axs(1,3))
+    % ylim([-0.3,0.7])
+    % axes(axs(2,3))
+    % ylim([-0.3,0.7])
+    % 240 - 4 states 
     axes(axs(1,1))
-    ylim([-0.5,1.2])
+    ylim([-1,1])
     axes(axs(2,1))
-    ylim([-0.5,1.2])
+    ylim([-1,1])
+    axes(axs(1,2))
+    ylim([-0.3,0.3])
+    axes(axs(2,2))
+    ylim([-0.3,0.3])
     axes(axs(1,3))
-    ylim([-0.3,0.7])
+    ylim([-0.3,0.5])
     axes(axs(2,3))
-    ylim([-0.3,0.7])
+    ylim([-0.3,0.5])
 end
 
 function [fig, axs] = baselineBarGraphs(data, k, data_versions, animal)
@@ -84,12 +102,16 @@ function [fig, axs] = baselineBarGraphs(data, k, data_versions, animal)
     end
     baselinePupilByState(data, k, data_versions, animal, axs(:,1))
     baselineNeByState(data, k, data_versions, animal, axs(:,2:3))
-    axes(axs(1,1))
-    ylim([-1,1])
+    axes(axs(1,2))
+    title('Prev. Trial Behavior + Stim. Strength', 'FontSize', 16)
     axes(axs(2,2))
-    ylim([-1.2,0.2])
-    axes(axs(2,3))
-    ylim([-0.5,0.3])
+    title('Pupil Area + Stim. Strength', 'FontSize', 16)
+    % axes(axs(1,1))
+    % ylim([-1,1])
+    % axes(axs(2,2))
+    % ylim([-1.2,0.2])
+    % axes(axs(2,3))
+    % ylim([-0.5,0.3])
 end
 
 function plot_psycho_curves_states(filename, data, animal, k, data_version)
@@ -442,25 +464,30 @@ function pupilDilationByOutcome(data, offset, ax, c)
     axes(ax)
     hold on
     errorbar([1:size(dilations,2)]+offset, dilations(1,:), dilations(2,:), '.', 'Color', c)
-    bar([1:size(dilations,2)]+offset, dilations(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar([1:size(dilations,2)]+offset, dilations(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
     action_dilations = zeros(2,length(action_outcomes));
     for ao = 1:length(action_outcomes)
         outcome = action_outcomes{ao};
         tmp = filterTrials(data, 'categorical_outcome', outcome);
-        [pupil, ~] = avg_pupil_traces(tmp, [0,6.0], 'stimulus');
-        [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
-        action_dilations(1,ao) = nanmean(nanmean(pupil))-nanmean(nanmean(baseline));
-        action_dilations(2,ao) = nanstd(nanmean(pupil,2)-nanmean(baseline,2)) / size(pupil,1);
+        if ~isempty(tmp)
+            [pupil, ~] = avg_pupil_traces(tmp, [0,6.0], 'stimulus');
+            [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+            action_dilations(1,ao) = nanmean(nanmean(pupil))-nanmean(nanmean(baseline));
+            action_dilations(2,ao) = nanstd(nanmean(pupil,2)-nanmean(baseline,2)) / size(pupil,1);
+        else
+            action_dilations(1,ao) = nan;
+            action_dilations(2,ao) = nan;
+        end
     end
     x = size(dilations,2)+2:size(dilations,2)+1+size(action_dilations,2);
     x = x + offset;
     errorbar(x, action_dilations(1,:), action_dilations(2,:), '.', 'Color', c)
-    bar(x, action_dilations(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar(x, action_dilations(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     xticks([1:size(dilations,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
-    ylabel('Mean Pupil Dilation (z-score)')
+    ylabel('Mean Pupil Dilation (z-score)', 'FontSize', 16)
 end
         
 
@@ -482,7 +509,7 @@ function baselinePupilByOutcome(data, offset, ax, c)
     axes(ax)
     hold on
     errorbar([1:size(baselines,2)]+offset, baselines(1,:), baselines(2,:), '.', 'Color', c)
-    bar([1:size(baselines,2)]+offset, baselines(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar([1:size(baselines,2)]+offset, baselines(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
     action_baselines = zeros(2,length(action_outcomes));
     for ao = 1:length(action_outcomes)
@@ -500,11 +527,11 @@ function baselinePupilByOutcome(data, offset, ax, c)
     x = size(baselines,2)+2:size(baselines,2)+1+size(action_baselines,2);
     x = x + offset;
     errorbar(x, action_baselines(1,:), action_baselines(2,:), '.', 'Color', c)
-    bar(x, action_baselines(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar(x, action_baselines(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     xticks([1:size(baselines,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
-    ylabel('Mean Baseline Pupil Area (z-score)')
+    ylabel('Mean Baseline Pupil Area (z-score)', 'FontSize', 16)
 end
 
 function baselineNeByOutcome(data, offset, ax, c)
@@ -530,11 +557,11 @@ function baselineNeByOutcome(data, offset, ax, c)
     axes(ax(1))
     hold on
     errorbar([1:size(ch1b,2)]+offset, ch1b(1,:), ch1b(2,:), '.', 'Color', c)
-    bar([1:size(ch1b,2)]+offset, ch1b(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar([1:size(ch1b,2)]+offset, ch1b(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     axes(ax(2))
     hold on
     errorbar([1:size(ch2b,2)]+offset, ch2b(1,:), ch2b(2,:), '.', 'Color', c)
-    bar([1:size(ch2b,2)]+offset, ch2b(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar([1:size(ch2b,2)]+offset, ch2b(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     % action trials
     action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
     action_ch1b = zeros(2,length(action_outcomes));
@@ -559,7 +586,7 @@ function baselineNeByOutcome(data, offset, ax, c)
     x = size(ch1b,2)+2:size(ch1b,2)+1+size(action_ch1b,2);
     x = x + offset;
     errorbar(x, action_ch1b(1,:), action_ch1b(2,:), '.', 'Color', c)
-    bar(x, action_ch1b(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar(x, action_ch1b(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     xticks([1:size(ch1b,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
@@ -569,7 +596,7 @@ function baselineNeByOutcome(data, offset, ax, c)
     x = size(ch2b,2)+2:size(ch2b,2)+1+size(action_ch2b,2);
     x = x + offset;
     errorbar(x, action_ch2b(1,:), action_ch2b(2,:), '.', 'Color', c)
-    bar(x, action_ch2b(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar(x, action_ch2b(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     xticks([1:size(ch2b,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
@@ -623,9 +650,9 @@ function increaseInNE(data, offset, ax, c)
     axes(ax(1))
     hold on
     errorbar([1:size(mpfc,2)]+offset, mpfc(1,:), mpfc(2,:), '.', 'Color', c)
-    bar([1:size(mpfc,2)]+offset, mpfc(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar([1:size(mpfc,2)]+offset, mpfc(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     errorbar(x, action_mpfc(1,:), action_mpfc(2,:), '.', 'Color', c)
-    bar(x, action_mpfc(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar(x, action_mpfc(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     xticks([1:size(mpfc,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
@@ -634,9 +661,9 @@ function increaseInNE(data, offset, ax, c)
     axes(ax(2))
     hold on
     errorbar([1:size(s1,2)]+offset, s1(1,:), s1(2,:), '.', 'Color', c)
-    bar([1:size(s1,2)]+offset, s1(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar([1:size(s1,2)]+offset, s1(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     errorbar(x, action_s1(1,:), action_s1(2,:), '.', 'Color', c)
-    bar(x, action_s1(1,:), 'FaceColor', c, 'BarWidth', 0.2)
+    bar(x, action_s1(1,:), 'FaceColor', c, 'BarWidth', 0.15)
     xticks([1:size(s1,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
