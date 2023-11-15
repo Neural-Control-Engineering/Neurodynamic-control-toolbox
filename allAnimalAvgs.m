@@ -46,6 +46,12 @@ tbounds = [-0.5, 6.0];
 
 xcorrs(data)
 
+xcorrStats(data)
+
+function xcorrStats(data)
+    right_wrong = {{'Hit', 'CR'}, {'Miss', 'FA'}};
+end
+
 function xcorrs(data)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     fig = figure('Position', [404,166,1252,766]);
@@ -276,13 +282,17 @@ function figure3(data)
     neByStimStrength(data, tbounds, 'stimulus')
     neByOutcome(data, tbounds, 'stimulus')
     baselineNeByOutcome(data)
+    baselineNeStats(data)
     increaseInNE(data)
+    evokedNeStats(data)
     neAlignToDistractor(data)
 end
 
 function figure2(data)
     pupilDilationByOutcome(data)
+    pupilDilationStats(data)
     baselinePupilByOutcome(data)
+    pupilBaselineStats(data)
     avgPsychCurve(data)
     reactionTimeVsStimStrength(data)
     plotFirstLickHist(data)
@@ -497,6 +507,44 @@ function increaseInNE(data)
     xticklabels(labels)
     xtickangle(45)
     ylabel('Mean Evoked S1 NE (z-score)', 'FontSize', 14)
+end
+
+function baselineNeStats(data)
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    outcome = action_outcomes{1};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [ch1, ch2, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
+    respond_mpfc = nanmean(ch1,2);
+    respond_s1 = nanmean(ch2,2);
+    outcome = action_outcomes{2};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [ch1, ch2, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
+    withhold_mpfc = nanmean(ch1,2);
+    withhold_s1 = nanmean(ch2,2);
+    [p, h, stats] = ranksum(respond_mpfc, withhold_mpfc);
+    sprintf('baseline NE mpfc, action vs withhold: Mann-Whitney p = %.4f', p)
+    [p, h, stats] = ranksum(respond_s1, withhold_s1);
+    sprintf('baseline NE S1, action vs withhold: Mann-Whitney p = %.4f', p)
+end
+
+function evokedNeStats(data)
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    outcome = action_outcomes{1};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [base1, base2, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
+    [ch1, ch2, ~] = avg_photo_traces(tmp, [0.0,6.0], 'stimulus');
+    respond_mpfc = nanmean(ch1,2) - nanmean(base1,2);
+    respond_s1 = nanmean(ch2,2) - nanmean(base2,2);
+    outcome = action_outcomes{2};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [base1, base2, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
+    [ch1, ch2, ~] = avg_photo_traces(tmp, [0.0,6.0], 'stimulus');
+    withhold_mpfc = nanmean(ch1,2) - nanmean(base1,2);
+    withhold_s1 = nanmean(ch2,2) - nanmean(base2,2);
+    [p, h, stats] = ranksum(respond_mpfc, withhold_mpfc);
+    sprintf('increease in NE mpfc, action vs withhold: Mann-Whitney p = %.4f', p)
+    [p, h, stats] = ranksum(respond_s1, withhold_s1);
+    sprintf('increase in NE S1, action vs withhold: Mann-Whitney p = %.4f', p)
 end
 
 function baselineNeByOutcome(data)
@@ -992,6 +1040,36 @@ function [Sm, Ss, Sp] = baselinesVsReactionTime(data)
     xlabel('Baseline Pupil', 'FontSize', 14)
     ylabel('Reaction Time (s)', 'FontSize', 14)
 end
+
+function pupilDilationStats(data)
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    outcome = action_outcomes{1};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [pupil, ~] = avg_pupil_traces(tmp, [0,6.0], 'stimulus');
+    [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+    respond_dilations = nanmean(pupil,2) - nanmean(baseline,2);
+    outcome = action_outcomes{1};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [pupil, ~] = avg_pupil_traces(tmp, [0,6.0], 'stimulus');
+    [baseline, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+    withhold_dilations = nanmean(pupil,2) - nanmean(baseline,2);
+    [h, p, stats] = ranksum(respond_dilations, withhold_dilations);
+    sprintf('pupil dilations, action vs withhold: Mann-Whitney p = %.3f', p)
+end
+
+function pupilBaselineStats(data)
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    outcome = action_outcomes{1};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [react, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+    react = nanmean(react,2);
+    outcome = action_outcomes{1};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [withhold, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
+    withhold = nanmean(withhold,2);
+    [h, p, stats] = ranksum(react, withhold);
+    sprintf('pupil baselines, action vs withhold: Mann-Whitney p = %.3f', p)
+end
     
 function pupilDilationByOutcome(data)
     % outcomes = unique(data.categorical_outcome);
@@ -1020,7 +1098,7 @@ function pupilDilationByOutcome(data)
         action_dilations(2,ao) = nanstd(nanmean(pupil,2)-nanmean(baseline,2)) / size(pupil,1);
     end
     x = size(dilations,2)+2:size(dilations,2)+1+size(action_dilations,2);
-    errorbar(x, action_dilations(1,:), action_dilations(2,:), 'k.')
+    errorbar(x, action_dilations(1,:), action_dilations(2,:), 'k.');
     bar(x, action_dilations(1,:), 'k')
     xticks([1:size(dilations,2), x])
     labels = [outcomes, {'Responded', 'Withheld'}];
