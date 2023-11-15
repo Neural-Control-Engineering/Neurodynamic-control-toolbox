@@ -50,6 +50,20 @@ xcorrStats(data)
 
 function xcorrStats(data)
     right_wrong = {{'Hit', 'CR'}, {'Miss', 'FA'}};
+    outcome = right_wrong{1};
+    tmp = filterTrials(data, 'categorical_outome', outcome);
+    [mpfc, s1, tp] = avg_photo_traces(otmp, tbounds, 'stimulus');
+    [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_s1 = zeros(size(mpfc,1),1);
+    mpfc_x_pupil = zeros(size(mpfc,1),1);
+    s1_x_pupil = zeros(size)
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        % mpfc x s1 
+        [c, lag] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
+    end
 end
 
 function xcorrs(data)
