@@ -41,29 +41,110 @@ tbounds = [-0.5, 6.0];
 
 %% figures
 % figure1(data)
-% figure2(data)
-% figure3(data)
+figure2(data)
+figure3(data)
 
-xcorrs(data)
+% xcorrs(data)
+% xcorrStats(data)
 
-xcorrStats(data)
+
+
+function figure1(data)
+    example_traces(data)
+    session = '243-R-mPFC-S1-NE_2023_01_09';
+    lickRasterHist(data, session)
+end
+
+function figure3(data)
+    tbounds = [-1, 1];
+    neByReactionTime(data, tbounds, 'response')
+    tbounds = [-0.5, 6.0];
+    neByStimStrength(data, tbounds, 'stimulus')
+    neByOutcome(data, tbounds, 'stimulus')
+    baselineNeByOutcome(data)
+    baselineNeStats(data)
+    increaseInNE(data)
+    evokedNeStats(data)
+    neAlignToDistractor(data)
+end
+
+function figure2(data)
+    pupilDilationByOutcome(data)
+    pupilDilationStats(data)
+    baselinePupilByOutcome(data)
+    pupilBaselineStats(data)
+    avgPsychCurve(data)
+    reactionTimeVsStimStrength(data)
+    plotFirstLickHist(data)
+    tbounds = [-0.5, 6.0];
+    pupilByOutcome(data, tbounds, 'stimulus')
+    pupilByStimStrength(data, tbounds, 'stimulus')
+    tbounds = [-1, 1];
+    pupilByReactionTime(data, tbounds, 'response')
+    pupilAlignedToDistractor(data)
+end
+
+function figure4(data)
+    xcorrs(data)
+    xcorrStats(data)
+end
 
 function xcorrStats(data)
-    right_wrong = {{'Hit', 'CR'}, {'Miss', 'FA'}};
+    right_wrong = {{'Hit', 'CR'}, {'Miss', 'FA'}}; %{{'Hit', 'FA'}, {'Miss', 'CR'}}; %
+    tbounds = [-5.0, 0.0];
     outcome = right_wrong{1};
-    tmp = filterTrials(data, 'categorical_outome', outcome);
-    [mpfc, s1, tp] = avg_photo_traces(otmp, tbounds, 'stimulus');
-    [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-    mpfc_x_s1 = zeros(size(mpfc,1),1);
-    mpfc_x_pupil = zeros(size(mpfc,1),1);
-    s1_x_pupil = zeros(size)
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_s1_correct = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_correct = zeros(size(mpfc,1),1);
+    s1_x_pupil_correct = zeros(size(mpfc,1),1);
     for i = 1:size(mpfc,1)
         ch1 = mpfc(i,:);
         ch2 = s1(i,:);
         p = pupil(i,:);
         % mpfc x s1 
-        [c, lag] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
+        [c, ~] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
+        mpfc_x_s1_correct(i) = c(round(length(c)/2)) / length(ch1(2:end-1));
+        % mpfc x pupil 
+        x = decimate(ch1(1,:), 12, 'fir');
+        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
+        mpfc_x_pupil_correct(i) = c(round(length(c)/2)) / length(p(3:end-1));
+        % s1 x pupil 
+        x = decimate(ch2(1,:), 12, 'fir');
+        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
+        s1_x_pupil_correct(i) = c(round(length(c)/2)) / length(p(3:end-1));
     end
+    outcome = right_wrong{2};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_s1_incorrect = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_incorrect = zeros(size(mpfc,1),1);
+    s1_x_pupil_incorrect = zeros(size(mpfc,1),1);
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        % mpfc x s1 
+        [c, ~] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
+        mpfc_x_s1_incorrect(i) = c(round(length(c)/2)) / length(ch1(2:end-1));
+        % mpfc x pupil 
+        x = decimate(ch1(1,:), 12, 'fir');
+        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
+        mpfc_x_pupil_incorrect(i) = c(round(length(c)/2)) / length(p(3:end-1));
+        % s1 x pupil 
+        x = decimate(ch2(1,:), 12, 'fir');
+        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
+        s1_x_pupil_incorrect(i) = c(round(length(c)/2)) / length(p(3:end-1));
+    end
+    [p, h, stats] = ranksum(mpfc_x_s1_correct, mpfc_x_s1_incorrect);
+    sprintf('mPFC x S1 Peak Correlation: Mann-Whitney p=%f', p)
+    [p, h, stats] = ranksum(mpfc_x_pupil_correct, mpfc_x_pupil_incorrect);
+    sprintf('mPFC x pupil Peak Correlation: Mann-Whitney p=%f', p)
+    [p, h, stats] = ranksum(s1_x_pupil_correct, s1_x_pupil_incorrect);
+    sprintf('S1 x Pupil Peak Correlation: Mann-Whitney p=%f', p)
+    % keyboard
 end
 
 function xcorrs(data)
@@ -283,41 +364,6 @@ function neAlignToDistractor(data)
     xlim([-0.1, 6.0])
 end    
 
-function figure1(data)
-    example_traces(data)
-    session = '243-R-mPFC-S1-NE_2023_01_09';
-    lickRasterHist(data, session)
-end
-
-function figure3(data)
-    tbounds = [-1, 1];
-    neByReactionTime(data, tbounds, 'response')
-    tbounds = [-0.5, 6.0];
-    neByStimStrength(data, tbounds, 'stimulus')
-    neByOutcome(data, tbounds, 'stimulus')
-    baselineNeByOutcome(data)
-    baselineNeStats(data)
-    increaseInNE(data)
-    evokedNeStats(data)
-    neAlignToDistractor(data)
-end
-
-function figure2(data)
-    pupilDilationByOutcome(data)
-    pupilDilationStats(data)
-    baselinePupilByOutcome(data)
-    pupilBaselineStats(data)
-    avgPsychCurve(data)
-    reactionTimeVsStimStrength(data)
-    plotFirstLickHist(data)
-    tbounds = [-0.5, 6.0];
-    pupilByOutcome(data, tbounds, 'stimulus')
-    pupilByStimStrength(data, tbounds, 'stimulus')
-    tbounds = [-1, 1];
-    pupilByReactionTime(data, tbounds, 'response')
-    pupilAlignedToDistractor(data)
-end
-
 function [starts, durs] = distractorToNextStim(data)
     difs = zeros(1,size(data,1));
     durs = zeros(1,size(data,1));
@@ -524,7 +570,7 @@ function increaseInNE(data)
 end
 
 function baselineNeStats(data)
-    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}}; %{{'Hit', 'CR'}, {'Miss', 'FA'}}; %
     outcome = action_outcomes{1};
     tmp = filterTrials(data, 'categorical_outcome', outcome);
     [ch1, ch2, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
@@ -542,7 +588,7 @@ function baselineNeStats(data)
 end
 
 function evokedNeStats(data)
-    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}}; %{{'Hit', 'CR'}, {'Miss', 'FA'}}; %
     outcome = action_outcomes{1};
     tmp = filterTrials(data, 'categorical_outcome', outcome);
     [base1, base2, ~] = avg_photo_traces(tmp, [-0.5,0.0], 'stimulus');
@@ -1056,7 +1102,7 @@ function [Sm, Ss, Sp] = baselinesVsReactionTime(data)
 end
 
 function pupilDilationStats(data)
-    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}}; %{{'Hit', 'CR'}, {'Miss', 'FA'}};
     outcome = action_outcomes{1};
     tmp = filterTrials(data, 'categorical_outcome', outcome);
     [pupil, ~] = avg_pupil_traces(tmp, [0,6.0], 'stimulus');
@@ -1072,7 +1118,7 @@ function pupilDilationStats(data)
 end
 
 function pupilBaselineStats(data)
-    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    action_outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}}; %{{'Hit', 'CR'}, {'Miss', 'FA'}}; %
     outcome = action_outcomes{1};
     tmp = filterTrials(data, 'categorical_outcome', outcome);
     [react, ~] = avg_pupil_traces(tmp, [-0.5,0.0], 'stimulus');
