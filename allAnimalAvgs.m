@@ -3,51 +3,14 @@ animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 tbounds = [-0.5, 6.0];
 
-% % separate by outcome 
-% outcome_types = unique(data.categorical_outcome);
-% cols = distinguishable_colors(length(outcome_types));
-% plotByOutcome(data, outcome_types, tbounds, cols, 'stimulus');
-% % % two outcomes
-% outcome_types = {'FA', 'Hit'};
-% plotByOutcome(data, outcome_types, tbounds, {'r', 'b'}, 'response');
-% % plot physiology separated by stim strength
-% outcome_types = 'Hit';
-% plotByStimStrength(data, tbounds, 'stimulus');
-% tmp = filterTrials(data, 'categorical_outcome', outcome_types);
-% plotByStimStrength(tmp, tbounds, 'response');
-% plot avg psychometric curve 
-% avgPsychCurve(data);
-% % plot avg phys separated by stim strength and outcome
-% outcome_types = {'FA', 'Hit'};
-% tmp = filterTrials(data, 'categorical_outcome', outcome_types);
-% plotByStimStratByOutcome(data, tbounds, 'stimulus');
-% plotByStimStratByOutcome(tmp, tbounds, 'response');
-% % plot hit rate vs false alarm rate for all sessions 
-% plotFAvsHitRates(data)
-% % plot histogram of first licks 
-% plotFirstLickHist(data)
-% % plot phys based on response time
-% plotPhysByResponseTime(data, tbounds, 'stimulus')
-% plotPhysByResponseTime(data, tbounds, 'response')
-% psychometric curves separated by baseline pupil quintile 
-% psychCurveByPupil(data)
-% [Sm, Ss, Sp] = baselinesVsReactionTime(data);
-% % check for photobleaching 
-% checkPhotoBleach(data)
-% reactionTimeVsStimStrength(data)
-
-% timeToThreshold(data, 0.3)
-% justTargetsNE(data)
-
 %% figures
 % figure1(data)
-figure2(data)
-figure3(data)
-
+% figure2(data)
+% figure3(data)
 % xcorrs(data)
 % xcorrStats(data)
 
-
+xcorrBySession(data)
 
 function figure1(data)
     example_traces(data)
@@ -88,6 +51,79 @@ function figure4(data)
     xcorrs(data)
     xcorrStats(data)
 end
+
+function xcorrBySession(data)
+    tbounds = [-0.5, 6.0];
+    sessions = unique(data.session_id);
+    outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
+    sesh_lags = zeros(length(sessions), length(outcomes)+1);
+    sesh_cors = zeros(length(sessions), length(outcomes)+1);
+    for s = 1:length(sessions)
+        stmp = filterTrials(data, 'session_id', sessions{s});
+        for o = 1:length(outcomes)
+            otmp = filterTrials(stmp, 'categorical_outcome', outcomes{o});
+            if ~isempty(otmp)
+                [mpfc, s1, ~] = avg_photo_traces(otmp, tbounds, 'stimulus');
+                [pupil, ~] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+                Fs = getFs(data, 'photometry_ch1');
+                Fs = Fs(1);
+                cs = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+                lags = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+                mp = zeros(size(otmp,1), 99);
+                sp = zeros(size(otmp,1), 99);
+                ls = mp;
+                for i = 1:size(mpfc,1)
+                    ch1 = mpfc(i,:);
+                    ch2 = s1(i,:);
+                    p = pupil(i,:);
+                    % mpfc x s1 
+                    [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+                    try
+                        lags(i,:) = lag ./ Fs;
+                        cs(i,:) = c; % ./ length(ch1(2:end-1));
+                    catch
+                        lags(i,:) = nan(1, size(lags,2));
+                        cs(i,:) = nan(1,size(cs,2));
+                    end
+                    % mpfc x pupil
+                    x = decimate(ch1(2:end-1), 12, 'fir');
+                    x(end-1:end) = x(end-2);
+                    [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+                    try
+                        ls(i,:) = lag ./ 12;
+                        mp(i,:) = c; % ./ length(p(3:end-1));
+                    catch
+                        ls(i,:) = nan(1, size(ls,2));
+                        mp(i,:) = nan(1,size(mp,2));
+                    end
+                    % s1 x pupil 
+                    x = decimate(ch2(2:end-1), 12, 'fir');
+                    x(end-1:end) = x(end-2);
+                    [c, ~] = xcorr(p(2:end-1), x, 'normalized');
+                    try
+                        sp(i,:) = c; % ./ length(p(3:end-1));
+                    catch
+                        sp(i,:) = nan(1,size(mp,2));
+                    end
+                end
+                keyboard
+                mp = nanmean(mp);
+                sp = nanmean(sp);
+                cs = nanmean(cs);
+                lags = lags(end,:);
+                cs = cs(lags >= -4.0 & lags <= 4.0);
+                lags = lags(lags >= -4.0 & lags <= 4.0);
+                ls = ls(end,:);
+                sp = sp(ls >= -4.0 & ls <= 4.0);
+                mp = mp(ls >= -4.0 & ls <= 4.0);
+                ls = ls(ls >= -4.0 & ls <= 4.0);
+                
+            end
+        end
+    end
+end
+
+
 
 function xcorrStats(data)
     right_wrong = {{'Hit', 'CR'}, {'Miss', 'FA'}}; %{{'Hit', 'FA'}, {'Miss', 'CR'}}; %
@@ -150,53 +186,53 @@ end
 function xcorrs(data)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     fig = figure('Position', [404,166,1252,766]);
-    tl = tiledlayout(3,4,'TileSpacing','Compact');
-    axs = zeros(3,4);
-    for r  = 1:3
-        for c = 1:4
+    tl = tiledlayout(3,6,'TileSpacing','Compact');
+    axs = zeros(3,6);
+    for r  = 1:size(axs,1)
+        for c = 1:size(axs,2)
             axs(r,c) = nexttile;
         end
     end
     tbounds = [-5.0, 0.0];
     for o = 1:length(outcomes)
         otmp = filterTrials(data, 'categorical_outcome', outcomes{o});
-        [mpfc, s1, tp] = avg_photo_traces(otmp, tbounds, 'stimulus');
-        [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus');
+        [pupil, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
         Fs = getFs(data, 'photometry_ch1');
         Fs = Fs(1);
         cs = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
         lags = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
-        mp = zeros(size(otmp,1), 97);
-        sp = zeros(size(otmp,1), 97);
+        mp = zeros(size(otmp,1), 99);
+        sp = zeros(size(otmp,1), 99);
         ls = mp;
         for i = 1:size(mpfc,1)
             ch1 = mpfc(i,:);
             ch2 = s1(i,:);
             p = pupil(i,:);
             % mpfc x s1 
-            [c, lag] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
+            [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
             try
                 lags(i,:) = lag ./ Fs;
-                cs(i,:) = c ./ length(ch1(2:end-1));
+                cs(i,:) = c; % ./ length(ch1(2:end-1));
             catch
                 lags(i,:) = nan(1, size(lags,2));
                 cs(i,:) = nan(1,size(cs,2));
             end
             % mpfc x pupil
-            x = decimate(mpfc(1,:), 12, 'fir');
-            [c, lag] = xcorr(p(3:end-1), x(3:end-1));
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            [c, lag] = xcorr(p(2:end-1), x, 'normalized');
             try
                 ls(i,:) = lag ./ 12;
-                mp(i,:) = c ./ length(p(3:end-1));
+                mp(i,:) = c; % ./ length(p(3:end-1));
             catch
                 ls(i,:) = nan(1, size(ls,2));
                 mp(i,:) = nan(1,size(mp,2));
             end
             % s1 x pupil 
-            x = decimate(s1(1,:), 12, 'fir');
-            [c, ~] = xcorr(p(3:end-1), x(3:end-1));
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            [c, ~] = xcorr(p(2:end-1), x, 'normalized');
             try
-                sp(i,:) = c ./ length(p(3:end-1));
+                sp(i,:) = c; % ./ length(p(3:end-1));
             catch
                 sp(i,:) = nan(1,size(mp,2));
             end
@@ -204,23 +240,91 @@ function xcorrs(data)
         axes(axs(1,o))
         hold on
         semshade(cs, 0.3, 'k', 'k', lags(1,:), 1);
-        plot([0,0],[-0.6,0.6], 'k:', 'HandleVisibility','off')
-        ylim([-0.06,0.06])
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility','off')
+        ylim([-0.1,0.2])
         xlim([-4,4])
         title(outcomes{o}, 'FontSize', 16)
         axes(axs(2,o))
         hold on
         semshade(mp, 0.3, 'k', 'k', ls(1,:), 1);
-        plot([0,0],[-0.6,0.6], 'k:', 'HandleVisibility', 'off')
-        ylim([-0.06,0.06])
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.1,0.2])
         xlim([-4,4])
         axes(axs(3,o))
         hold on
         semshade(sp, 0.3, 'k', 'k', ls(1,:), 1);
-        plot([0,0],[-0.6,0.6], 'k:', 'HandleVisibility', 'off')
-        ylim([-0.06,0.06])
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.1,0.2])
         xlim([-4,4])
     end
+    outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    for o = 1:length(outcomes)
+        otmp = filterTrials(data, 'categorical_outcome', outcomes{o});
+        [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus');
+        [pupil, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        cs = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+        lags = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+        mp = zeros(size(otmp,1), 99);
+        sp = zeros(size(otmp,1), 99);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            % mpfc x s1 
+            [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+            try
+                lags(i,:) = lag ./ Fs;
+                cs(i,:) = c; % ./ length(ch1(2:end-1));
+            catch
+                lags(i,:) = nan(1, size(lags,2));
+                cs(i,:) = nan(1,size(cs,2));
+            end
+            % mpfc x pupil
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            [c, ~] = xcorr(p(2:end-1), x, 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        axes(axs(1,4+o))
+        hold on
+        semshade(cs, 0.3, 'k', 'k', lags(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility','off')
+        ylim([-0.1,0.2])
+        xlim([-4,4])
+        title(outcomes{o}, 'FontSize', 16)
+        axes(axs(2,4+o))
+        hold on
+        semshade(mp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.1,0.2])
+        xlim([-4,4])
+        axes(axs(3,4+o))
+        hold on
+        semshade(sp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.1,0.2])
+        xlim([-4,4])
+    end
+    axes(axs(1,5))
+    title('Action', 'FontSize', 16)
+    axes(axs(1,6))
+    title('Withheld', 'FontSize', 16)
     axes(axs(1,1))
     ylabel('mPFC x S1', 'FontSize', 16)
     axes(axs(2,1))
@@ -228,24 +332,93 @@ function xcorrs(data)
     axes(axs(3,1))
     ylabel('S1 x Pupil Area', 'FontSize', 16)
     xlabel(tl, 'Lag (s)', 'FontSize', 16)
-    for r = 1:3
-        for c = 2:4
+    for r = 1:size(axs,1)
+        for c = 2:size(axs,2)
             axes(axs(r,c))
             yticks([])
         end
     end
-    for r = 1:2
-        for c = 1:4
+    for r = 1:(size(axs,1)-1)
+        for c = 1:size(axs,2)
             axes(axs(r,c))
             xticks([])
         end
     end
     ylabel(tl, 'Normalized Cross Correlation', 'FontSize', 16)
-    % for r = 1:3
-    %     axes(axs(r,1))
-    %     yticks([-0.5,0,0.5])
-    %     yticklabels(['-0.5', '0', '0.5'])
-    % end
+    saveas(fig, 'Analysis/paper_figures/cross_correlation/xcorrs.fig')
+    all_fig = figure();
+    all_tl = tiledlayout(all_fig, 1,3);
+    all_axs = zeros(1,3);
+    for i = 1:3
+        all_axs(i) = nexttile;
+    end
+    for o = 1:length(outcomes)
+        [mpfc, s1, t] = avg_photo_traces(data, tbounds, 'stimulus');
+        [pupil, tp] = avg_pupil_traces(data, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        cs = zeros(size(data,1), round(Fs*2*diff(tbounds)-5));
+        lags = zeros(size(data,1), round(Fs*2*diff(tbounds)-5));
+        mp = zeros(size(data,1), 99);
+        sp = zeros(size(data,1), 99);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            % mpfc x s1 
+            [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+            try
+                lags(i,:) = lag ./ Fs;
+                cs(i,:) = c; % ./ length(ch1(2:end-1));
+            catch
+                lags(i,:) = nan(1, size(lags,2));
+                cs(i,:) = nan(1,size(cs,2));
+            end
+            % mpfc x pupil
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            [c, ~] = xcorr(p(2:end-1), x, 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        axes(all_axs(1,1))
+        hold on
+        semshade(cs, 0.3, 'k', 'k', lags(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility','off')
+        ylim([-0.1,0.2])
+        xlim([-4,4])
+        title('NE_{mPFC} x NE_{S1}', 'FontSize', 16)
+        ylabel('Normalized Cross Correlation', 'FontSize', 16)
+        axes(all_axs(1,2))
+        hold on
+        semshade(mp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.1,0.2])
+        xlim([-4,4])
+        title('Pupil area x NE_{mPFC}', 'FontSize', 16)
+        xlabel('Lag (s)', 'FontSize', 16)
+        axes(all_axs(1,3))
+        hold on
+        semshade(sp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.1,0.2])
+        xlim([-4,4])
+        title('Pupil area x NE_{S1}', 'FontSize', 16)
+    end
+    saveas(all_fig, 'Analysis/paper_figures/cross_correlation/xcorr_all_trials.fig')
 end
 
 
@@ -296,7 +469,6 @@ end
 
 function pupilAlignedToDistractor(data)
     [starts, durs] = distractorToNextStim(data);
-    pupil = [];
     Fss = getFs(data, 'photometry_ch1');
     tbounds = [-0.5,6.0];
     pupil_time = linspace(-0.5, 6.0, round(max(Fss)*diff(tbounds)));
@@ -321,6 +493,8 @@ function pupilAlignedToDistractor(data)
     plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
     xlabel('Time (s)', 'FontSize', 14)
     ylabel('Pupil Area (z-score)', 'FontSize', 14)
+    xlim([-0.5, 6.0])
+    saveas(fig2, 'Analysis/paper_figures/figure2/pupilAlignedToDistractor.fig')
 end
 
 function neAlignToDistractor(data)
@@ -353,7 +527,7 @@ function neAlignToDistractor(data)
                 time(2:end-1), 1);
     ylabel('mPFC NE (z-score)', 'FontSize', 14)
     plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
-    xlim([-0.1, 6.0])
+    xlim([-0.5, 6.0])
     axs(2) = nexttile;
     hold on
     semshade(ch2mat(:,2:end-1), 0.3, 'k', 'k', ...
@@ -361,7 +535,8 @@ function neAlignToDistractor(data)
     ylabel('S1 NE (z-score)', 'FontSize', 14)
     plot([0,0], [-2,2], 'k:', 'HandleVisibility', 'off')
     xlabel(tl, 'Time (s)', 'FontSize', 14)
-    xlim([-0.1, 6.0])
+    xlim([-0.4, 6.0])
+    saveas(fig, 'Analysis/paper_figures/figure3/neAlignToDistractor.fig')
 end    
 
 function [starts, durs] = distractorToNextStim(data)
@@ -438,6 +613,7 @@ function lickRasterHist(data, session)
     axes(axs(2,1))
     ylabel('Binned Responses', 'FontSize', 14)
     xlabel(tl, 'Time (s)', 'FontSize', 14)
+    saveas(fig, 'Analysis/paper_figures/figure1/lickRasterHist.fig')
 end
 
 function example_traces(data)
@@ -511,6 +687,7 @@ function example_traces(data)
     xlabel('Time (s)', 'FontSize', 14)
     xlim([0,50])
     ylim([-2,2])
+    saveas(fig, 'Analysis/paper_figures/figure1/example_traces.fig')
 end
 
 function increaseInNE(data)
@@ -567,6 +744,7 @@ function increaseInNE(data)
     xticklabels(labels)
     xtickangle(45)
     ylabel('Mean Evoked S1 NE (z-score)', 'FontSize', 14)
+    saveas(fig, 'Analysis/paper_figures/figure3/increaseInNE.fig')
 end
 
 function baselineNeStats(data)
@@ -663,6 +841,7 @@ function baselineNeByOutcome(data)
     xticklabels(labels)
     xtickangle(45)
     ylabel('Mean Baseline S1 NE (z-score)', 'FontSize', 14)
+    saveas(fig, 'Analysis/paper_figures/figure3/baselineNeByOutcome.fig')
 end    
 
 function neByOutcome(data, tbounds, alignTo)
@@ -714,6 +893,7 @@ function neByOutcome(data, tbounds, alignTo)
     axes(axs(2,1))
     ylabel('S1 NE (z-score)', 'FontSize', 14)
     xlabel(tl, 'Time (s)', 'FontSize', 14)
+    saveas(fig, 'Analysis/paper_figures/figure3/neByOutcome.fig')
 end
 
 function neByStimStrength(data, tbounds, alignTo)
@@ -789,6 +969,7 @@ function neByStimStrength(data, tbounds, alignTo)
         leg = legend();
         leg.Title.String = 'Stimulus Strength';
     end
+    saveas(fig, 'Analysis/paper_figures/figure3/neByStimStrength.fig')
 end
 
 function neByReactionTime(data, tbounds, alignTo)
@@ -856,6 +1037,7 @@ function neByReactionTime(data, tbounds, alignTo)
     xlim(tbounds)
     ylim([-0.2, 0.7])
     plot([0,0], [-0.2, 0.7], 'k:', 'HandleVisibility', 'off')
+    saveas(fig, 'Analysis/paper_figures/figure3/neByReactionTime.fig')
 end
 
 function pupilByReactionTime(data, tbounds, alignTo)
@@ -866,7 +1048,7 @@ function pupilByReactionTime(data, tbounds, alignTo)
     cols = distinguishable_colors(5);
     ptiles = 20:20:100;
     low = prctile(data.response_time, 0);
-    figure();
+    fig = figure();
     hold on
     for i = 1:length(ptiles)
         ptile = ptiles(i);
@@ -901,6 +1083,7 @@ function pupilByReactionTime(data, tbounds, alignTo)
     xlim(tbounds)
     ylim([-0.5,0.5])
     plot([0,0], [-0.5,0.5], 'k:', 'HandleVisibility', 'off')
+    saveas(fig, 'Analysis/paper_figures/figure2/pupilByReactionTime.fig')
 end
 
 function pupilByOutcome(data, tbounds, alignTo)
@@ -934,6 +1117,7 @@ function pupilByOutcome(data, tbounds, alignTo)
     end
     ylabel(tl, 'Pupil Area (z-score)', 'FontSize', 14)
     xlabel(tl, 'Time (s)', 'FontSize', 14)
+    saveas(fig, 'Analysis/paper_figures/figure2/pupilByOutcome.fig')
 end
 
 function pupilByStimStrength(data, tbounds, alignTo)
@@ -991,7 +1175,8 @@ function pupilByStimStrength(data, tbounds, alignTo)
         title(outcome, 'FontSize', 16)
     end
     ylabel(tl, 'Pupil Area (z-score)', 'FontSize', 14)
-    xlabel(tl, 'Time (s)', 'FontSize', 14)   
+    xlabel(tl, 'Time (s)', 'FontSize', 14)
+    saveas(fig, 'Analysis/paper_figures/figure2/pupilByStimStrength.fig')
     % leg.Title.FontSize = 12;
 end
 
@@ -1008,7 +1193,7 @@ function reactionTimeVsStimStrength(data)
         avgs(i) = mean(rts);
         stds(i) = std(rts) ./ length(rts);
     end
-    figure()
+    fig = figure();
     errorbar(1:length(avgs), avgs, stds, 'k.')
     hold on
     bar(1:length(avgs), avgs, 'k')
@@ -1020,6 +1205,7 @@ function reactionTimeVsStimStrength(data)
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Reaction Time (s)', 'FontSize', 14)
     xticklabels(labels)
+    saveas(fig, 'Analysis/paper_figures/figure2/reactionTimeVsStimStrength.fig')
 end
 
 function timeToThreshold(data, threshold)
@@ -1143,7 +1329,7 @@ function pupilDilationByOutcome(data)
         dilations(1,o) = nanmean(nanmean(pupil))-nanmean(nanmean(baseline));
         dilations(2,o) = nanstd(nanmean(pupil,2)-nanmean(baseline,2)) / size(pupil,1);
     end
-    figure()
+    fig = figure();
     hold on
     errorbar(1:size(dilations,2), dilations(1,:), dilations(2,:), 'k.')
     bar(1:size(dilations,2), dilations(1,:), 'k')
@@ -1164,6 +1350,7 @@ function pupilDilationByOutcome(data)
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
     ylabel('Mean Pupil Dilation (z-score)')
+    saveas(fig, 'Analysis/paper_figures/figure2/pupilDilationByOutcome.fig')
 end
         
 
@@ -1177,7 +1364,7 @@ function baselinePupilByOutcome(data)
         baselines(1,o) = nanmean(nanmean(baseline));
         baselines(2,o) = nanstd(nanmean(baseline,2)) / size(baseline,1);
     end
-    figure()
+    fig = figure();
     hold on
     errorbar(1:size(baselines,2), baselines(1,:), baselines(2,:), 'k.')
     bar(1:size(baselines,2), baselines(1,:), 'k')
@@ -1197,6 +1384,7 @@ function baselinePupilByOutcome(data)
     labels = [outcomes, {'Responded', 'Withheld'}];
     xticklabels(labels)
     ylabel('Mean Baseline Pupil Area (z-score)')
+    saveas(fig, 'Analysis/paper_figures/figure2/baselinePupilByOutcome.fig')
 end
 
 function psychCurveByPupil(data)
@@ -1356,13 +1544,14 @@ function plotFAvsHitRates(data)
 end
 
 function plotFirstLickHist(data)
-    figure()
+    fig = figure();
     outcomes = {'Hit', 'FA'};
     data = filterTrials(data, 'categorical_outcome', outcomes);
-    histogram(data.response_time, 20, 'FaceColor', 'k', 'EdgeColor', 'k')
+    histogram(data.response_time, 20, 'FaceColor', 'k', 'EdgeColor', 'k', 'Normalization', 'probability')
     xlabel('Response Time (s)', 'FontSize', 14)
-    ylabel('N_{trials}', 'FontSize', 14)
+    ylabel('Fraction of total trials', 'FontSize', 14)
     xlim([0,0.8])
+    saveas(fig, 'Analysis/paper_figures/figure2/plotFirstLickHist.fig')
 end
 
 function fig = plotByStimStratByOutcome(data, tbounds, alignTo)
@@ -1675,7 +1864,7 @@ function [pupil, time] = avg_pupil_traces(data, tbounds, alignTo)
 end
 
 function avgPsychCurve(data)
-    figure()
+    fig = figure();
     animals = fetchAnimals(data);
     cols = {'b', 'r', 'g', 'm'};
     for a = 1:length(animals)
@@ -1713,6 +1902,7 @@ function avgPsychCurve(data)
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Performance', 'FontSize', 14)
     legend('location', 'southeast')
+    saveas(fig, 'Analysis/paper_figures/figure2/baselinePupilByOutcome.fig')
 end
 
 function checkPhotoBleach(data)
