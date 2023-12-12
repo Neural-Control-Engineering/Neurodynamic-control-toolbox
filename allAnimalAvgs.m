@@ -53,11 +53,15 @@ function figure4(data)
 end
 
 function xcorrBySession(data)
-    tbounds = [-0.5, 6.0];
+    tbounds = [-5, 0.0];
     sessions = unique(data.session_id);
     outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
-    sesh_lags = zeros(length(sessions), length(outcomes)+1);
-    sesh_cors = zeros(length(sessions), length(outcomes)+1);
+    ms_lags = zeros(length(sessions), length(outcomes)+1);
+    ms_cors = zeros(length(sessions), length(outcomes)+1);
+    pm_lags = zeros(length(sessions), length(outcomes)+1);
+    pm_cors = zeros(length(sessions), length(outcomes)+1);
+    ps_lags = zeros(length(sessions), length(outcomes)+1);
+    ps_cors = zeros(length(sessions), length(outcomes)+1);
     for s = 1:length(sessions)
         stmp = filterTrials(data, 'session_id', sessions{s});
         for o = 1:length(outcomes)
@@ -87,7 +91,7 @@ function xcorrBySession(data)
                     end
                     % mpfc x pupil
                     x = decimate(ch1(2:end-1), 12, 'fir');
-                    x(end-1:end) = x(end-2);
+                    % x(end-1:end) = x(end-2);
                     [c, lag] = xcorr(p(2:end-1), x, 'normalized');
                     try
                         ls(i,:) = lag ./ 12;
@@ -98,7 +102,7 @@ function xcorrBySession(data)
                     end
                     % s1 x pupil 
                     x = decimate(ch2(2:end-1), 12, 'fir');
-                    x(end-1:end) = x(end-2);
+                    % x(end-1:end) = x(end-2);
                     [c, ~] = xcorr(p(2:end-1), x, 'normalized');
                     try
                         sp(i,:) = c; % ./ length(p(3:end-1));
@@ -106,10 +110,12 @@ function xcorrBySession(data)
                         sp(i,:) = nan(1,size(mp,2));
                     end
                 end
-                keyboard
-                mp = nanmean(mp);
-                sp = nanmean(sp);
-                cs = nanmean(cs);
+                [r,c] = size(otmp);
+                if r > 1
+                    mp = nanmean(mp);
+                    sp = nanmean(sp);
+                    cs = nanmean(cs);
+                end
                 lags = lags(end,:);
                 cs = cs(lags >= -4.0 & lags <= 4.0);
                 lags = lags(lags >= -4.0 & lags <= 4.0);
@@ -117,13 +123,142 @@ function xcorrBySession(data)
                 sp = sp(ls >= -4.0 & ls <= 4.0);
                 mp = mp(ls >= -4.0 & ls <= 4.0);
                 ls = ls(ls >= -4.0 & ls <= 4.0);
-                
+                [msc, msi] = max(cs);
+                [pmc, pmi] = max(mp);
+                [psc, psi] = max(sp);
+                ms_lags(s,o) = lags(msi);
+                ps_lags(s,o) = ls(psi);
+                pm_lags(s,o) = ls(pmi);
+                ms_cors(s,o) = msc;
+                ps_cors(s,o) = psc;
+                pm_cors(s,o) = pmc;
+            else
+                ms_lags(s,o) = nan;
+                ps_lags(s,o) = nan;
+                pm_lags(s,o) = nan;
+                ms_cors(s,o) = nan;
+                ps_cors(s,o) = nan;
+                pm_cors(s,o) = nan;
             end
+            [mpfc, s1, ~] = avg_photo_traces(stmp, tbounds, 'stimulus');
+            [pupil, ~] = avg_pupil_traces(stmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+            Fs = getFs(data, 'photometry_ch1');
+            Fs = Fs(1);
+            cs = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+            lags = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+            mp = zeros(size(otmp,1), 99);
+            sp = zeros(size(otmp,1), 99);
+            ls = mp;
+            for i = 1:size(mpfc,1)
+                ch1 = mpfc(i,:);
+                ch2 = s1(i,:);
+                p = pupil(i,:);
+                % mpfc x s1 
+                [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+                try
+                    lags(i,:) = lag ./ Fs;
+                    cs(i,:) = c; % ./ length(ch1(2:end-1));
+                catch
+                    lags(i,:) = nan(1, size(lags,2));
+                    cs(i,:) = nan(1,size(cs,2));
+                end
+                % mpfc x pupil
+                x = decimate(ch1(2:end-1), 12, 'fir');
+                % x(end-1:end) = x(end-2);
+                [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+                try
+                    ls(i,:) = lag ./ 12;
+                    mp(i,:) = c; % ./ length(p(3:end-1));
+                catch
+                    ls(i,:) = nan(1, size(ls,2));
+                    mp(i,:) = nan(1,size(mp,2));
+                end
+                % s1 x pupil 
+                x = decimate(ch2(2:end-1), 12, 'fir');
+                % x(end-1:end) = x(end-2);
+                [c, ~] = xcorr(p(2:end-1), x, 'normalized');
+                try
+                    sp(i,:) = c; % ./ length(p(3:end-1));
+                catch
+                    sp(i,:) = nan(1,size(mp,2));
+                end
+            end
+            mp = nanmean(mp);
+            sp = nanmean(sp);
+            cs = nanmean(cs);
+            lags = lags(end,:);
+            cs = cs(lags >= -4.0 & lags <= 4.0);
+            lags = lags(lags >= -4.0 & lags <= 4.0);
+            ls = ls(end,:);
+            sp = sp(ls >= -4.0 & ls <= 4.0);
+            mp = mp(ls >= -4.0 & ls <= 4.0);
+            ls = ls(ls >= -4.0 & ls <= 4.0);
+            [msc, msi] = max(cs);
+            [pmc, pmi] = max(mp);
+            [psc, psi] = max(sp);
+            ms_lags(s,end) = lags(msi);
+            ps_lags(s,end) = ls(psi);
+            pm_lags(s,end) = ls(pmi);
+            ms_cors(s,end) = msc;
+            ps_cors(s,end) = psc;
+            pm_cors(s,end) = pmc;
         end
     end
+    fig = figure();
+    tl = tiledlayout(2,3);
+    axs = zeros(2,3);
+    for r = 1:size(axs,1)
+        for c = 1:size(axs,2)
+            axs(r,c) = nexttile;
+        end
+    end
+    x = [1:4, 6:7, 9];
+    xl = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withheld', 'Overall'}
+    axes(axs(1,1))
+    errorbar(x, nanmean(ms_cors), nanstd(ms_cors), 'k.')
+    hold on
+    bar(x, nanmean(ms_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    ylim([0.0, 0.5])
+
+    axes(axs(2,1))
+    errorbar(x, nanmean(ms_lags), nanstd(ms_lags), 'k.')
+    hold on
+    bar(x, nanmean(ms_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+
+    axes(axs(1,2))
+    errorbar(x, nanmean(pm_cors), nanstd(pm_cors), 'k.')
+    hold on
+    bar(x, nanmean(pm_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    ylim([0.0, 0.5])
+
+    axes(axs(2,2))
+    errorbar(x, nanmean(pm_lags), nanstd(pm_lags), 'k.')
+    hold on
+    bar(x, nanmean(pm_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    
+    axes(axs(1,3))
+    errorbar(x, nanmean(ps_cors), nanstd(ps_cors), 'k.')
+    hold on
+    bar(x, nanmean(ps_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    ylim([0.0, 0.5])
+
+    axes(axs(2,3))
+    errorbar(x, nanmean(ps_lags), nanstd(ps_lags), 'k.')
+    hold on
+    bar(x, nanmean(ps_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
 end
-
-
 
 function xcorrStats(data)
     right_wrong = {{'Hit', 'CR'}, {'Miss', 'FA'}}; %{{'Hit', 'FA'}, {'Miss', 'CR'}}; %
