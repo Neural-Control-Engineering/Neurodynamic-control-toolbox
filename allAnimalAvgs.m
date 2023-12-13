@@ -7,8 +7,9 @@ tbounds = [-0.5, 6.0];
 % figure1(data)
 % figure2(data)
 % figure3(data)
-figure4(data)
+% figure4(data)
 % xcorrBySession(data)
+xcorrHeatMap(data)
 
 function figure1(data)
     example_traces(data)
@@ -48,6 +49,90 @@ end
 function figure4(data)
     xcorrs(data)
     xcorrBySession(data)
+end
+
+function xcorrHeatMap(data)
+    tbounds = [-5, 0.0];
+    sessions = unique(data.session_id);
+    pfcXs1 = zeros(length(sessions), 961);
+    pupilXpfc = zeros(length(sessions), 97);
+    pupilXs1 = zeros(length(sessions), 97);
+    for s = 1:length(sessions)
+        stmp = filterTrials(data, 'session_id', sessions{s});
+        [mpfc, s1, ~] = avg_photo_traces(stmp, tbounds, 'stimulus');
+        [pupil, ~] = avg_pupil_traces(stmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        cs = zeros(size(stmp,1), round(Fs*2*diff(tbounds)-5));
+        lags = zeros(size(stmp,1), round(Fs*2*diff(tbounds)-5));
+        mp = zeros(size(stmp,1), 99);
+        sp = zeros(size(stmp,1), 99);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            % mpfc x s1 
+            [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+            try
+                lags(i,:) = lag ./ Fs;
+                cs(i,:) = c; % ./ length(ch1(2:end-1));
+            catch
+                lags(i,:) = nan(1, size(lags,2));
+                cs(i,:) = nan(1,size(cs,2));
+            end
+            % mpfc x pupil
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            % x(end-1:end) = x(end-2);
+            [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            % x(end-1:end) = x(end-2);
+            [c, ~] = xcorr(p(2:end-1), x, 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        mp = nanmean(mp);
+        sp = nanmean(sp);
+        cs = nanmean(cs);
+        lags = lags(end,:);
+        cs = cs(lags >= -4.0 & lags <= 4.0);
+        lags = lags(lags >= -4.0 & lags <= 4.0);
+        ls = ls(end,:);
+        sp = sp(ls >= -4.0 & ls <= 4.0);
+        mp = mp(ls >= -4.0 & ls <= 4.0);
+        ls = ls(ls >= -4.0 & ls <= 4.0);
+        pfcXs1(s,:) = cs;
+        pupilXpfc(s,:) = mp;
+        pupilXs1(s,:) = sp;
+    end
+    pfcXs1_inds = zeros(1,length(sessions));
+    pupilXs1_inds = zeros(1,length(sessions));
+    pupilXpfc_inds = zeros(1,length(sessions));
+    for i = 1:length(sessions)
+        [~, ind] = max(pfcXs1(i,:));
+        pfcXs1_inds(i) = ind;
+        [~, ind] = max(pupilXs1(i,:));
+        pupilXs1_inds(i) = ind;
+        [~, ind] = max(pupilXpfc(i,:));
+        pupilXpfc_inds(i) = ind;
+    end
+    [~, pfcXs1_inds_sorted] = sort(pfcXs1_inds);
+    [~, pupilXs1_inds_sorted] = sort(pupilXs1_inds);
+    [~, pupilXpfc_inds_sorted] = sort(pupilXpfc_inds);
+    figure(); imagesc(pupilXs1(pupilXs1_inds_sorted,:));
+    figure(); imagesc(pupilXs1(pupilXpfc_inds_sorted,:));
+    figure(); imagesc(pupilXs1(pfcXs1_inds_sorted,:));
 end
 
 function xcorrBySession(data)
