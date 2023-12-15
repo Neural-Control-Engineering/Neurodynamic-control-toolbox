@@ -130,9 +130,27 @@ function xcorrHeatMap(data)
     [~, pfcXs1_inds_sorted] = sort(pfcXs1_inds);
     [~, pupilXs1_inds_sorted] = sort(pupilXs1_inds);
     [~, pupilXpfc_inds_sorted] = sort(pupilXpfc_inds);
-    figure(); imagesc(pupilXs1(pupilXs1_inds_sorted,:));
-    figure(); imagesc(pupilXs1(pupilXpfc_inds_sorted,:));
-    figure(); imagesc(pupilXs1(pfcXs1_inds_sorted,:));
+    figure(); colormap('hot');
+    imagesc(ls, 1:size(pupilXs1,1), pupilXs1(pupilXs1_inds_sorted,:));
+    xlabel('Lag (s)', 'FontSize', 16)
+    ylabel('Session #', 'FontSize', 16)
+    title('Pupil X S1', 'FontSize', 16)
+    cbar = colorbar();
+    ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
+    figure(); colormap('hot');
+    imagesc(ls, 1:size(pupilXpfc,1), pupilXpfc(pupilXpfc_inds_sorted,:));
+    xlabel('Lag (s)', 'FontSize', 16)
+    ylabel('Session #', 'FontSize', 16)
+    title('Pupil X PFC', 'FontSize', 16)
+    cbar = colorbar();
+    ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
+    figure(); colormap('hot');
+    imagesc(lags, 1:size(pfcXs1,1), pfcXs1(pfcXs1_inds_sorted,:));
+    xlabel('Lag (s)', 'FontSize', 16)
+    ylabel('Session #', 'FontSize', 16)
+    title('PFC X S1', 'FontSize', 16)
+    cbar = colorbar();
+    ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
 end
 
 function xcorrBySession(data)
