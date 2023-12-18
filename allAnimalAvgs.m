@@ -7,9 +7,8 @@ tbounds = [-0.5, 6.0];
 % figure1(data)
 % figure2(data)
 % figure3(data)
-% figure4(data)
-% xcorrBySession(data)
-xcorrHeatMap(data)
+figure4(data)
+
 
 function figure1(data)
     example_traces(data)
@@ -49,6 +48,8 @@ end
 function figure4(data)
     xcorrs(data)
     xcorrBySession(data)
+    xcorrHeatMap(data)
+    xcorrsDerivative(data)
 end
 
 function xcorrHeatMap(data)
@@ -130,27 +131,42 @@ function xcorrHeatMap(data)
     [~, pfcXs1_inds_sorted] = sort(pfcXs1_inds);
     [~, pupilXs1_inds_sorted] = sort(pupilXs1_inds);
     [~, pupilXpfc_inds_sorted] = sort(pupilXpfc_inds);
-    figure(); colormap('hot');
+
+    sp_fig = figure(); hold on; colormap('hot');
     imagesc(ls, 1:size(pupilXs1,1), pupilXs1(pupilXs1_inds_sorted,:));
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel('Session #', 'FontSize', 16)
     title('Pupil X S1', 'FontSize', 16)
     cbar = colorbar();
     ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
-    figure(); colormap('hot');
+    plot([0,0], [1,size(pupilXs1,1)], 'k--')
+    xlim([-4,4])
+    ylim([1,size(pupilXs1,1)])
+    saveas(sp_fig, 'Analysis/paper_figures/cross_correlation/pupil_x_s1_heatmap.fig')
+    
+    mp_fig = figure(); hold on; colormap('hot');
     imagesc(ls, 1:size(pupilXpfc,1), pupilXpfc(pupilXpfc_inds_sorted,:));
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel('Session #', 'FontSize', 16)
     title('Pupil X PFC', 'FontSize', 16)
     cbar = colorbar();
     ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
-    figure(); colormap('hot');
+    plot([0,0], [1,size(pupilXpfc,1)], 'k--')
+    xlim([-4,4])
+    ylim([1,size(pupilXpfc,1)])
+    saveas(mp_fig, 'Analysis/paper_figures/cross_correlation/pupil_x_mpfc_heatmap.fig')
+    
+    ps_fig = figure(); hold on; colormap('hot');
     imagesc(lags, 1:size(pfcXs1,1), pfcXs1(pfcXs1_inds_sorted,:));
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel('Session #', 'FontSize', 16)
     title('PFC X S1', 'FontSize', 16)
     cbar = colorbar();
     ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
+    plot([0,0], [1,size(pfcXs1,1)], 'k--')
+    xlim([-4,4])
+    ylim([1,size(pfcXs1,1)])
+    saveas(ps_fig, 'Analysis/paper_figures/cross_correlation/mpfc_x_s1_heatmap.fig')
 end
 
 function xcorrBySession(data)
@@ -323,16 +339,17 @@ function xcorrBySession(data)
     x = [1:4, 6:7, 9];
     xl = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withheld', 'Overall'}
     axes(axs(1,1))
-    errorbar(x, nanmean(ms_cors), nanstd(ms_cors), 'k.')
+    errorbar(x, nanmean(ms_cors), nanstd(ms_cors) ./ size(ms_cors,1), 'k.')
     hold on
     bar(x, nanmean(ms_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
     xticks(x)
     xticklabels(xl)
     ylim([0.0, 0.5])
     ylabel('Peak correlation (a.u.)', 'FontSize', 16)
+    title('NE_{mPFC} x NE_{S1}', 'FontSize', 16)
 
     axes(axs(2,1))
-    errorbar(x, nanmean(ms_lags), nanstd(ms_lags), 'k.')
+    errorbar(x, nanmean(ms_lags), nanstd(ms_lags) ./ size(ms_lags,1), 'k.')
     hold on
     bar(x, nanmean(ms_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
     xticks(x)
@@ -341,15 +358,16 @@ function xcorrBySession(data)
     ylabel('Lag of peak correlation (s)', 'FontSize', 16)
 
     axes(axs(1,2))
-    errorbar(x, nanmean(pm_cors), nanstd(pm_cors), 'k.')
+    errorbar(x, nanmean(pm_cors), nanstd(pm_cors) ./ size(pm_cors,1), 'k.')
     hold on
     bar(x, nanmean(pm_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
     xticks(x)
     xticklabels(xl)
     ylim([0.0, 0.5])
+    title('Pupil Area x NE_{mPFC}', 'FontSize', 16)
 
     axes(axs(2,2))
-    errorbar(x, nanmean(pm_lags), nanstd(pm_lags), 'k.')
+    errorbar(x, nanmean(pm_lags), nanstd(pm_lags) ./ size(pm_lags,1), 'k.')
     hold on
     bar(x, nanmean(pm_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
     xticks(x)
@@ -357,15 +375,16 @@ function xcorrBySession(data)
     ylim([-2.0,3.0])
     
     axes(axs(1,3))
-    errorbar(x, nanmean(ps_cors), nanstd(ps_cors), 'k.')
+    errorbar(x, nanmean(ps_cors), nanstd(ps_cors) ./ size(pm_lags,1), 'k.')
     hold on
     bar(x, nanmean(ps_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
     xticks(x)
     xticklabels(xl)
     ylim([0.0, 0.5])
+    title('Pupil Area x NE_{S1}', 'FontSize', 16)
 
     axes(axs(2,3))
-    errorbar(x, nanmean(ps_lags), nanstd(ps_lags), 'k.')
+    errorbar(x, nanmean(ps_lags), nanstd(ps_lags) ./ size(ps_lags,1), 'k.')
     hold on
     bar(x, nanmean(ps_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
     xticks(x)
@@ -577,11 +596,11 @@ function xcorrs(data)
     axes(axs(1,6))
     title('Withheld', 'FontSize', 16)
     axes(axs(1,1))
-    ylabel('mPFC x S1', 'FontSize', 16)
+    ylabel('NE_{mPFC} x NE_{S1}', 'FontSize', 16)
     axes(axs(2,1))
-    ylabel('mPFC x Pupil Area', 'FontSize', 16)
+    ylabel('Pupil Area x NE_{mPFC}', 'FontSize', 16)
     axes(axs(3,1))
-    ylabel('S1 x Pupil Area', 'FontSize', 16)
+    ylabel('Pupil Area x NE_{S1}', 'FontSize', 16)
     xlabel(tl, 'Lag (s)', 'FontSize', 16)
     for r = 1:size(axs,1)
         for c = 2:size(axs,2)
@@ -671,6 +690,199 @@ function xcorrs(data)
         title('Pupil area x NE_{S1}', 'FontSize', 16)
     end
     saveas(all_fig, 'Analysis/paper_figures/cross_correlation/xcorr_all_trials_avgs.fig')
+    clear all_fig
+end
+
+function xcorrsDerivative(data)
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    fig = figure('Position', [404,166,1252,766]);
+    tl = tiledlayout(2,6,'TileSpacing','Compact');
+    axs = zeros(2,6);
+    for r  = 1:size(axs,1)
+        for c = 1:size(axs,2)
+            axs(r,c) = nexttile;
+        end
+    end
+    tbounds = [-5.0, 0.0];
+    for o = 1:length(outcomes)
+        otmp = filterTrials(data, 'categorical_outcome', outcomes{o});
+        [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus');
+        [pupil, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        cs = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+        lags = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+        mp = zeros(size(otmp,1), 97);
+        sp = zeros(size(otmp,1), 97);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            p = diff(p);
+            % mpfc x pupil
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            [c, ~] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        axes(axs(1,o))
+        hold on
+        semshade(mp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.055,0.1])
+        xlim([-4,4])
+        title(outcomes{o}, 'FontSize', 16)
+        axes(axs(2,o))
+        hold on
+        semshade(sp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.055,0.1])
+        xlim([-4,4])
+    end
+    outcomes = {{'Hit', 'FA'}, {'Miss', 'CR'}};
+    for o = 1:length(outcomes)
+        otmp = filterTrials(data, 'categorical_outcome', outcomes{o});
+        [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus');
+        [pupil, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        cs = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+        lags = zeros(size(otmp,1), round(Fs*2*diff(tbounds)-5));
+        mp = zeros(size(otmp,1), 97);
+        sp = zeros(size(otmp,1), 97);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            p = diff(p);
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            [c, ~] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        axes(axs(1,4+o))
+        hold on
+        semshade(mp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.055,0.1])
+        xlim([-4,4])
+        axes(axs(2,4+o))
+        hold on
+        semshade(sp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.055,0.1])
+        xlim([-4,4])
+    end
+    axes(axs(1,5))
+    title('Action', 'FontSize', 16)
+    axes(axs(1,6))
+    title('Withheld', 'FontSize', 16)
+    axes(axs(1,1))
+    ylabel('$\frac{dPupil}{dt}$ x NE$_{mPFC}$ Cross Correlation', 'interpreter', 'latex', 'FontSize', 16)
+    axes(axs(2,1))
+    ylabel('$\frac{dPupil}{dt}$ x NE$_{S1}$ Cross Correlation', 'interpreter', 'latex', 'FontSize', 16)
+    xlabel(tl, 'Lag (s)', 'FontSize', 16)
+    for r = 1:size(axs,1)
+        for c = 2:size(axs,2)
+            axes(axs(r,c))
+            yticks([])
+        end
+    end
+    for r = 1:(size(axs,1)-1)
+        for c = 1:size(axs,2)
+            axes(axs(r,c))
+            xticks([])
+        end
+    end
+    ylabel(tl, 'Normalized Cross Correlation', 'FontSize', 16)
+    saveas(fig, 'Analysis/paper_figures/cross_correlation/ne_dpupildt_xcorrs_by_outcome.fig')
+    clear fig
+    all_fig = figure('Position', [404,166,1252,766]);
+    all_tl = tiledlayout(all_fig, 1,2);
+    all_axs = zeros(1,2);
+    for i = 1:length(all_axs)
+        all_axs(i) = nexttile;
+    end
+    for o = 1:length(outcomes)
+        [mpfc, s1, t] = avg_photo_traces(data, tbounds, 'stimulus');
+        [pupil, tp] = avg_pupil_traces(data, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        cs = zeros(size(data,1), round(Fs*2*diff(tbounds)-5));
+        lags = zeros(size(data,1), round(Fs*2*diff(tbounds)-5));
+        mp = zeros(size(data,1), 97);
+        sp = zeros(size(data,1), 97);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            p = diff(p);
+            % mpfc x pupil
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            [c, ~] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        axes(all_axs(1,1))
+        hold on
+        semshade(mp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.04,0.08])
+        xlim([-4,4])
+        title('$\frac{dPupil}{dt}$ x NE$_{mPFC}$', 'interpreter', 'latex', 'FontSize', 16)
+        axes(all_axs(1,2))
+        hold on
+        semshade(sp, 0.3, 'k', 'k', ls(1,:), 1);
+        plot([0,0],[-0.2,0.2], 'k:', 'HandleVisibility', 'off')
+        ylim([-0.04,0.08])
+        xlim([-4,4])
+        title('$\frac{dPupil}{dt}$ x NE$_{S1}$', 'interpreter', 'latex', 'FontSize', 16)
+    end
+    xlabel(all_tl, 'Lag (s)', 'FontSize', 16)
+    ylabel(all_tl, 'Normalized Cross Correlation', 'FontSize', 16)
+    saveas(all_fig, 'Analysis/paper_figures/cross_correlation/ne_dpupildt_xcorr_all_trials_avgs.fig')
     clear all_fig
 end
 
