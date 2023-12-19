@@ -46,10 +46,11 @@ function figure2(data)
 end
 
 function figure4(data)
-    xcorrs(data)
-    xcorrBySession(data)
-    xcorrHeatMap(data)
-    xcorrsDerivative(data)
+    % xcorrs(data)
+    % xcorrBySession(data)
+    % xcorrHeatMap(data)
+    % xcorrsDerivative(data)
+    xcorrDerivativeBySession(data)
 end
 
 function xcorrHeatMap(data)
@@ -337,7 +338,7 @@ function xcorrBySession(data)
         end
     end
     x = [1:4, 6:7, 9];
-    xl = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withheld', 'Overall'}
+    xl = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withheld', 'Overall'};
     axes(axs(1,1))
     errorbar(x, nanmean(ms_cors), nanstd(ms_cors) ./ size(ms_cors,1), 'k.')
     hold on
@@ -393,6 +394,179 @@ function xcorrBySession(data)
 
     saveas(fig, 'Analysis/paper_figures/cross_correlation/xcorr_by_session.fig')
     clear fig
+end
+
+function xcorrDerivativeBySession(data)
+    tbounds = [-5, 0.0];
+    sessions = unique(data.session_id);
+    outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
+    pm_lags = zeros(length(sessions), length(outcomes)+1);
+    pm_cors = zeros(length(sessions), length(outcomes)+1);
+    ps_lags = zeros(length(sessions), length(outcomes)+1);
+    ps_cors = zeros(length(sessions), length(outcomes)+1);
+    for s = 1:length(sessions)
+        stmp = filterTrials(data, 'session_id', sessions{s});
+        for o = 1:length(outcomes)
+            otmp = filterTrials(stmp, 'categorical_outcome', outcomes{o});
+            if ~isempty(otmp)
+                [mpfc, s1, ~] = avg_photo_traces(otmp, tbounds, 'stimulus');
+                [pupil, ~] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+                Fs = getFs(data, 'photometry_ch1');
+                Fs = Fs(1);
+                mp = zeros(size(otmp,1), 97);
+                sp = zeros(size(otmp,1), 97);
+                ls = mp;
+                for i = 1:size(mpfc,1)
+                    ch1 = mpfc(i,:);
+                    ch2 = s1(i,:);
+                    p = pupil(i,:);
+                    p = diff(p);
+                    % mpfc x pupil
+                    x = decimate(ch1(2:end-1), 12, 'fir');
+                    % x(end-1:end) = x(end-2);
+                    [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+                    try
+                        ls(i,:) = lag ./ 12;
+                        mp(i,:) = c; % ./ length(p(3:end-1));
+                    catch
+                        ls(i,:) = nan(1, size(ls,2));
+                        mp(i,:) = nan(1,size(mp,2));
+                    end
+                    % s1 x pupil 
+                    x = decimate(ch2(2:end-1), 12, 'fir');
+                    % x(end-1:end) = x(end-2);
+                    [c, ~] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+                    try
+                        sp(i,:) = c; % ./ length(p(3:end-1));
+                    catch
+                        sp(i,:) = nan(1,size(mp,2));
+                    end
+                end
+                [r,~] = size(otmp);
+                if r > 1
+                    sp = nanmean(sp);
+                    mp = nanmean(mp);
+                end
+                ls = ls(end,:);
+                sp = sp(ls >= -4.0 & ls <= 4.0);
+                mp = mp(ls >= -4.0 & ls <= 4.0);
+                ls = ls(ls >= -4.0 & ls <= 4.0);
+                [pmc, pmi] = max(mp);
+                [psc, psi] = max(sp);
+                ps_lags(s,o) = ls(psi);
+                pm_lags(s,o) = ls(pmi);
+                ps_cors(s,o) = psc;
+                pm_cors(s,o) = pmc;
+            else
+                ps_lags(s,o) = nan;
+                pm_lags(s,o) = nan;
+                ps_cors(s,o) = nan;
+                pm_cors(s,o) = nan;
+            end
+        end
+        [mpfc, s1, ~] = avg_photo_traces(stmp, tbounds, 'stimulus');
+        [pupil, ~] = avg_pupil_traces(stmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        mp = zeros(size(otmp,1), 97);
+        sp = zeros(size(otmp,1), 97);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            p = diff(p);
+            % mpfc x pupil
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            % x(end-1:end) = x(end-2);
+            [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            % x(end-1:end) = x(end-2);
+            [c, ~] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        mp = nanmean(mp);
+        sp = nanmean(sp);
+        ls = ls(end,:);
+        sp = sp(ls >= -4.0 & ls <= 4.0);
+        mp = mp(ls >= -4.0 & ls <= 4.0);
+        ls = ls(ls >= -4.0 & ls <= 4.0);
+        [pmc, pmi] = max(mp);
+        [psc, psi] = max(sp);
+        ps_lags(s,end) = ls(psi);
+        pm_lags(s,end) = ls(pmi);
+        ps_cors(s,end) = psc;
+        pm_cors(s,end) = pmc;
+        % figure(); subplot(2,1,1); plot(ls, sp); subplot(2,1,2); plot(ls, mp);
+        % figure()
+        % subplot(3,1,1)
+        % plot(lags, cs)
+        % subplot(3,1,2)
+        % plot(ls, mp)
+        % subplot(3,1,3)
+        % plot(ls, sp)
+    end
+    xcorrfig = figure('Position', [404,166,1252,766]);
+    tl = tiledlayout(2,2);
+    axs = zeros(2,2);
+    for r = 1:size(axs,1)
+        for c = 1:size(axs,2)
+            axs(r,c) = nexttile;
+        end
+    end
+    x = [1:4, 6:7, 9];
+    xl = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withheld', 'Overall'};
+
+    axes(axs(1,1))
+    errorbar(x, nanmean(pm_cors), nanstd(pm_cors) ./ size(pm_cors,1), 'k.')
+    hold on
+    bar(x, nanmean(pm_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    ylim([0.0, 0.5])
+    title('$\frac{dPupil}{dt}$ x NE$_{mPFC}$', 'interpreter', 'latex', 'FontSize', 16)
+    ylabel('Peak Cross Correlation (a.u.)', 'FontSize', 16)
+
+    axes(axs(2,1))
+    errorbar(x, nanmean(pm_lags), nanstd(pm_lags) ./ size(pm_lags,1), 'k.')
+    hold on
+    bar(x, nanmean(pm_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    ylim([-2.0,0.0])
+    ylabel('Lag of Peak Cross Correlation (s)', 'FontSize', 16)
+    
+    axes(axs(1,2))
+    errorbar(x, nanmean(ps_cors), nanstd(ps_cors) ./ size(pm_lags,1), 'k.')
+    hold on
+    bar(x, nanmean(ps_cors), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    ylim([0.0, 0.5])
+    title('$\frac{dPupil}{dt}$ x NE$_{S1}$', 'interpreter', 'latex', 'FontSize', 16)
+
+    axes(axs(2,2))
+    errorbar(x, nanmean(ps_lags), nanstd(ps_lags) ./ size(ps_lags,1), 'k.')
+    hold on
+    bar(x, nanmean(ps_lags), 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks(x)
+    xticklabels(xl)
+    ylim([-2.0,0.0])
+
+    saveas(xcorrfig, 'Analysis/paper_figures/cross_correlation/xcorr_derivative_by_session.fig')
+    clear xcorrfig
 end
 
 function xcorrStats(data)
