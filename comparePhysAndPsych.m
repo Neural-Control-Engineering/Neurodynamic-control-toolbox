@@ -14,8 +14,8 @@ animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 animals = animals_v2;
 
-animal = 240;
-k = 4;
+animal = 241;
+k = 3;
 
 fig = figure('Visible', 'on', 'WindowState', 'maximized');
 hold on;
@@ -26,7 +26,10 @@ for dv = 1:length(data_versions)
     tmp = filterTrials(data, 'animal', num2str(animal));
     if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
         tmp = removeFirstTrials(tmp);
-    end    
+    end
+    % if endsWith(data_ver, 'outliers')
+    %     tmp = tmp((tmp.pupil_base_before_stimulus > -6 & tmp.pupil_base_before_stimulus < 6),:);
+    % end
     fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, k, fformat{2});
     subplot(length(data_versions), 4, (dv-1)*4+1)
     hold on
@@ -51,8 +54,8 @@ end
 %     baselinePupilByState(tmp, fname, k, data_ver)
 % end
 
-[base_fig, base_axs] = baselineBarGraphs(data, k, data_versions, animal);
-[evoked_fig, evoked_axs] = evokedBarGraphs(data, k, data_versions, animal);
+% [base_fig, base_axs] = baselineBarGraphs(data, k, data_versions, animal);
+% [evoked_fig, evoked_axs] = evokedBarGraphs(data, k, data_versions, animal);
 
 function [fig, axs] = evokedBarGraphs(data, k, data_versions, animal);
     fig = figure('Visible', 'on', 'WindowState', 'maximized');
