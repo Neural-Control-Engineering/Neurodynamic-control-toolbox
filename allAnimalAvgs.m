@@ -46,11 +46,14 @@ function figure2(data)
 end
 
 function figure4(data)
-    % xcorrs(data)
-    % xcorrBySession(data)
-    % xcorrHeatMap(data)
-    % xcorrsDerivative(data)
+    xcorrs(data)
+    xcorrBySession(data)
+    xcorrStats(data)
+    dPupilXcorrStats(data)
+    xcorrHeatMap(data)
+    xcorrsDerivative(data)
     xcorrDerivativeBySession(data)
+    xcorrDerivativeHeatMap(data)
 end
 
 function xcorrHeatMap(data)
@@ -168,6 +171,89 @@ function xcorrHeatMap(data)
     xlim([-4,4])
     ylim([1,size(pfcXs1,1)])
     saveas(ps_fig, 'Analysis/paper_figures/cross_correlation/mpfc_x_s1_heatmap.fig')
+end
+
+function xcorrDerivativeHeatMap(data)
+    tbounds = [-5, 0.0];
+    sessions = unique(data.session_id);
+    pupilXpfc = zeros(length(sessions), 97);
+    pupilXs1 = zeros(length(sessions), 97);
+    for s = 1:length(sessions)
+        stmp = filterTrials(data, 'session_id', sessions{s});
+        [mpfc, s1, ~] = avg_photo_traces(stmp, tbounds, 'stimulus');
+        [pupil, ~] = avg_pupil_traces(stmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+        mp = zeros(size(stmp,1), 97);
+        sp = zeros(size(stmp,1), 97);
+        ls = mp;
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            p = pupil(i,:);
+            p = diff(p);
+            % mpfc x pupil
+            x = decimate(ch1(2:end-1), 12, 'fir');
+            % x(end-1:end) = x(end-2);
+            [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                ls(i,:) = lag ./ 12;
+                mp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                ls(i,:) = nan(1, size(ls,2));
+                mp(i,:) = nan(1,size(mp,2));
+            end
+            % s1 x pupil 
+            x = decimate(ch2(2:end-1), 12, 'fir');
+            % x(end-1:end) = x(end-2);
+            [c, ~] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+            try
+                sp(i,:) = c; % ./ length(p(3:end-1));
+            catch
+                sp(i,:) = nan(1,size(mp,2));
+            end
+        end
+        mp = nanmean(mp);
+        sp = nanmean(sp);
+        ls = ls(end,:);
+        sp = sp(ls >= -4.0 & ls <= 4.0);
+        mp = mp(ls >= -4.0 & ls <= 4.0);
+        ls = ls(ls >= -4.0 & ls <= 4.0);
+        pupilXpfc(s,:) = mp;
+        pupilXs1(s,:) = sp;
+    end
+    pupilXs1_inds = zeros(1,length(sessions));
+    pupilXpfc_inds = zeros(1,length(sessions));
+    for i = 1:length(sessions)
+        [~, ind] = max(pupilXs1(i,:));
+        pupilXs1_inds(i) = ind;
+        [~, ind] = max(pupilXpfc(i,:));
+        pupilXpfc_inds(i) = ind;
+    end
+    [~, pupilXs1_inds_sorted] = sort(pupilXs1_inds);
+    [~, pupilXpfc_inds_sorted] = sort(pupilXpfc_inds);
+
+    sp_fig = figure(); hold on; colormap('hot');
+    imagesc(ls, 1:size(pupilXs1,1), pupilXs1(pupilXs1_inds_sorted,:));
+    xlabel('Lag (s)', 'FontSize', 16)
+    ylabel('Session #', 'FontSize', 16)
+    title('Pupil X S1', 'FontSize', 16)
+    cbar = colorbar();
+    ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
+    plot([0,0], [1,size(pupilXs1,1)], 'k--')
+    xlim([-4,4])
+    ylim([1,size(pupilXs1,1)])
+    saveas(sp_fig, 'Analysis/paper_figures/cross_correlation/dPupil_x_s1_heatmap.fig')
+    
+    mp_fig = figure(); hold on; colormap('hot');
+    imagesc(ls, 1:size(pupilXpfc,1), pupilXpfc(pupilXpfc_inds_sorted,:));
+    xlabel('Lag (s)', 'FontSize', 16)
+    ylabel('Session #', 'FontSize', 16)
+    title('Pupil X PFC', 'FontSize', 16)
+    cbar = colorbar();
+    ylabel(cbar, 'Normalized Cross Correlation', 'FontSize', 14)
+    plot([0,0], [1,size(pupilXpfc,1)], 'k--')
+    xlim([-4,4])
+    ylim([1,size(pupilXpfc,1)])
+    saveas(mp_fig, 'Analysis/paper_figures/cross_correlation/dPupil_x_mpfc_heatmap.fig')
 end
 
 function xcorrBySession(data)
@@ -321,13 +407,6 @@ function xcorrBySession(data)
         ms_cors(s,end) = msc;
         ps_cors(s,end) = psc;
         pm_cors(s,end) = pmc;
-        % figure()
-        % subplot(3,1,1)
-        % plot(lags, cs)
-        % subplot(3,1,2)
-        % plot(ls, mp)
-        % subplot(3,1,3)
-        % plot(ls, sp)
     end
     fig = figure('Position', [404,166,1252,766]);
     tl = tiledlayout(2,3);
@@ -348,6 +427,10 @@ function xcorrBySession(data)
     ylim([0.0, 0.5])
     ylabel('Peak correlation (a.u.)', 'FontSize', 16)
     title('NE_{mPFC} x NE_{S1}', 'FontSize', 16)
+    [p, h, stats] = ranksum(ms_cors(:,1), ms_cors(:,2));
+    fprintf(sprintf('mPFC x S1 Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(ms_cors(:,5), ms_cors(:,6));
+    fprintf(sprintf('mPFC x S1 Peak Correlation Action vs Withheld: p=%f\n', p))
 
     axes(axs(2,1))
     errorbar(x, nanmean(ms_lags), nanstd(ms_lags) ./ size(ms_lags,1), 'k.')
@@ -357,6 +440,10 @@ function xcorrBySession(data)
     xticklabels(xl)
     ylim([-2.0,3.0])
     ylabel('Lag of peak correlation (s)', 'FontSize', 16)
+    [p, h, stats] = ranksum(ms_lags(:,1), ms_lags(:,2));
+    fprintf(sprintf('mPFC x S1 Lag of Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(ms_lags(:,5), ms_lags(:,6));
+    fprintf(sprintf('mPFC x S1 Lag of Peak Correlation Action vs Withheld: p=%f\n\n', p))
 
     axes(axs(1,2))
     errorbar(x, nanmean(pm_cors), nanstd(pm_cors) ./ size(pm_cors,1), 'k.')
@@ -366,6 +453,10 @@ function xcorrBySession(data)
     xticklabels(xl)
     ylim([0.0, 0.5])
     title('Pupil Area x NE_{mPFC}', 'FontSize', 16)
+    [p, h, stats] = ranksum(pm_cors(:,1), pm_cors(:,2));
+    fprintf(sprintf('pupil x mPFC Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(pm_cors(:,5), pm_cors(:,6));
+    fprintf(sprintf('pupil x mPFC Peak Correlation Action vs Withheld: p=%f\n', p))
 
     axes(axs(2,2))
     errorbar(x, nanmean(pm_lags), nanstd(pm_lags) ./ size(pm_lags,1), 'k.')
@@ -374,7 +465,11 @@ function xcorrBySession(data)
     xticks(x)
     xticklabels(xl)
     ylim([-2.0,3.0])
-    
+    [p, h, stats] = ranksum(pm_lags(:,1), pm_lags(:,2));
+    fprintf(sprintf('pupil x mPFC Lag of Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(pm_lags(:,5), pm_lags(:,6));
+    fprintf(sprintf('pupil x mPFC Lag of Peak Correlation Action vs Withheld: p=%f\n\n', p))
+
     axes(axs(1,3))
     errorbar(x, nanmean(ps_cors), nanstd(ps_cors) ./ size(pm_lags,1), 'k.')
     hold on
@@ -383,6 +478,10 @@ function xcorrBySession(data)
     xticklabels(xl)
     ylim([0.0, 0.5])
     title('Pupil Area x NE_{S1}', 'FontSize', 16)
+    [p, h, stats] = ranksum(ps_cors(:,1), ps_cors(:,2));
+    fprintf(sprintf('pupil x S1 Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(ps_cors(:,5), ps_cors(:,6));
+    fprintf(sprintf('pupil x S1 Peak Correlation Action vs Withheld: p=%f\n', p))
 
     axes(axs(2,3))
     errorbar(x, nanmean(ps_lags), nanstd(ps_lags) ./ size(ps_lags,1), 'k.')
@@ -391,6 +490,10 @@ function xcorrBySession(data)
     xticks(x)
     xticklabels(xl)
     ylim([-2.0,3.0])
+    [p, h, stats] = ranksum(ps_lags(:,1), ps_lags(:,2));
+    fprintf(sprintf('pupil x S1 Lag of Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(ps_lags(:,5), ps_lags(:,6));
+    fprintf(sprintf('pupil x S1 Lag of Peak Correlation Action vs Withheld: p=%f\n\n', p))
 
     saveas(fig, 'Analysis/paper_figures/cross_correlation/xcorr_by_session.fig')
     clear fig
@@ -538,6 +641,10 @@ function xcorrDerivativeBySession(data)
     ylim([0.0, 0.5])
     title('$\frac{dPupil}{dt}$ x NE$_{mPFC}$', 'interpreter', 'latex', 'FontSize', 16)
     ylabel('Peak Cross Correlation (a.u.)', 'FontSize', 16)
+    [p, h, stats] = ranksum(pm_cors(:,1), pm_cors(:,2));
+    fprintf(sprintf('pupil x mPFC Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(pm_cors(:,5), pm_cors(:,6));
+    fprintf(sprintf('pupil x mPFC Peak Correlation Action vs Withheld: p=%f\n', p))
 
     axes(axs(2,1))
     errorbar(x, nanmean(pm_lags), nanstd(pm_lags) ./ size(pm_lags,1), 'k.')
@@ -547,6 +654,10 @@ function xcorrDerivativeBySession(data)
     xticklabels(xl)
     ylim([-2.0,0.0])
     ylabel('Lag of Peak Cross Correlation (s)', 'FontSize', 16)
+    [p, h, stats] = ranksum(pm_lags(:,1), pm_lags(:,2));
+    fprintf(sprintf('dPupil x mPFC Lag of Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(pm_lags(:,5), pm_lags(:,6));
+    fprintf(sprintf('dPupil x mPFC Lag of Peak Correlation Action vs Withheld: p=%f\n\n', p))
     
     axes(axs(1,2))
     errorbar(x, nanmean(ps_cors), nanstd(ps_cors) ./ size(pm_lags,1), 'k.')
@@ -556,6 +667,10 @@ function xcorrDerivativeBySession(data)
     xticklabels(xl)
     ylim([0.0, 0.5])
     title('$\frac{dPupil}{dt}$ x NE$_{S1}$', 'interpreter', 'latex', 'FontSize', 16)
+    [p, h, stats] = ranksum(ps_cors(:,1), ps_cors(:,2));
+    fprintf(sprintf('dPupil x S1 Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(ps_cors(:,5), ps_cors(:,6));
+    fprintf(sprintf('dPupil x S1 Peak Correlation Action vs Withheld: p=%f\n', p))
 
     axes(axs(2,2))
     errorbar(x, nanmean(ps_lags), nanstd(ps_lags) ./ size(ps_lags,1), 'k.')
@@ -564,13 +679,18 @@ function xcorrDerivativeBySession(data)
     xticks(x)
     xticklabels(xl)
     ylim([-2.0,0.0])
+    [p, h, stats] = ranksum(ps_lags(:,1), ps_lags(:,2));
+    fprintf(sprintf('dPupil x S1 Lag of Peak Correlation Hit vs Miss: p=%f\n', p))
+    [p, h, stats] = ranksum(ps_lags(:,5), ps_lags(:,6));
+    fprintf(sprintf('dPupil x S1 Lag of Peak Correlation Action vs Withheld: p=%f\n\n', p))
 
     saveas(xcorrfig, 'Analysis/paper_figures/cross_correlation/xcorr_derivative_by_session.fig')
     clear xcorrfig
 end
 
 function xcorrStats(data)
-    right_wrong = {{'Hit', 'CR'}, {'Miss', 'FA'}}; %{{'Hit', 'FA'}, {'Miss', 'CR'}}; %
+    fprintf('\nCross Correlation Stats\n')
+    right_wrong = {{'Hit', 'FA'}, {'Miss', 'CR'}}; %{{'Hit', 'CR'}, {'Miss', 'FA'}}; %
     tbounds = [-5.0, 0.0];
     outcome = right_wrong{1};
     tmp = filterTrials(data, 'categorical_outcome', outcome);
@@ -579,21 +699,36 @@ function xcorrStats(data)
     mpfc_x_s1_correct = zeros(size(mpfc,1),1);
     mpfc_x_pupil_correct = zeros(size(mpfc,1),1);
     s1_x_pupil_correct = zeros(size(mpfc,1),1);
+    mpfc_x_s1_correct_lag = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_correct_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_correct_lag = zeros(size(mpfc,1),1);
     for i = 1:size(mpfc,1)
         ch1 = mpfc(i,:);
         ch2 = s1(i,:);
         p = pupil(i,:);
-        % mpfc x s1 
-        [c, ~] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
-        mpfc_x_s1_correct(i) = c(round(length(c)/2)) / length(ch1(2:end-1));
-        % mpfc x pupil 
-        x = decimate(ch1(1,:), 12, 'fir');
-        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
-        mpfc_x_pupil_correct(i) = c(round(length(c)/2)) / length(p(3:end-1));
-        % s1 x pupil 
-        x = decimate(ch2(1,:), 12, 'fir');
-        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
-        s1_x_pupil_correct(i) = c(round(length(c)/2)) / length(p(3:end-1));
+         % mpfc x s1 
+         [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+         c = c(lag > -4 & lag < 4);
+         lag = lag(lag > -4 & lag < 4);
+         [val, ind] = max(c);
+         mpfc_x_s1_correct(i) = val;
+         mpfc_x_s1_correct_lag(i) = lag(ind);
+         % mpfc x pupil
+         x = decimate(ch1(2:end-1), 12, 'fir');
+         [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+         c = c(lag > -4 & lag < 4);
+         lag = lag(lag > -4 & lag < 4);
+         [val, ind] = max(c);
+         mpfc_x_pupil_correct(i) = val;
+         mpfc_x_pupil_correct_lag(i) = lag(ind);
+         % s1 x pupil 
+         x = decimate(ch2(2:end-1), 12, 'fir');
+         [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+         c = c(lag > -4 & lag < 4);
+         lag = lag(lag > -4 & lag < 4);
+         [val, ind] = max(c);
+         s1_x_pupil_correct(i) = val;
+         s1_x_pupil_correct_lag(i) = lag(ind);
     end
     outcome = right_wrong{2};
     tmp = filterTrials(data, 'categorical_outcome', outcome);
@@ -602,28 +737,316 @@ function xcorrStats(data)
     mpfc_x_s1_incorrect = zeros(size(mpfc,1),1);
     mpfc_x_pupil_incorrect = zeros(size(mpfc,1),1);
     s1_x_pupil_incorrect = zeros(size(mpfc,1),1);
+    mpfc_x_s1_incorrect_lag = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_incorrect_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_incorrect_lag = zeros(size(mpfc,1),1);
     for i = 1:size(mpfc,1)
         ch1 = mpfc(i,:);
         ch2 = s1(i,:);
         p = pupil(i,:);
         % mpfc x s1 
-        [c, ~] = xcorr(ch1(2:end-1)-nanmean(ch1), ch2(2:end-1)-nanmean(ch2));
-        mpfc_x_s1_incorrect(i) = c(round(length(c)/2)) / length(ch1(2:end-1));
-        % mpfc x pupil 
-        x = decimate(ch1(1,:), 12, 'fir');
-        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
-        mpfc_x_pupil_incorrect(i) = c(round(length(c)/2)) / length(p(3:end-1));
+        [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_s1_incorrect(i) = val;
+        mpfc_x_s1_incorrect_lag(i) = lag(ind);
+        % mpfc x pupil
+        x = decimate(ch1(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_pupil_incorrect(i) = val;
+        mpfc_x_pupil_incorrect_lag(i) = lag(ind);
         % s1 x pupil 
-        x = decimate(ch2(1,:), 12, 'fir');
-        [c, ~] = xcorr(p(3:end-1), x(3:end-1));
-        s1_x_pupil_incorrect(i) = c(round(length(c)/2)) / length(p(3:end-1));
+        x = decimate(ch2(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        s1_x_pupil_incorrect(i) = val;
+        s1_x_pupil_incorrect_lag(i) = lag(ind);
     end
     [p, h, stats] = ranksum(mpfc_x_s1_correct, mpfc_x_s1_incorrect);
-    sprintf('mPFC x S1 Peak Correlation: Mann-Whitney p=%f', p)
+    fprintf(sprintf('mean mPFC x S1 Peak Correlation Action: %.3f\n', nanmean(mpfc_x_s1_correct)))
+    fprintf(sprintf('mean mPFC x S1 Peak Correlation Withheld: %.3f\n', nanmean(mpfc_x_s1_incorrect)))
+    fprintf(sprintf('mPFC x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(mpfc_x_s1_correct_lag, mpfc_x_s1_incorrect_lag);
+    fprintf(sprintf('mean mPFC x S1 Lag of Peak Correlation Action: %.3f\n', nanmean(mpfc_x_s1_correct_lag)))
+    fprintf(sprintf('mean mPFC x S1 Lag of Peak Correlation Withheld: %.3f\n', nanmean(mpfc_x_s1_incorrect_lag)))
+    fprintf(sprintf('mPFC x S1 Lag of Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
     [p, h, stats] = ranksum(mpfc_x_pupil_correct, mpfc_x_pupil_incorrect);
-    sprintf('mPFC x pupil Peak Correlation: Mann-Whitney p=%f', p)
+    fprintf(sprintf('mean pupil x mPFC Peak Correlation Action: %.3f\n', nanmean(mpfc_x_pupil_correct)))
+    fprintf(sprintf('mean pupil x mPFC Peak Correlation Withheld: %.3f\n', nanmean(mpfc_x_pupil_incorrect)))
+    fprintf(sprintf('pupil x mPFC Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(mpfc_x_pupil_correct_lag, mpfc_x_pupil_incorrect_lag);
+    fprintf(sprintf('mean pupil x mPFC Lag of Peak Correlation Action: %.3f\n', nanmean(mpfc_x_pupil_correct_lag)))
+    fprintf(sprintf('mean pupil x mPFC Lag of Peak Correlation Withheld: %.3f\n', nanmean(mpfc_x_pupil_incorrect_lag)))
+    fprintf(sprintf('pupil x mPFC Lag of Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
     [p, h, stats] = ranksum(s1_x_pupil_correct, s1_x_pupil_incorrect);
-    sprintf('S1 x Pupil Peak Correlation: Mann-Whitney p=%f', p)
+    fprintf(sprintf('mean pupil x S1 Peak Correlation Action: %.3f\n', nanmean(s1_x_pupil_correct)))
+    fprintf(sprintf('mean pupil x S1 Peak Correlation Withheld: %.3f\n', nanmean(s1_x_pupil_incorrect)))
+    fprintf(sprintf('pupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(s1_x_pupil_correct_lag, s1_x_pupil_incorrect_lag);
+    fprintf(sprintf('mean pupil x S1 Lag of Peak Correlation Action: %.3f\n', nanmean(s1_x_pupil_correct_lag)))
+    fprintf(sprintf('mean pupil x S1 Lag of Peak Correlation Withheld: %.3f\n', nanmean(s1_x_pupil_incorrect_lag)))
+    fprintf(sprintf('pupil x S1 Lag of Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    tmp = filterTrials(data, 'categorical_outcome', 'Hit');
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_s1_hit = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_hit = zeros(size(mpfc,1),1);
+    s1_x_pupil_hit = zeros(size(mpfc,1),1);
+    mpfc_x_s1_hit_lag = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_hit_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_hit_lag = zeros(size(mpfc,1),1);
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        % mpfc x s1 
+        [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_s1_hit(i) = val;
+        mpfc_x_s1_hit_lag(i) = lag(ind);
+        % mpfc x pupil
+        x = decimate(ch1(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_pupil_hit(i) = val;
+        mpfc_x_pupil_hit_lag(i) = lag(ind);
+        % s1 x pupil 
+        x = decimate(ch2(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        s1_x_pupil_hit(i) = val;
+        s1_x_pupil_hit_lag(i) = lag(ind);
+    end
+    tmp = filterTrials(data, 'categorical_outcome', 'Miss');
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_s1_miss = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_miss = zeros(size(mpfc,1),1);
+    s1_x_pupil_miss = zeros(size(mpfc,1),1);
+    mpfc_x_s1_miss_lag = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_miss_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_miss_lag = zeros(size(mpfc,1),1);
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        % mpfc x s1 
+        [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_s1_miss(i) = val;
+        mpfc_x_s1_miss_lag(i) = lag(ind);
+        % mpfc x pupil
+        x = decimate(ch1(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_pupil_miss(i) = val;
+        mpfc_x_pupil_miss_lag(i) = lag(ind);
+        % s1 x pupil 
+        x = decimate(ch2(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x, 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        s1_x_pupil_miss(i) = val;
+        s1_x_pupil_miss_lag(i) = lag(ind);
+    end
+    [p, h, stats] = ranksum(mpfc_x_s1_hit, mpfc_x_s1_miss);
+    fprintf(sprintf('mean mPFC x S1 Peak Correlation Hit: %.3f\n', nanmean(mpfc_x_s1_hit)))
+    fprintf(sprintf('mean mPFC x S1 Peak Correlation Miss: %.3f\n', nanmean(mpfc_x_s1_miss)))
+    fprintf(sprintf('mPFC x S1 Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(mpfc_x_s1_hit_lag, mpfc_x_s1_miss_lag);
+    fprintf(sprintf('mean mPFC x S1 Lag of Peak Correlation Hit: %.3f\n', nanmean(mpfc_x_s1_hit_lag)))
+    fprintf(sprintf('mean mPFC x S1 Lag of Peak Correlation Miss: %.3f\n', nanmean(mpfc_x_s1_miss_lag)))
+    fprintf(sprintf('mPFC x S1 Lag of Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(mpfc_x_pupil_hit, mpfc_x_pupil_miss);
+    fprintf(sprintf('mean pupil x mPFC Peak Correlation Hit: %.3f\n', nanmean(mpfc_x_pupil_hit)))
+    fprintf(sprintf('mean pupil x mPFC Peak Correlation Miss: %.3f\n', nanmean(mpfc_x_pupil_miss)))
+    fprintf(sprintf('pupil x mPFC Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(mpfc_x_pupil_hit_lag, mpfc_x_pupil_miss_lag);
+    fprintf(sprintf('mean pupil x mPFC Lag of Peak Correlation Hit: %.3f\n', nanmean(mpfc_x_pupil_hit_lag)))
+    fprintf(sprintf('mean pupil x mPFC Lag of Peak Correlation Miss: %.3f\n', nanmean(mpfc_x_pupil_miss_lag)))
+    fprintf(sprintf('pupil x mPFC Lag of Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(s1_x_pupil_hit, s1_x_pupil_miss);
+    fprintf(sprintf('mean pupil x S1 Peak Correlation Hit: %.3f\n', nanmean(s1_x_pupil_hit)))
+    fprintf(sprintf('mean pupil x S1 Peak Correlation Miss: %.3f\n', nanmean(s1_x_pupil_miss)))
+    fprintf(sprintf('pupil x S1 Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(s1_x_pupil_hit_lag, s1_x_pupil_miss_lag);
+    fprintf(sprintf('mean pupil x S1 Lag of Peak Correlation Hit: %.3f\n', nanmean(s1_x_pupil_hit_lag)))
+    fprintf(sprintf('mean pupil x S1 Lag of Peak Correlation Miss: %.3f\n', nanmean(s1_x_pupil_miss_lag)))
+    fprintf(sprintf('pupil x S1 Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    % keyboard
+end
+
+function dPupilXcorrStats(data)
+    fprintf('\nPupil Derivative Cross Correlation Stats\n')
+    right_wrong = {{'Hit', 'FA'}, {'Miss', 'CR'}}; %{{'Hit', 'CR'}, {'Miss', 'FA'}}; %
+    tbounds = [-5.0, 0.0];
+    outcome = right_wrong{1};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_pupil_correct = zeros(size(mpfc,1),1);
+    s1_x_pupil_correct = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_correct_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_correct_lag = zeros(size(mpfc,1),1);
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        p = diff(p);
+        % mpfc x pupil
+        x = decimate(ch1(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_pupil_correct(i) = val;
+        mpfc_x_pupil_correct_lag(i) = lag(ind);
+        % s1 x pupil 
+        x = decimate(ch2(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        s1_x_pupil_correct(i) = val;
+        s1_x_pupil_correct_lag(i) = lag(ind);
+    end
+    outcome = right_wrong{2};
+    tmp = filterTrials(data, 'categorical_outcome', outcome);
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_pupil_incorrect = zeros(size(mpfc,1),1);
+    s1_x_pupil_incorrect = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_incorrect_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_incorrect_lag = zeros(size(mpfc,1),1);
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        p = diff(p);
+        % mpfc x pupil
+        x = decimate(ch1(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_pupil_incorrect(i) = val;
+        mpfc_x_pupil_incorrect_lag(i) = lag(ind);
+        % s1 x pupil 
+        x = decimate(ch2(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        s1_x_pupil_incorrect(i) = val;
+        s1_x_pupil_incorrect_lag(i) = lag(ind);
+    end
+    [p, h, stats] = ranksum(mpfc_x_pupil_correct, mpfc_x_pupil_incorrect);
+    fprintf(sprintf('mean dPupil x mPFC Peak Correlation Action: %.3f\n', nanmean(mpfc_x_pupil_correct)))
+    fprintf(sprintf('mean dPupil x mPFC Peak Correlation Withheld: %.3f\n', nanmean(mpfc_x_pupil_incorrect)))
+    fprintf(sprintf('dPupil x mPFC Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(mpfc_x_pupil_correct_lag, mpfc_x_pupil_incorrect_lag);
+    fprintf(sprintf('mean dPupil x mPFC Lag of Peak Correlation Action: %.3f\n', nanmean(mpfc_x_pupil_correct_lag)))
+    fprintf(sprintf('mean dPupil x mPFC Lag of Peak Correlation Withheld: %.3f\n', nanmean(mpfc_x_pupil_incorrect_lag)))
+    fprintf(sprintf('dPupil x mPFC Lag of Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(s1_x_pupil_correct, s1_x_pupil_incorrect);
+    fprintf(sprintf('mean dPupil x S1 Peak Correlation Action: %.3f\n', nanmean(s1_x_pupil_correct)))
+    fprintf(sprintf('mean dPupil x S1 Peak Correlation Withheld: %.3f\n', nanmean(s1_x_pupil_incorrect)))
+    fprintf(sprintf('dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(s1_x_pupil_correct_lag, s1_x_pupil_incorrect_lag);
+    fprintf(sprintf('mean dPupil x S1 Lag of Peak Correlation Action: %.3f\n', nanmean(s1_x_pupil_correct_lag)))
+    fprintf(sprintf('mean dPupil x S1 Lag of Peak Correlation Withheld: %.3f\n', nanmean(s1_x_pupil_incorrect_lag)))
+    fprintf(sprintf('dPupil x S1 Lag of Peak Correlation Action vs Withheld: Mann-Whitney p=%f\n\n', p))
+    tmp = filterTrials(data, 'categorical_outcome', 'Hit');
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_pupil_hit = zeros(size(mpfc,1),1);
+    s1_x_pupil_hit = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_hit_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_hit_lag = zeros(size(mpfc,1),1);
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        p = diff(p);
+        % mpfc x pupil
+        x = decimate(ch1(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_pupil_hit(i) = val;
+        mpfc_x_pupil_hit_lag(i) = lag(ind);
+        % s1 x pupil 
+        x = decimate(ch2(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        s1_x_pupil_hit(i) = val;
+        s1_x_pupil_hit_lag(i) = lag(ind);
+    end
+    tmp = filterTrials(data, 'categorical_outcome', 'Miss');
+    [mpfc, s1, ~] = avg_photo_traces(tmp, tbounds, 'stimulus');
+    [pupil, ~] = avg_pupil_traces(tmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+    mpfc_x_pupil_miss = zeros(size(mpfc,1),1);
+    s1_x_pupil_miss = zeros(size(mpfc,1),1);
+    mpfc_x_pupil_miss_lag = zeros(size(mpfc,1),1);
+    s1_x_pupil_miss_lag = zeros(size(mpfc,1),1);
+    for i = 1:size(mpfc,1)
+        ch1 = mpfc(i,:);
+        ch2 = s1(i,:);
+        p = pupil(i,:);
+        p = diff(p);
+        % mpfc x pupil
+        x = decimate(ch1(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        mpfc_x_pupil_miss(i) = val;
+        mpfc_x_pupil_miss_lag(i) = lag(ind);
+        % s1 x pupil 
+        x = decimate(ch2(2:end-1), 12, 'fir');
+        [c, lag] = xcorr(p(2:end-1), x(1:end-1), 'normalized');
+        c = c(lag > -4 & lag < 4);
+        lag = lag(lag > -4 & lag < 4);
+        [val, ind] = max(c);
+        s1_x_pupil_miss(i) = val;
+        s1_x_pupil_miss_lag(i) = lag(ind);
+    end
+    [p, h, stats] = ranksum(mpfc_x_pupil_hit, mpfc_x_pupil_miss);
+    fprintf(sprintf('mean dPupil x mPFC Peak Correlation Hit: %.3f\n', nanmean(mpfc_x_pupil_hit)))
+    fprintf(sprintf('mean dPupil x mPFC Peak Correlation Miss: %.3f\n', nanmean(mpfc_x_pupil_miss)))
+    fprintf(sprintf('dPupil x mPFC Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(mpfc_x_pupil_hit_lag, mpfc_x_pupil_miss_lag);
+    fprintf(sprintf('mean dPupil x mPFC Lag of Peak Correlation Hit: %.3f\n', nanmean(mpfc_x_pupil_hit_lag)))
+    fprintf(sprintf('mean dPupil x mPFC Lag of Peak Correlation Miss: %.3f\n', nanmean(mpfc_x_pupil_miss_lag)))
+    fprintf(sprintf('dPupil x mPFC Lag of Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(s1_x_pupil_hit, s1_x_pupil_miss);
+    fprintf(sprintf('mean dPupil x S1 Peak Correlation Hit: %.3f\n', nanmean(s1_x_pupil_hit)))
+    fprintf(sprintf('mean dPupil x S1 Peak Correlation Miss: %.3f\n', nanmean(s1_x_pupil_miss)))
+    fprintf(sprintf('dPupil x S1 Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
+    [p, h, stats] = ranksum(s1_x_pupil_hit_lag, s1_x_pupil_miss_lag);
+    fprintf(sprintf('mean dPupil x S1 Lag of Peak Correlation Hit: %.3f\n', nanmean(s1_x_pupil_hit_lag)))
+    fprintf(sprintf('mean dPupil x S1 Lag of Peak Correlation Miss: %.3f\n', nanmean(s1_x_pupil_miss_lag)))
+    fprintf(sprintf('dPupil x S1 Peak Correlation Hit vs Miss: Mann-Whitney p=%f\n\n', p))
     % keyboard
 end
 
