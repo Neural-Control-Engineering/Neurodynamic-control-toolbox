@@ -1,4 +1,4 @@
-function psychCurveByPupilArea(data)
+function dPrimeByPupilArea(data)
     % ptiles = 25:25:100;
     ptiles = [33, 66, 100];
     low = prctile(data.pupil_base_before_stimulus, 0);
@@ -14,26 +14,28 @@ function psychCurveByPupilArea(data)
         stim_strengths = unique(tmp.stimulus_strength);
         sessions = unique(tmp.session_id);
         animals = fetchAnimals(tmp);
-        mat = nan(length(sessions), length(stim_strengths));
+        mat = nan(length(sessions), length(stim_strengths)-1);
         for s = 1:length(sessions)
             stmp = filterTrials(tmp, 'session_id', num2str(sessions(s)));
             sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
             fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+            far = (size(fatmp,1)+0.5) / (size(sstmp,1)+1);
             mat(s,1) = size(fatmp,1) / size(sstmp,1);
-        % mat = nan(length(animals), length(stim_strengths));
+        % mat = nan(length(animals), length(stim_strengths)-1);
         % for s = 1:length(animals)
         %     stmp = filterTrials(tmp, 'animal', num2str(animals(s)));
         %     sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
         %     fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+        %     far = (size(fatmp,1)+0.5) / (size(sstmp,1)+1);
         %     mat(s,1) = size(fatmp,1) / size(sstmp,1);
             for ss = 2:length(stim_strengths)
                 sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(ss));
                 otmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
-                hr = size(otmp,1) / size(sstmp,1);
+                hr = (size(otmp,1)+0.5) / (size(sstmp,1)+1);
                 if length(unique(stmp.stimulus_strength)) == 2
-                    mat(s,end) = hr;
+                    mat(s,end) = norminv(hr) - norminv(far);
                 else
-                    mat(s, ss) = hr;
+                    mat(s, ss-1) = norminv(hr) - norminv(far);
                 end
             end
         end
@@ -57,11 +59,12 @@ function psychCurveByPupilArea(data)
                 l = sprintf('%ith quartile', i);
         end
         n = size(mat,1);
-        semshade(mat, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, sprintf('%s (n=%i)', l, n));
+        semshade(mat, 0.3, cols(i,:), cols(i,:), stim_strengths(2:end) .* 10, 1, sprintf('%s (n=%i)', l, n));
         hold on
     end
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
-    ylabel('Response Probability', 'FontSize', 14)
+    ylabel('d''', 'FontSize', 14)
+    
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline Pupil Area';
 end

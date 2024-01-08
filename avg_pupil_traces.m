@@ -12,22 +12,28 @@ function [pupil, time] = avg_pupil_traces(data, tbounds, alignTo)
     else
         starts = data.stimulus_time;
     end
-    Fs = 1 / (data.pupil_area{1,1}(2,1)-data.pupil_area{1,1}(1,1));
-    pupil = nan(size(data,1), round(Fs*diff(tbounds)));
-    time = linspace(tbounds(1), tbounds(2), round(Fs*diff(tbounds)));
-
+    % Fs = 1 / (data.pupil_area{1,1}(2,1)-data.pupil_area{1,1}(1,1));
+    pupil = nan(size(data,1), length(tbounds(1):0.1:tbounds(2)));
+    time = tbounds(1):0.1:tbounds(2);
+    pre = -tbounds(1);
+    post = tbounds(2);
+    xvalues = tbounds(1):0.1:tbounds(2);
     for i = 1:size(data,1)
-        t = data.pupil_area{i,1}(:,1) - starts(i);
-        p = data.pupil_area{i,1}(:,2);
-        p = p(t >= tbounds(1) & t <= tbounds(2));
-        t = t(t >= tbounds(1) & t <= tbounds(2));
+        stimTime = starts(i);
+        pupilTrace = data.pupil_area{i};
+        notLarger = (pupilTrace(:,1)-(stimTime-pre))<0;
+        validIndices = find(notLarger);
+        stimIndex = validIndices(end);
+        segIndexStart = stimIndex-(pre*10);
+        segIndexStop = stimIndex+(post*10);
+            
         try
-            pupil(i,:) = p;
-        catch
-            % again with the sample rate issues
-            try
-                pupil(i,:) = interp1(t,p,time);
-            end
+            pupilTraceSeg = pupilTrace(segIndexStart:segIndexStop,:);
+            pupil(i,:) = pupilTraceSeg(:,2);
+        catch 
+            pupilTraceSeg = pupilTrace(segIndexStart:end,:);
+            pupil(i,1:size(pupilTraceSeg,1)) = pupilTraceSeg(:,2);
         end
+        
     end
 end

@@ -18,9 +18,9 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
             if ~isempty(otmp)
                 [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
                 if size(pupil,1) > 1
-                    animal{o} = [animal{o}; nanmean(pupil(:,2:end-1))];
+                    animal{o} = [animal{o}; nanmean(pupil)];
                 else
-                    animal{o} = [animal{o}; pupil(2:end-1)];
+                    animal{o} = [animal{o}; pupil];
                 end
             end
         end
@@ -34,14 +34,13 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
             if ~isempty(otmp)
                 [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
                 if size(pupil,1) > 1
-                    session{o} = [session{o}; nanmean(pupil(:,2:end-1))];
+                    session{o} = [session{o}; nanmean(pupil)];
                 else
-                    session{o} = [session{o}; pupil(2:end-1)];
+                    session{o} = [session{o}; pupil];
                 end
             end
         end
     end
-    t = t(2:end-1);
 
     dilations_animal = {[], [], [], []};
     dilations_sessions = {[], [], [], []};

@@ -13,7 +13,7 @@ function baselineVsDilationScatter(data, tbounds, alignTo)
         e = nanmean(pupil(:,(t > 0 & t < 6)),2);
         d = e - b;
         baselines = [baselines; b];
-        dilations = [dilations; e];
+        dilations = [dilations; d];
         % plot(b, e, 'o', 'MarkerFaceColor', cols(s,:), 'MarkerSize', 2.0)
         % hold on
     end

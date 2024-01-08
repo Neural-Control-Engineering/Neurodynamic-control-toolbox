@@ -18,9 +18,9 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
             if ~isempty(otmp)
                 [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
                 if size(pupil,1) > 1
-                    animal{o} = [animal{o}; nanmean(pupil(:,2:end-1))];
+                    animal{o} = [animal{o}; nanmean(pupil)];
                 else
-                    animal{o} = [animal{o}; pupil(2:end-1)];
+                    animal{o} = [animal{o}; pupil];
                 end
             end
         end
@@ -34,14 +34,13 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
             if ~isempty(otmp)
                 [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
                 if size(pupil,1) > 1
-                    session{o} = [session{o}; nanmean(pupil(:,2:end-1))];
+                    session{o} = [session{o}; nanmean(pupil)];
                 else
-                    session{o} = [session{o}; pupil(2:end-1)];
+                    session{o} = [session{o}; pupil];
                 end
             end
         end
     end
-    t = t(2:end-1);
 
     baselines_animal = {[], [], [], []};
     baselines_sessions = {[], [], [], []};
@@ -65,7 +64,7 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Mean Pupil Dilation (z-score)')
+    ylabel('Baseline Pupil Area (z-score)')
 
     for i = 1:length(baselines_animal) 
         avg(i) = mean(baselines_animal{i});
@@ -79,6 +78,6 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Mean Pupil Dilation (z-score)')
+    ylabel('Baseline Pupil Area (z-score)')
 
 end
