@@ -17,7 +17,7 @@ function baselineVsDilationScatter(data, tbounds, alignTo)
         % plot(b, e, 'o', 'MarkerFaceColor', cols(s,:), 'MarkerSize', 2.0)
         % hold on
     end
-    scatter(baselines, dilations, 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [0,0,0])
+    scatter(baselines, dilations, 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1])
     x = baselines;
     y = dilations;
     mdl = fitlm(x, y)

@@ -12,18 +12,18 @@ function [pupil, time] = avg_pupil_traces(data, tbounds, alignTo)
     else
         starts = data.stimulus_time;
     end
-    % Fs = 1 / (data.pupil_area{1,1}(2,1)-data.pupil_area{1,1}(1,1));
-    pupil = nan(size(data,1), length(tbounds(1):0.1:tbounds(2)));
-    time = tbounds(1):0.1:tbounds(2);
+    
     pre = -tbounds(1);
     post = tbounds(2);
-    xvalues = tbounds(1):0.1:tbounds(2);
+    time = tbounds(1):0.1:tbounds(2);
+    pupil = nan(size(data,1), length(time));
+
     for i = 1:size(data,1)
         stimTime = starts(i);
         pupilTrace = data.pupil_area{i};
-        notLarger = (pupilTrace(:,1)-(stimTime-pre))<0;
+        notLarger = (pupilTrace(:,1)-(stimTime))<0;
         validIndices = find(notLarger);
-        stimIndex = validIndices(end);
+        stimIndex = validIndices(end) - 1;
         segIndexStart = stimIndex-(pre*10);
         segIndexStop = stimIndex+(post*10);
             

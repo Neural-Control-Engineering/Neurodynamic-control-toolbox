@@ -45,13 +45,15 @@ function [animal, session] = baselineDilationCorrCoef(data, tbounds, alignTo)
                     dilations = evoked - baselines;
                     pcc = corrcoef(baselines, dilations);
                     session{o} = [session{o}; pcc(1,2)];
-                else
-                    baselines = nanmean(pupil(t > -0.5 & t < 0));
-                    evoked = nanmean(pupil(t > 0 & t < 6.0));
-                    dilations = evoked - baselines;
-                    pcc = corrcoef(baselines, dilations);
-                    session{o} = [session{o}; pcc];
                 end
+                % else
+                %     keyboard
+                %     baselines = nanmean(pupil(t > -0.5 & t < 0));
+                %     evoked = nanmean(pupil(t > 0 & t < 6.0));
+                %     dilations = evoked - baselines;
+                %     pcc = corrcoef(baselines, dilations);
+                %     session{o} = [session{o}; pcc];
+                % end
             end
         end
     end

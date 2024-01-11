@@ -1,7 +1,8 @@
-function dPrimeByStimStrength(data)
+function dPrimeByStimStrength_v2(data)
     animals = fetchAnimals(data);
-    fig_session = figure();
+    
     fig_animal = figure();
+    hold on
     for a = 1:length(animals)
         animal = animals(a);
         tmp = filterTrials(data, 'animal', num2str(animal));
@@ -25,18 +26,22 @@ function dPrimeByStimStrength(data)
                 end
             end
         end
-        figure(fig_session)
+        % figure(fig_session)
+        % plot(stim_strengths(2:end) .* 10, nanmean(dp), 'color', [.5 .5 .5], 'linewidth', 2, 'DisplayName', sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
+        % hold on
         plot(stim_strengths(2:end) .* 10, nanmean(dp), 'color', [.5 .5 .5], 'linewidth', 2, 'DisplayName', sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
-        hold on
-        figure(fig_animal)
-        plot(stim_strengths(2:end) .* 10, nanmean(dp), 'color', [.5 .5 .5], 'linewidth', 2, 'DisplayName', sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
-        hold on
         animal_avg(a,:) = nanmean(dp);
     end
-    animals = fetchAnimals(data);
+
+    errorbar(stim_strengths(2:end) .* 10, nanmean(animal_avg), nanstd(animal_avg) ./ sqrt(length(animals)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('Mean \x00B1 SEM: (N_{animals}=%i)', length(animals)))
+    ylabel('d''', 'FontSize', 16)
+    xlabel('Stimulus Strength (PSI)', 'FontSize', 16)
+
+    fig_session = figure();
+    hold on
+
     stim_strengths = unique(data.stimulus_strength);
     dp = nan(length(sessions), length(stim_strengths)-1);
-    % dp = mat;
     sessions = unique(data.session_id);
     for s = 1:length(sessions)
         stmp = filterTrials(data, 'session_id', num2str(sessions(s)));
@@ -54,13 +59,15 @@ function dPrimeByStimStrength(data)
                 dp(s, ss-1) = norminv(hr) - norminv(far);
             end
         end
+        if length(stim_strengths) == 2
+            plot(stim_strengths(2:end) .* 10, dp(s,end), '*', 'Color', [0.5,0.5,0.5])
+        else
+            plot(stim_strengths(2:end) .* 10, dp(s,:), 'Color', [0.5,0.5,0.5])
+        end
     end
-    figure(fig_session)
+
     errorbar(stim_strengths(2:end) .* 10, nanmean(dp), nanstd(dp) ./ sqrt(length(sessions)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('Mean \x00B1 SEM: (N_{sessions}=%i)', length(sessions)))
     ylabel('d''', 'FontSize', 16)
     xlabel('Stimulus Strength (PSI)', 'FontSize', 16)
-    figure(fig_animal)
-    errorbar(stim_strengths(2:end) .* 10, nanmean(animal_avg), nanstd(animal_avg) ./ sqrt(length(animals)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('Mean \x00B1 SEM: (N_{animals}=%i)', length(animals)))
-    ylabel('d''', 'FontSize', 16)
-    xlabel('Stimulus Strength (PSI)', 'FontSize', 16)
+    
 end

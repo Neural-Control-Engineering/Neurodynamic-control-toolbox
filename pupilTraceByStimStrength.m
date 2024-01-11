@@ -69,6 +69,8 @@ function pupilTraceByStimStrength(data, tbounds, alignTo)
     plot([0,0], [-0.3, 1.3], 'k:', 'HandleVisibility', 'off')
     ylabel('Pupil Area (z-score)', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
+    leg = legend();
+    leg.Title.String = 'Stimulus Strength';
 
     animal_fig = figure();
     hold on
@@ -85,6 +87,8 @@ function pupilTraceByStimStrength(data, tbounds, alignTo)
     plot([0,0], [-0.3, 1.3], 'k:', 'HandleVisibility', 'off')
     ylabel('Pupil Area (z-score)', 'FontSize', 14)
     xlabel('Time (s)', 'FontSize', 14)
+    leg = legend();
+    leg.Title.String = 'Stimulus Strength';
     % saveas(fig, 'Analysis/paper_figures/figure2/pupilByStimStrength.fig')
     % leg.Title.FontSize = 12;
 end
