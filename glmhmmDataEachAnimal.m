@@ -19,7 +19,8 @@ ssd_version = 'v2';
 %                 'spontaneous_s1_stim', ...
 %                 'spontaneous_pupil_stim'};
 % data_versions = {'dynamic_state'};
-data_versions = {'spontaneous_mpfc_s1_stim'}
+% data_versions = {'spontaneous_mpfc_s1_stim'}
+data_versions = {'spontaneous_pupil_stim_drop_outliers'};
 
 for i = 1:length(data_versions)
     data_version = data_versions{i};
