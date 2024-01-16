@@ -1,4 +1,4 @@
-function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds, alignTo)
+function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds, alignTo, ver)
     % generates averages of photometry traces 
     if ~exist('alignTo', 'var')
         starts = data.stimulus_time;
@@ -21,8 +21,13 @@ function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds, alignTo)
     for i = 1:size(data,1)
         
         stimTime = starts(i);
-        ch1 = data.photometry_ch1{i,1};
-        ch2 = data.photometry_ch2{i,1};
+        if strcmp(ver, 'zscore')
+            ch1 = data.photometry_ch1{i,1};
+            ch2 = data.photometry_ch2{i,1};
+        else
+            ch1 = data.channel_1_photo_5hzLP_zscore{i,1};
+            ch2 = data.channel_2_photo_5hzLP_zscore{i,1};
+        end
         notLarger = (ch1(:,1)-(stimTime))<0;
         validIndices = find(notLarger);
         stimIndex = validIndices(end);

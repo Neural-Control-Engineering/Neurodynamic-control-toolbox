@@ -1,5 +1,4 @@
-function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOutcome(data, ver)
-
+function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOutcomeBar(data, ver, peak_ver)
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
     
@@ -70,32 +69,6 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOut
         end
     end
     session_lags = lag ./ Fs;
-    
-    fig_sesh = figure();
-    tl_sesh = tiledlayout(1,4);
-    for o = 1:4
-        axs_sesh(o) = nexttile;
-        semshade(session_xcor{o}, 0.3, 'k', 'k', session_lags, 1);
-        hold on
-        plot([0,0],[0,0.4],'k:')
-        title(outcomes{o}, 'FontSize', 16)
-        ylim([0,0.32])
-    end
-    xlabel(tl_sesh, 'Lag (s)', 'FontSize', 16)
-    ylabel(tl_sesh, {'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
-
-    fig_animal = figure();
-    tl_animal = tiledlayout(1,4);
-    for o = 1:4
-        axs_sesh(o) = nexttile;
-        semshade(animal_xcor{o}, 0.3, 'k', 'k', animal_lags, 1);
-        hold on
-        plot([0,0],[0,0.4],'k:')
-        title(outcomes{o}, 'FontSize', 16)
-        ylim([0,0.35])
-    end
-    xlabel(tl_animal, 'Lag (s)', 'FontSize', 16)
-    ylabel(tl_animal, {'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
 
     animal_peaks = {[], [], [], [], [], [], [], []};
     animal_pl = animal_peaks;
@@ -105,14 +78,55 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOut
     for o = 1:length(outcomes)
         for r = 1:size(animal_xcor{o},1)
             [peak, ind] = max(animal_xcor{o}(r,:));
-            animal_peaks{o} = [animal_peaks{o}; peak];
+            % animal_peaks{o} = [animal_peaks{o}; peak];
+            n = floor(length(animal_xcor{o}(r,:))/2);
+            if strcmp(peak_ver, 'atzero')
+                animal_peaks{o} = [animal_peaks{o}; animal_xcor{o}(r,n)];
+            else
+                animal_peaks{o} = [animal_peaks{o}; peak];
+            end
             animal_pl{o} = [animal_pl{o}; animal_lags(ind)];
         end
         for r = 1:size(session_xcor{o},1)
             [peak, ind] = max(session_xcor{o}(r,:));
-            session_peaks{o} = [session_peaks{o}; peak];
+            n = floor(length(session_xcor{o}(r,:))/2);
+            if strcmp(peak_ver, 'atzero')
+                session_peaks{o} = [session_peaks{o}; session_xcor{o}(r,n)];
+            else
+                session_peaks{o} = [session_peaks{o}; peak];
+            end
             session_pl{o} = [session_pl{o}; session_lags(ind)];
         end
     end
+
+    session_avg = zeros(length(session_peaks), 1);
+    session_err = zeros(length(session_peaks), 1);
+    animal_avg = zeros(length(animal_peaks), 1);
+    animal_err = zeros(length(animal_peaks), 1);
+    for i = 1:length(session_peaks)
+        session_avg(i) = mean(session_peaks{i});
+        session_err(i) = std(session_peaks{i}) / sqrt(length(session_peaks{i}));
+        animal_avg(i) = mean(animal_peaks{i});
+        animal_err(i) = std(animal_peaks{i}) / sqrt(length(animal_peaks{i}));
+    end
+
+    fig_session = figure();
+    errorbar([1:4, 6:7, 9:10], session_avg, session_err, 'k.')
+    hold on
+    bar([1:4, 6:7, 9:10], session_avg, 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks([1:4, 6:7, 9:10])
+    xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold', 'Correct', 'Incorrect'})
+    xtickangle(45)
+    ylabel('Peak Cross Correlation')
+
+    fig_animal = figure();
+    errorbar([1:4, 6:7, 9:10], animal_avg, animal_err, 'k.')
+    hold on
+    bar([1:4, 6:7, 9:10], animal_avg, 'FaceColor', 'k', 'EdgeColor', 'k')
+    xticks([1:4, 6:7, 9:10])
+    xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold', 'Correct', 'Incorrect'})
+    xtickangle(45)
+    ylabel('Peak Cross Correlation')
+
 
 end

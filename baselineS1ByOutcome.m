@@ -1,4 +1,4 @@
-function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tbounds, alignTo)
+function [baselines_animal, baselines_session] = baselineS1ByOutcome(data, tbounds, alignTo, ver)
     outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
 
     animals = fetchAnimals(data);
@@ -16,11 +16,11 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
             outcome = outcomes{o};
             otmp = filterTrials(atmp, 'categorical_outcome', outcome);
             if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    animal{o} = [animal{o}; nanmean(pupil)];
+                [~, s1, t] = avg_photo_traces(otmp, [tbounds(1), tbounds(2)], alignTo, ver);
+                if size(s1,1) > 1
+                    animal{o} = [animal{o}; nanmean(s1)];
                 else
-                    animal{o} = [animal{o}; pupil];
+                    animal{o} = [animal{o}; s1];
                 end
             end
         end
@@ -32,18 +32,18 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
             outcome = outcomes{o};
             otmp = filterTrials(stmp, 'categorical_outcome', outcome);
             if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    session{o} = [session{o}; nanmean(pupil)];
+                [~, s1, t] = avg_photo_traces(otmp, [tbounds(1), tbounds(2)], alignTo, ver);
+                if size(s1,1) > 1
+                    session{o} = [session{o}; nanmean(s1)];
                 else
-                    session{o} = [session{o}; pupil];
+                    session{o} = [session{o}; s1];
                 end
             end
         end
     end
 
-    baselines_animal = {[], [], [], []};
-    baselines_sessions = {[], [], [], []};
+    baselines_animal = {[], [], [], [], [], []};
+    baselines_session = {[], [], [], [], [], []};
     for o = 1:length(outcomes)
         baselines_animal{o} =  nanmean(animal{o}(:,(t > -0.5 & t < 0)),2);
         baselines_session{o} =  nanmean(session{o}(:,(t > -0.5 & t < 0)),2);
@@ -64,7 +64,7 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Baseline Pupil Area (z-score)')
+    ylabel('Baseline NE_{S1} (z-score)')
 
     for i = 1:length(baselines_animal) 
         avg(i) = mean(baselines_animal{i});
@@ -78,6 +78,6 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Baseline Pupil Area (z-score)')
+    ylabel('Baseline NE_{S1} (z-score)')
 
 end

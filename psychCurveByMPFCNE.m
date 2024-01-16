@@ -1,6 +1,6 @@
-function psychCurveByMPFCNE(data)
+function psychCurveByMPFCNE(data, ver)
 
-    [mpfc, ~, ~] = avg_photo_traces(data, [-0.5, 0], 'stimulus');
+    [mpfc, ~, ~] = avg_photo_traces(data, [-0.5, 0], 'stimulus', ver);
     baselines = nanmean(mpfc,2);
 
     % ptiles = 25:25:100;
@@ -18,18 +18,18 @@ function psychCurveByMPFCNE(data)
         stim_strengths = unique(tmp.stimulus_strength);
         sessions = unique(tmp.session_id);
         animals = fetchAnimals(tmp);
-        % mat = nan(length(sessions), length(stim_strengths));
-        % for s = 1:length(sessions)
-        %     stmp = filterTrials(tmp, 'session_id', num2str(sessions(s)));
-        %     sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
-        %     fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
-        %     mat(s,1) = size(fatmp,1) / size(sstmp,1);
-        mat = nan(length(animals), length(stim_strengths));
-        for s = 1:length(animals)
-            stmp = filterTrials(tmp, 'animal', num2str(animals(s)));
+        mat = nan(length(sessions), length(stim_strengths));
+        for s = 1:length(sessions)
+            stmp = filterTrials(tmp, 'session_id', num2str(sessions(s)));
             sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
             fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
             mat(s,1) = size(fatmp,1) / size(sstmp,1);
+        % mat = nan(length(animals), length(stim_strengths));
+        % for s = 1:length(animals)
+        %     stmp = filterTrials(tmp, 'animal', num2str(animals(s)));
+        %     sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
+        %     fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+        %     mat(s,1) = size(fatmp,1) / size(sstmp,1);
             for ss = 2:length(stim_strengths)
                 sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(ss));
                 otmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
