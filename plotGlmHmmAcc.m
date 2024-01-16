@@ -29,6 +29,8 @@ kstates = [2,3,4,5];
 data_versions = {'last_trial_behavior_no_bias', ... 
     'spontaneous_pupil_stim', ...
     'last_trial_behavior_drop_stim_no_bias', ...
+    'spontaneous_pupil_stim_v2', ...
+    'spontaneous_pupil_stim_1s_v2'
      };
 N_folds = 5;
 
@@ -38,7 +40,7 @@ N_folds = 5;
 % fig = animalPlot(animals(1), ssd_version, data_versions, kstates, N_folds)
 
 % fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds);
-best_fig = combineAnimals(animals, data_versions, kstates, 'best');
+% best_fig = combineAnimals(animals, data_versions, kstates, 'best');
 all_fig = combineAnimals(animals, data_versions, kstates, 'all');
 
 function fig = combineAnimals(animals, data_versions, kstates, lapse_ver)
