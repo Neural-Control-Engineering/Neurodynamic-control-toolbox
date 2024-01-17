@@ -26,8 +26,11 @@ ssd_version = 'v2';
                 % 'last_trial_behavior_no_bias', ...
                 % 'spontaneous_pupil_stim', ...
                 % 'spontaneous_s1_stim', ...
-data_versions = {'spontaneous_pupil_stim_1s_v2', ...
-                'spontaneous_pupil_stim_drop_outliers'};
+data_versions = {'last_trial_behavior_no_bias', ...
+                'last_trial_behavior_drop_stim_no_bias', ...
+                'spontaneous_pupil_stim_1s_v2', ...
+                'spontaneous_pupil_stim_v2', ...
+                'spontaneous_pupil_stim'};
 
 for i = 1:length(data_versions)
     data_version = data_versions{i};
@@ -167,6 +170,24 @@ function genLapseData(data, outfile, version, shuffle, seed)
         metrics = getSpontaneousMetrics(data, true);
         stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
         metrics = metrics(:,1);
+        preprocessed_input = [metrics, stim_strengths];
+        preprocessed_session = sessions;
+        preprocessed_label = num2cell(data.go_nogo);
+        preprocessed_trial_number = data.sequential_trial_number;
+    elseif strcmp(version, 'spontaneous_pupil_stim_v2')
+        % metrics = getSpontaneousMetrics(data, true);
+        [pupil, ~] = avg_pupil_traces(data, [-0.5, 0], 'stimulus');
+        metrics = nanmean(pupil,2);
+        stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
+        preprocessed_input = [metrics, stim_strengths];
+        preprocessed_session = sessions;
+        preprocessed_label = num2cell(data.go_nogo);
+        preprocessed_trial_number = data.sequential_trial_number;
+    elseif strcmp(version, 'spontaneous_pupil_stim_1s_v2')
+        % metrics = getSpontaneousMetrics(data, true);
+        [pupil, ~] = avg_pupil_traces(data, [-1.0, 0], 'stimulus');
+        metrics = nanmean(pupil,2);
+        stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
         preprocessed_input = [metrics, stim_strengths];
         preprocessed_session = sessions;
         preprocessed_label = num2cell(data.go_nogo);

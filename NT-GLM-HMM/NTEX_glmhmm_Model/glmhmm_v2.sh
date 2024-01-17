@@ -20,7 +20,9 @@ cd ~/Neurodynamic-control-toolbox/NT-GLM-HMM/NTEX_glmhmm_Model/
 # 'spontaneous_pupil_stim')
 # datavers=('dynamic_state')
 # datavers=('spontaneous_mpfc_s1_stim')
-datavers=('spontaneous_pupil_stim_drop_outliers')
+# datavers=('spontaneous_pupil_stim_drop_outliers')
+datavers=('spontaneous_pupil_stim_v2' \
+'spontaneous_pupil_stim_1s_v2')
 
 animals=(240 241 242 243)
 # animals=(243)
