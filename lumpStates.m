@@ -50,25 +50,106 @@ psychver = 'byanimal';
 % tmp = filterTrials(data, 'animal', num2str(a));
 % plot_phys_by_states(filename, tmp, a, k, 'Analysis/paper_figures/figure4/')
 
-for dv = 1:length(data_versions)
-    data_ver = data_versions{dv};
-    fformat = {data_ver, 'state_Python2mat.mat'};
-    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-    outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
-    if ~exist(outdir, 'dir')
-        mkdir(outdir)
-    end
-    for a = animals
-        tmp = filterTrials(data, 'animal', num2str(a));
-        if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
-            tmp = removeFirstTrials(tmp);
-        end
-        for k = kstates
-            filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
-            plot_phys_by_states(filename, tmp, num2str(a), k, outdir, psychver)
-        end
-    end
+% for dv = 1:length(data_versions)
+%     data_ver = data_versions{dv};
+%     fformat = {data_ver, 'state_Python2mat.mat'};
+%     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+%     outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
+%     if ~exist(outdir, 'dir')
+%         mkdir(outdir)
+%     end
+%     for a = animals
+%         tmp = filterTrials(data, 'animal', num2str(a));
+%         if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+%             tmp = removeFirstTrials(tmp);
+%         end
+%         for k = kstates
+%             filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
+%             plot_phys_by_states(filename, tmp, num2str(a), k, outdir, psychver)
+%         end
+%     end
+% end
+
+% boilerplate
+data_ver = data_versions{1};
+fformat = {data_ver, 'state_Python2mat.mat'};
+base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
+if ~exist(outdir, 'dir')
+    mkdir(outdir)
 end
+% for single number of states, get the states ordered by average response probability
+% in each state
+k = 4;
+mrps = zeros(length(animals), k);
+ordered_states = mrps;
+for a = 1:length(animals)
+    tmp = filterTrials(data, 'animal', num2str(animals(a)));
+    filename = sprintf('%s%i_%s_%i%s', base_path, animals(a), fformat{1}, k, fformat{2});
+    mrps(a,:) = meanResponseProb(filename, tmp, animals(a), k);
+    [~, inds] = sort(mrps(a,:));
+    ordered_states(a,:) = inds - 1;
+end
+
+% average psychometric curves for each animal in each ordered state (starting with lowest)
+
+figure()
+tbounds = [-0.5,6.0];
+for s = 1:k
+    cols = distinguishable_colors(k);
+    state_rp = [];
+    ne_ch1 = [];
+    ne_ch2 = [];
+    pupil = [];
+    for as = 1:size(ordered_states,1)
+        i = ordered_states(as,s);
+        filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
+        results = load(filename);
+        stim_strengths = unique(data.stimulus_strength);
+        rp = nan(1,length(stim_strengths));
+        tmp = filterTrials(data, 'animal', num2str(animals(as)));
+        statetmp = tmp(results.predicted_states == i,:);
+        if ~isempty(statetmp)
+            if strcmp(psychver, 'byanimal')
+                tmp_strengths = unique(statetmp.stimulus_strength);
+                for ss = 1:length(tmp_strengths)
+                    sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
+                    if tmp_strengths(ss)
+                        rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                    else
+                        rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+                    end
+                    ind = find(stim_strengths == tmp_strengths(ss));
+                    rp(ind) = size(rtmp,1) / size(sstmp,1);
+                end
+            end
+            state_rp = [state_rp; rp];
+            [ch1, ch2, t] = avg_photo_traces(statetmp, tbounds, 'stimulus', 'filtered');
+            ne_ch1 = [ne_ch1; nanmean(ch1)];
+            ne_ch2 = [ne_ch2; nanmean(ch2)];
+            [p, tp] = avg_pupil_traces(statetmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+            pupil = [pupil; p];
+        end
+    end
+    subplot(1,4,1)
+    semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
+    hold on
+    subplot(1,4,2)
+    semshade(ch1, 0.3, cols(s,:), cols(s,:), t);
+    hold on
+    subplot(1,4,3)
+    semshade(ch2, 0.3, cols(s,:), cols(s,:), t);
+    hold on
+    subplot(1,4,4)
+    semshade(pupil, 0.3, cols(s,:), cols(s,:), tp);
+    hold on
+end
+subplot(1,4,2)
+xlim(tbounds)
+subplot(1,4,3)
+xlim(tbounds)
+subplot(1,4,4)
+xlim(tbounds)
 
 function data = removeFirstTrials(data)
     sessions = unique(data.session_id);
@@ -139,6 +220,34 @@ function plot_phys_by_states_outcomes(filename, data, animal, k)
     end
 end
 
+function mrp = meanResponseProb(filename, data, animal, k)
+    results = load(filename);
+    states = 0:k-1;
+    stim_strengths = unique(data.stimulus_strength);
+    mrp = zeros(1,length(states));
+    cols = distinguishable_colors(length(states));
+    % figure()
+    for i = states
+        rp = nan(1,length(stim_strengths));
+        tmp = data(results.predicted_states == i,:);
+        if ~isempty(tmp)
+            tmp_strengths = unique(tmp.stimulus_strength);
+            for ss = 1:length(tmp_strengths)
+                sstmp = filterTrials(tmp, 'stim_strength', tmp_strengths(ss));
+                if tmp_strengths(ss)
+                    rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                else
+                    rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+                end
+                ind = find(stim_strengths == tmp_strengths(ss));
+                rp(ind) = size(rtmp,1) / size(sstmp,1);
+            end
+            % plot(stim_strengths.*10, rp, 'Color', cols(i+1,:))
+            % hold on
+        end
+        mrp(i+1) = nanmean(rp);
+    end
+end
 
 
 function plot_phys_by_states(filename, data, animal, k, outdir, psychver)
