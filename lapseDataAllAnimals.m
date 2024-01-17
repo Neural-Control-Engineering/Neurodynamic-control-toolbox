@@ -1,4 +1,5 @@
-data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 ssd_version = 'v2';

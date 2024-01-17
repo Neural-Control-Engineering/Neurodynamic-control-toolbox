@@ -72,8 +72,8 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOut
     session_lags = lag ./ Fs;
     
     fig_sesh = figure();
-    tl_sesh = tiledlayout(1,4);
-    for o = 1:4
+    tl_sesh = tiledlayout(1,length(outcomes));
+    for o = 1:length(outcomes)
         axs_sesh(o) = nexttile;
         semshade(session_xcor{o}, 0.3, 'k', 'k', session_lags, 1);
         hold on
@@ -85,8 +85,8 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOut
     ylabel(tl_sesh, {'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
 
     fig_animal = figure();
-    tl_animal = tiledlayout(1,4);
-    for o = 1:4
+    tl_animal = tiledlayout(1,length(outcomes));
+    for o = 1:length(outcomes)
         axs_sesh(o) = nexttile;
         semshade(animal_xcor{o}, 0.3, 'k', 'k', animal_lags, 1);
         hold on
