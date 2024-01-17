@@ -1,7 +1,8 @@
 % script for plotting physiology data based on states identified by glm-hmm
 % Craig Kelley, NEC Lab, 8/25/23
 
-data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 ssd_version = 'v2';
@@ -21,7 +22,8 @@ data_versions = {'last_trial_behavior_no_bias', ...
     'spontaneous_s1_stim', ...
     'spontaneous_pupil_stim', ...
     'dynamic_state' ...
-    'spontaneous_mpfc_s1_stim'};
+    'spontaneous_mpfc_s1_stim', ...
+    'spontaneous_pupil_stim_v2'};
 % data = rmDiscrepantTrials(data);
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
@@ -34,12 +36,14 @@ animals = animals_v2;
 
 data_ver = data_versions{1};
 % data_ver = data_versions{1};
-k = 5;
+k = 3;
 fformat = {data_ver, 'state_Python2mat.mat'};
 base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
 a = 241;
 filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
-plot_phys_by_states_outcomes(filename, data, a, k)
+% plot_phys_by_states_outcomes(filename, data, a, k)
+tmp = filterTrials(data, 'animal', num2str(a));
+plot_phys_by_states(filename, tmp, a, k, 'Analysis/paper_figures/figure4/')
 
 % for dv = 1:length(data_versions)
 %     data_ver = data_versions{dv};
@@ -87,7 +91,7 @@ function plot_phys_by_states_outcomes(filename, data, animal, k)
             outcome = outcomes{o};
             otmp = filterTrials(tmp, 'categorical_outcome', outcome);
             if ~isempty(otmp)
-                [ch1, ch2, t] = avg_photo_traces(otmp, tbounds);
+                [ch1, ch2, t] = avg_photo_traces(otmp, tbounds, 'stimulus', 'filtered');
                 n = size(ch1,1);
                 subplot(length(states), 3, ((i+1)*3-3)+1)
                 hold on 
@@ -143,7 +147,7 @@ function plot_phys_by_states(filename, data, animal, k, outdir)
     for i = states
         tmp = data(results.predicted_states == i,:);
         if ~isempty(tmp)
-            [ch1, ch2, t] = avg_photo_traces(tmp, tbounds);
+            [ch1, ch2, t] = avg_photo_traces(tmp, tbounds, 'stimulus', 'filtered');
             % keyboard
             n = size(tmp,1);
             subplot(1,3,1)
@@ -192,49 +196,49 @@ function plot_phys_by_states(filename, data, animal, k, outdir)
     ylims = ylim;
     ylabel('Pupil Area')
     plot([0,0],[ylims(1), ylims(2)], 'k:', 'HandleVisibility','off')
-    saveas(fig, sprintf('%s%s_%istates.png', outdir, animal,length(states)))
-    saveas(fig, sprintf('%s%s_%istates.svg', outdir, animal,length(states)))
-    saveas(fig, sprintf('%s%s_%istates.fig', outdir, animal,length(states)))
-    close
+    % saveas(fig, sprintf('%s%i_%istates.png', outdir, animal,length(states)))
+    % saveas(fig, sprintf('%s%i_%istates.svg', outdir, animal,length(states)))
+    % saveas(fig, sprintf('%s%i_%istates.fig', outdir, animal,length(states)))
+    % close
 end
 
-function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds)
-    % generates averages of photometry traces 
-    Fss = getFs(data, 'photometry_ch1');
-    ch1mat = zeros(size(data,1), round(max(Fss)*diff(tbounds)));
-    ch2mat = ch1mat;
-    starts = data.stimulus_time;
-    time = linspace(tbounds(1), tbounds(2), round(max(Fss)*diff(tbounds)));
+% function [ch1mat, ch2mat, time] = avg_photo_traces(data, tbounds)
+%     % generates averages of photometry traces 
+%     Fss = getFs(data, 'photometry_ch1');
+%     ch1mat = zeros(size(data,1), round(max(Fss)*diff(tbounds)));
+%     ch2mat = ch1mat;
+%     starts = data.stimulus_time;
+%     time = linspace(tbounds(1), tbounds(2), round(max(Fss)*diff(tbounds)));
 
-    for i = 1:size(data,1)
-        t = data.photometry_ch1{i,1}(:,1) - starts(i);
-        ch1 = data.photometry_ch1{i,1}(:,2);
-        ch2 = data.photometry_ch2{i,1}(:,2);
-        ch1 = ch1(t > tbounds(1) & t < tbounds(2));
-        ch2 = ch2(t > tbounds(1) & t < tbounds(2));
-        t = t(t > tbounds(1) & t < tbounds(2));
-        % using interp1 to avoid issues with differing sample rates
-        ch1mat(i,:) = interp1(t, ch1, time);
-        ch2mat(i,:) = interp1(t, ch2, time);
-    end
-end
+%     for i = 1:size(data,1)
+%         t = data.photometry_ch1{i,1}(:,1) - starts(i);
+%         ch1 = data.photometry_ch1{i,1}(:,2);
+%         ch2 = data.photometry_ch2{i,1}(:,2);
+%         ch1 = ch1(t > tbounds(1) & t < tbounds(2));
+%         ch2 = ch2(t > tbounds(1) & t < tbounds(2));
+%         t = t(t > tbounds(1) & t < tbounds(2));
+%         % using interp1 to avoid issues with differing sample rates
+%         ch1mat(i,:) = interp1(t, ch1, time);
+%         ch2mat(i,:) = interp1(t, ch2, time);
+%     end
+% end
 
-function [pupil, time] = avg_pupil_traces(data, tbounds)
-    % generates averages of pupil traces
-    Fs = 1 / (data.pupil_area{1,1}(2,1)-data.pupil_area{1,1}(1,1));
-    pupil = nan(size(data,1), round(Fs*diff(tbounds)));
-    starts = data.stimulus_time;
-    time = linspace(tbounds(1), tbounds(2), round(Fs*diff(tbounds)));
+% function [pupil, time] = avg_pupil_traces(data, tbounds)
+%     % generates averages of pupil traces
+%     Fs = 1 / (data.pupil_area{1,1}(2,1)-data.pupil_area{1,1}(1,1));
+%     pupil = nan(size(data,1), round(Fs*diff(tbounds)));
+%     starts = data.stimulus_time;
+%     time = linspace(tbounds(1), tbounds(2), round(Fs*diff(tbounds)));
 
-    for i = 1:size(data,1)
-        t = data.pupil_area{i,1}(:,1) - starts(i);
-        p = data.pupil_area{i,1}(:,2);
-        p = p(t >= tbounds(1) & t <= tbounds(2));
-        t = t(t >= tbounds(1) & t <= tbounds(2));
-        try
-            % again with the sample rate issues
-            pupil(i,:) = interp1(t,p,time);
-        end
-    end
-end
+%     for i = 1:size(data,1)
+%         t = data.pupil_area{i,1}(:,1) - starts(i);
+%         p = data.pupil_area{i,1}(:,2);
+%         p = p(t >= tbounds(1) & t <= tbounds(2));
+%         t = t(t >= tbounds(1) & t <= tbounds(2));
+%         try
+%             % again with the sample rate issues
+%             pupil(i,:) = interp1(t,p,time);
+%         end
+%     end
+% end
 

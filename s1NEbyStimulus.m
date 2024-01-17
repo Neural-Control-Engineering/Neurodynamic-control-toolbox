@@ -1,4 +1,4 @@
-function s1NEbyStimulus(data, tbounds, alignTo)
+function s1NEbyStimulus(data, tbounds, alignTo, ver)
 
     animal_ne = {};
     session_ne = {};
@@ -17,7 +17,7 @@ function s1NEbyStimulus(data, tbounds, alignTo)
             stim = stim_strengths(i);
             otmp = filterTrials(atmp, 'stim_strength', stim);
             if ~isempty(otmp)
-                [~, s1, t] = avg_photo_traces(otmp, tbounds, alignTo);
+                [~, s1, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
                 if length(stim_strengths) == 2 && i == 2
                     animal_ne{end} = [animal_ne{end}; nanmean(s1)];
                 else
@@ -34,7 +34,7 @@ function s1NEbyStimulus(data, tbounds, alignTo)
             stim = stim_strengths(i);
             otmp = filterTrials(atmp, 'stim_strength', stim);
             if ~isempty(otmp)
-                [~, s1, t] = avg_photo_traces(otmp, tbounds, alignTo);
+                [~, s1, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
                 if length(stim_strengths) == 2 && i == 2
                     if size(s1,1) > 1
                         session_ne{end} = [session_ne{end}; nanmean(s1)];

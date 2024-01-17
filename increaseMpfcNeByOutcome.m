@@ -1,4 +1,4 @@
-function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbounds, alignTo)
+function [dilations_animal, dilations_session] = increaseMpfcNeByOutcome(data, tbounds, alignTo, ver)
     outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
 
     animals = fetchAnimals(data);
@@ -16,11 +16,11 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
             outcome = outcomes{o};
             otmp = filterTrials(atmp, 'categorical_outcome', outcome);
             if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    animal{o} = [animal{o}; nanmean(pupil)];
+                [mpfc, ~, t] = avg_photo_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo, ver);
+                if size(mpfc,1) > 1
+                    animal{o} = [animal{o}; nanmean(mpfc)];
                 else
-                    animal{o} = [animal{o}; pupil];
+                    animal{o} = [animal{o}; mpfc];
                 end
             end
         end
@@ -32,18 +32,18 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
             outcome = outcomes{o};
             otmp = filterTrials(stmp, 'categorical_outcome', outcome);
             if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    session{o} = [session{o}; nanmean(pupil)];
+                [mpfc, ~, t] = avg_photo_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo, ver);
+                if size(mpfc,1) > 1
+                    session{o} = [session{o}; nanmean(mpfc)];
                 else
-                    session{o} = [session{o}; pupil];
+                    session{o} = [session{o}; mpfc];
                 end
             end
         end
     end
 
     dilations_animal = {[], [], [], []};
-    dilations_sessions = {[], [], [], []};
+    dilations_session = {[], [], [], []};
     for o = 1:length(outcomes)
         baselines_animal =  nanmean(animal{o}(:,(t > -0.5 & t < 0)),2);
         evoked_animal = nanmean(animal{o}(:,(t > 0 & t < 6)),2);
@@ -68,7 +68,7 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Mean Pupil Dilation (z-score)')
+    ylabel('Mean Increase in NE_{mPFC} (z-score)')
 
     for i = 1:length(dilations_animal) 
         avg(i) = mean(dilations_animal{i});
@@ -82,6 +82,6 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Mean Pupil Dilation (z-score)')
+    ylabel('Mean Increase in NE_{mPFC} (z-score)')
 
 end

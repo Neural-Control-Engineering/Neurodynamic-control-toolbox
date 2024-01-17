@@ -1,4 +1,4 @@
-function neCrossCorr(data)
+function neCrossCorr(data, ver)
 
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
@@ -9,7 +9,7 @@ function neCrossCorr(data)
 
     for a = 1:length(animals)
         tmp = filterTrials(data, 'animal', num2str(animals(a)));
-        [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus');
+        [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus', ver);
         Fs = getFs(data, 'photometry_ch1');
         Fs = Fs(1);
         cs = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
@@ -37,7 +37,7 @@ function neCrossCorr(data)
 
     for s = 1:length(sessions)
         tmp = filterTrials(data, 'session_id', num2str(sessions(s)));
-        [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus');
+        [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus', ver);
         Fs = getFs(data, 'photometry_ch1');
         Fs = Fs(1);
         cs = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);

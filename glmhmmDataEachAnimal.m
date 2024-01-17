@@ -1,7 +1,8 @@
-data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
-ssd_version = 'v2';
+ssd_version = 'v3';
 
 %% behavior from previous trial
 % data_versions = {'last_trial_behavior_no_bias', ... 
@@ -21,8 +22,16 @@ ssd_version = 'v2';
 % data_versions = {'dynamic_state'};
 % data_versions = {'spontaneous_mpfc_s1_stim'}
 % data_versions = {'spontaneous_pupil_stim_drop_outliers'};
+<<<<<<< HEAD
 data_versions = {'spontaneous_pupil_stim_1s_v2', ...
                 'spontaneous_pupil_stim_v2'};
+=======
+% data_versions = {'spontaneous_pupil_stim_1s_v2', ...
+%                 'spontaneous_pupil_stim_drop_outliers'};
+data_versions = {'spontaneous_pupil_stim_v2', ...
+                'last_trial_behavior_no_bias', ...
+                'last_trial_behavior_drop_stim_no_bias'};
+>>>>>>> 5bf0027d217aa6e48b7335cd3de8a23fa06a50f1
 
 for i = 1:length(data_versions)
     data_version = data_versions{i};

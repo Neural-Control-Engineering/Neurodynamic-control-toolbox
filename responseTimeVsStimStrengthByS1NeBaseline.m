@@ -1,11 +1,11 @@
-function responseTimeVsStimStrengthByS1NeBaseline(data)
+function responseTimeVsStimStrengthByS1NeBaseline(data, ver)
     animals = fetchAnimals(data);
     cols = {'b', 'r', 'g', 'm'};
     stim_strengths = unique(data.stimulus_strength);
     animal_avgs = {};
     session_avgs = {};
     
-    [~, s1, ~] = avg_photo_traces(data, [-0.5, 0], 'stimulus');
+    [~, s1, ~] = avg_photo_traces(data, [-0.5, 0], 'stimulus', ver);
     baselines = nanmean(s1,2);
 
     ptiles = [33, 66, 100];
