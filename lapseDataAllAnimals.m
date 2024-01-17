@@ -2,7 +2,7 @@
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
-ssd_version = 'v2';
+ssd_version = 'v3';
 
 %% behavior from previous trial
 % data_versions = {'last_trial_behavior_no_bias', ... 
@@ -35,7 +35,7 @@ data_versions = {'last_trial_behavior_no_bias', ...
 
 for i = 1:length(data_versions)
     data_version = data_versions{i};
-    outdir = sprintf('NT-GLM-HMM/data/lapse/%s/', data_version);
+    outdir = sprintf('NT-GLM-HMM/data/lapse/v3/%s/', data_version);
     if ~exist(outdir, 'dir')
         mkdir(outdir)
     end
