@@ -3,153 +3,299 @@
 
 % data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
-animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
+animals = fetchAnimals(data);
 ssd_version = 'v3';
 kstates = [2, 3, 4, 5, 6];
-% data_versions = {'last_trial_behavior_no_bias', ... 
-%     'spontaneous_mpfc_s1_pupil_normalized', ... 
-%     'last_trial_behavior_drop_stim_no_bias', ...
-%     'behavior_pupil_mpfc_s1_combo', ... 
-%     'behavior_pupil_mpfc_combo', ... 
-%     'behavior_pupil_s1_combo', ...
-%     'spontaneous_mpfc_s1_pupil_drop_stim', ...
-%     'behavior_mpfc_s1_combo', ...
-%     'behavior_mpfc_combo', ...
-%     'behavior_s1_combo', ...
-%     'behavior_pupil_combo', ...
-%     'spontaneous_mpfc_stim', ...
-%     'spontaneous_s1_stim', ...
-%     'spontaneous_pupil_stim', ...
-%     'dynamic_state' ...
-%     'spontaneous_mpfc_s1_stim', ...
-%     'spontaneous_pupil_stim_v2'};
-% data = rmDiscrepantTrials(data);
+% boilerplate
+k = 4;
 data_versions = {'last_trial_behavior_no_bias', ... 
     'last_trial_behavior_drop_stim_no_bias', ...
     'spontaneous_pupil_stim_v2', ...
      };
-animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
-animals_v2 = [240, 241, 242, 243];
-animals = animals_v2;
 psychver = 'byanimal';
 
-% p = gcp('nocreate');
-% if isempty(p)
-%     parpool(11)
-% end
+lumpByResponseProb(data_versions{1}, ssd_version, psychver, animals, data, k)
+lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k)
+% lumpByResponseProbSlope(data_versions{1}, ssd_version, psychver, animals, data, k)
+% lumpByResponseProbSlope(data_versions{end}, ssd_version, psychver, animals, data, k)
+% lumpByPupilBaseline(data_versions{1}, ssd_version, psychver, animals, data, k)
+% lumpByPupilBaseline(data_versions{end}, ssd_version, psychver, animals, data, k)
 
-% data_ver = data_versions{1};
-% % data_ver = data_versions{1};
-% k = 4;
-% fformat = {data_ver, 'state_Python2mat.mat'};
-% base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-% a = 241;
-% filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
-% % plot_phys_by_states_outcomes(filename, data, a, k)
-% tmp = filterTrials(data, 'animal', num2str(a));
-% plot_phys_by_states(filename, tmp, a, k, 'Analysis/paper_figures/figure4/')
 
-% for dv = 1:length(data_versions)
-%     data_ver = data_versions{dv};
-%     fformat = {data_ver, 'state_Python2mat.mat'};
-%     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-%     outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
-%     if ~exist(outdir, 'dir')
-%         mkdir(outdir)
-%     end
-%     for a = animals
-%         tmp = filterTrials(data, 'animal', num2str(a));
-%         if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
-%             tmp = removeFirstTrials(tmp);
-%         end
-%         for k = kstates
-%             filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
-%             plot_phys_by_states(filename, tmp, num2str(a), k, outdir, psychver)
-%         end
-%     end
-% end
+function lumpByPupilBaseline(data_ver, ssd_version, psychver, animals, data, k)
+    % set paths 
+    fformat = {data_ver, 'state_Python2mat.mat'};
+    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+    outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
 
-% boilerplate
-data_ver = data_versions{1};
-fformat = {data_ver, 'state_Python2mat.mat'};
-base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
-if ~exist(outdir, 'dir')
-    mkdir(outdir)
-end
-% for single number of states, get the states ordered by average response probability
-% in each state
-k = 4;
-mrps = zeros(length(animals), k);
-ordered_states = mrps;
-for a = 1:length(animals)
-    tmp = filterTrials(data, 'animal', num2str(animals(a)));
-    filename = sprintf('%s%i_%s_%i%s', base_path, animals(a), fformat{1}, k, fformat{2});
-    mrps(a,:) = meanResponseProb(filename, tmp, animals(a), k);
-    [~, inds] = sort(mrps(a,:));
-    ordered_states(a,:) = inds - 1;
-end
+    mpbs = zeros(length(animals), k);
+    ordered_states = mpbs;
+    for a = 1:length(animals)
+        tmp = filterTrials(data, 'animal', num2str(animals(a)));
+        filename = sprintf('%s%i_%s_%i%s', base_path, animals(a), fformat{1}, k, fformat{2});
+        mpbs(a,:) = pupilBaseline(filename, tmp, k);
+        [~, inds] = sort(mpbs(a,:));
+        ordered_states(a,:) = inds - 1;
+    end
 
-% average psychometric curves for each animal in each ordered state (starting with lowest)
-
-figure()
-tbounds = [-0.5,6.0];
-for s = 1:k
-    cols = distinguishable_colors(k);
-    state_rp = [];
-    ne_ch1 = [];
-    ne_ch2 = [];
-    pupil = [];
-    for as = 1:size(ordered_states,1)
-        i = ordered_states(as,s);
-        filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
-        results = load(filename);
-        stim_strengths = unique(data.stimulus_strength);
-        rp = nan(1,length(stim_strengths));
-        tmp = filterTrials(data, 'animal', num2str(animals(as)));
-        statetmp = tmp(results.predicted_states == i,:);
-        if ~isempty(statetmp)
-            if strcmp(psychver, 'byanimal')
-                tmp_strengths = unique(statetmp.stimulus_strength);
-                for ss = 1:length(tmp_strengths)
-                    sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
-                    if tmp_strengths(ss)
-                        rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
-                    else
-                        rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+    % average psychometric curves for each animal in each ordered state (starting with lowest)
+    figure('Position', [ 1151, 1516, 1830, 404])
+    tbounds = [-0.5,6.0];
+    for s = 1:k
+        cols = distinguishable_colors(k);
+        state_rp = [];
+        ne_ch1 = [];
+        ne_ch2 = [];
+        pupil = [];
+        for as = 1:size(ordered_states,1)
+            i = ordered_states(as,s);
+            filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
+            results = load(filename);
+            stim_strengths = unique(data.stimulus_strength);
+            rp = nan(1,length(stim_strengths));
+            tmp = filterTrials(data, 'animal', num2str(animals(as)));
+            statetmp = tmp(results.predicted_states == i,:);
+            if ~isempty(statetmp)
+                if strcmp(psychver, 'byanimal')
+                    tmp_strengths = unique(statetmp.stimulus_strength);
+                    for ss = 1:length(tmp_strengths)
+                        sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
+                        if tmp_strengths(ss)
+                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                        else
+                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+                        end
+                        ind = find(stim_strengths == tmp_strengths(ss));
+                        rp(ind) = size(rtmp,1) / size(sstmp,1);
                     end
-                    ind = find(stim_strengths == tmp_strengths(ss));
-                    rp(ind) = size(rtmp,1) / size(sstmp,1);
                 end
+                state_rp = [state_rp; rp];
+                [ch1, ch2, t] = avg_photo_traces(statetmp, tbounds, 'stimulus', 'filtered');
+                ne_ch1 = [ne_ch1; nanmean(ch1)];
+                ne_ch2 = [ne_ch2; nanmean(ch2)];
+                [p, tp] = avg_pupil_traces(statetmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+                pupil = [pupil; p];
             end
-            state_rp = [state_rp; rp];
-            [ch1, ch2, t] = avg_photo_traces(statetmp, tbounds, 'stimulus', 'filtered');
-            ne_ch1 = [ne_ch1; nanmean(ch1)];
-            ne_ch2 = [ne_ch2; nanmean(ch2)];
-            [p, tp] = avg_pupil_traces(statetmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-            pupil = [pupil; p];
         end
+        subplot(1,4,1)
+        semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
+        hold on
+        subplot(1,4,2)
+        semshade(ch1, 0.3, cols(s,:), cols(s,:), t);
+        hold on
+        subplot(1,4,3)
+        semshade(ch2, 0.3, cols(s,:), cols(s,:), t);
+        hold on
+        subplot(1,4,4)
+        semshade(pupil, 0.3, cols(s,:), cols(s,:), tp);
+        hold on
     end
     subplot(1,4,1)
-    semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
-    hold on
+    xlabel('Stimulus Strength (PSI)')
+    ylabel('Response Probability')
     subplot(1,4,2)
-    semshade(ch1, 0.3, cols(s,:), cols(s,:), t);
-    hold on
+    xlim(tbounds)
+    ylabel('NE_{mPFC} (z-score)')
     subplot(1,4,3)
-    semshade(ch2, 0.3, cols(s,:), cols(s,:), t);
-    hold on
+    xlim(tbounds)
+    xlabel('Time (s)')
+    ylabel('NE_{S1} (z-score)')
     subplot(1,4,4)
-    semshade(pupil, 0.3, cols(s,:), cols(s,:), tp);
-    hold on
+    xlim(tbounds)
+    ylabel('Pupil Area (z-score)')
+    subplot(1,4,4); ylim([-0.6,0.61])
+    subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
 end
-subplot(1,4,2)
-xlim(tbounds)
-subplot(1,4,3)
-xlim(tbounds)
-subplot(1,4,4)
-xlim(tbounds)
+
+function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k)
+    % set paths 
+    fformat = {data_ver, 'state_Python2mat.mat'};
+    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+    outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
+
+    if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+        data = removeFirstTrials(data);
+    end
+
+    rpss = zeros(length(animals), k);
+    ordered_states = rpss;
+    for a = 1:length(animals)
+        tmp = filterTrials(data, 'animal', num2str(animals(a)));
+        filename = sprintf('%s%i_%s_%i%s', base_path, animals(a), fformat{1}, k, fformat{2});
+        rpss(a,:) = responseProbSlope(filename, tmp, k);
+        [~, inds] = sort(rpss(a,:));
+        ordered_states(a,:) = inds - 1;
+    end
+
+    % average psychometric curves for each animal in each ordered state (starting with lowest)
+    figure('Position', [ 1151, 1516, 1830, 404])
+    tbounds = [-0.5,6.0];
+    for s = 1:k
+        cols = distinguishable_colors(k);
+        state_rp = [];
+        ne_ch1 = [];
+        ne_ch2 = [];
+        pupil = [];
+        for as = 1:size(ordered_states,1)
+            i = ordered_states(as,s);
+            filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
+            results = load(filename);
+            stim_strengths = unique(data.stimulus_strength);
+            rp = nan(1,length(stim_strengths));
+            tmp = filterTrials(data, 'animal', num2str(animals(as)));
+            statetmp = tmp(results.predicted_states == i,:);
+            if ~isempty(statetmp)
+                if strcmp(psychver, 'byanimal')
+                    tmp_strengths = unique(statetmp.stimulus_strength);
+                    for ss = 1:length(tmp_strengths)
+                        sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
+                        if tmp_strengths(ss)
+                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                        else
+                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+                        end
+                        ind = find(stim_strengths == tmp_strengths(ss));
+                        rp(ind) = size(rtmp,1) / size(sstmp,1);
+                    end
+                end
+                state_rp = [state_rp; rp];
+                [ch1, ch2, t] = avg_photo_traces(statetmp, tbounds, 'stimulus', 'filtered');
+                ne_ch1 = [ne_ch1; nanmean(ch1)];
+                ne_ch2 = [ne_ch2; nanmean(ch2)];
+                [p, tp] = avg_pupil_traces(statetmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+                pupil = [pupil; p];
+            end
+        end
+        subplot(1,4,1)
+        semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
+        hold on
+        subplot(1,4,2)
+        semshade(ch1, 0.3, cols(s,:), cols(s,:), t);
+        hold on
+        subplot(1,4,3)
+        semshade(ch2, 0.3, cols(s,:), cols(s,:), t);
+        hold on
+        subplot(1,4,4)
+        semshade(pupil, 0.3, cols(s,:), cols(s,:), tp);
+        hold on
+    end
+    subplot(1,4,1)
+    xlabel('Stimulus Strength (PSI)')
+    ylabel('Response Probability')
+    subplot(1,4,2)
+    xlim(tbounds)
+    ylabel('NE_{mPFC} (z-score)')
+    subplot(1,4,3)
+    xlim(tbounds)
+    xlabel('Time (s)')
+    ylabel('NE_{S1} (z-score)')
+    subplot(1,4,4)
+    xlim(tbounds)
+    ylabel('Pupil Area (z-score)')
+    subplot(1,4,4); ylim([-0.6,0.61])
+    subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
+end
+
+function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
+    % set paths 
+    fformat = {data_ver, 'state_Python2mat.mat'};
+    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+    outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
+
+    if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+        data = removeFirstTrials(data);
+    end
+
+    % for single number of states, get the states ordered by average response probability
+    % in each state
+    mrps = zeros(length(animals), k);
+    ordered_states = mrps;
+    for a = 1:length(animals)
+        tmp = filterTrials(data, 'animal', num2str(animals(a)));
+        filename = sprintf('%s%i_%s_%i%s', base_path, animals(a), fformat{1}, k, fformat{2});
+        mrps(a,:) = meanResponseProb(filename, tmp, k);
+        [~, inds] = sort(mrps(a,:));
+        ordered_states(a,:) = inds - 1;
+    end
+
+    % average psychometric curves for each animal in each ordered state (starting with lowest)
+    figure('Position', [ 1151, 1516, 1830, 404])
+    tbounds = [-0.5,6.0];
+    for s = 1:k
+        cols = distinguishable_colors(k);
+        state_rp = [];
+        ne_ch1 = [];
+        ne_ch2 = [];
+        pupil = [];
+        for as = 1:size(ordered_states,1)
+            i = ordered_states(as,s);
+            filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
+            results = load(filename);
+            stim_strengths = unique(data.stimulus_strength);
+            rp = nan(1,length(stim_strengths));
+            tmp = filterTrials(data, 'animal', num2str(animals(as)));
+            statetmp = tmp(results.predicted_states == i,:);
+            if ~isempty(statetmp)
+                if strcmp(psychver, 'byanimal')
+                    tmp_strengths = unique(statetmp.stimulus_strength);
+                    for ss = 1:length(tmp_strengths)
+                        sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
+                        if tmp_strengths(ss)
+                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                        else
+                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+                        end
+                        ind = find(stim_strengths == tmp_strengths(ss));
+                        rp(ind) = size(rtmp,1) / size(sstmp,1);
+                    end
+                end
+                state_rp = [state_rp; rp];
+                [ch1, ch2, t] = avg_photo_traces(statetmp, tbounds, 'stimulus', 'filtered');
+                ne_ch1 = [ne_ch1; nanmean(ch1)];
+                ne_ch2 = [ne_ch2; nanmean(ch2)];
+                [p, tp] = avg_pupil_traces(statetmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+                pupil = [pupil; p];
+            end
+        end
+        subplot(1,4,1)
+        semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
+        hold on
+        subplot(1,4,2)
+        semshade(ch1, 0.3, cols(s,:), cols(s,:), t);
+        hold on
+        subplot(1,4,3)
+        semshade(ch2, 0.3, cols(s,:), cols(s,:), t);
+        hold on
+        subplot(1,4,4)
+        semshade(pupil, 0.3, cols(s,:), cols(s,:), tp);
+        hold on
+    end
+    subplot(1,4,1)
+    xlabel('Stimulus Strength (PSI)')
+    ylabel('Response Probability')
+    subplot(1,4,2)
+    xlim(tbounds)
+    ylabel('NE_{mPFC} (z-score)')
+    subplot(1,4,3)
+    xlim(tbounds)
+    xlabel('Time (s)')
+    ylabel('NE_{S1} (z-score)')
+    subplot(1,4,4)
+    xlim(tbounds)
+    ylabel('Pupil Area (z-score)')
+    subplot(1,4,4); ylim([-0.6,0.61])
+    subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
+end
 
 function data = removeFirstTrials(data)
     sessions = unique(data.session_id);
@@ -162,65 +308,51 @@ function data = removeFirstTrials(data)
     data(first_trials, :) = [];
 end
 
-function plot_phys_by_states_outcomes(filename, data, animal, k)
+function mpb = pupilBaseline(filename, data, k)
     results = load(filename);
-    fig = figure('Visible', 'on', 'WindowState', 'maximized');
-    hold on;
     states = 0:k-1;
-    tbounds = [-0.5, 6.0];
-    outcomes = {'Hit', 'Miss', 'CR'};
-    cols = distinguishable_colors(length(outcomes));
+    mpb = zeros(1,length(states));
     for i = states
         tmp = data(results.predicted_states == i,:);
-        % outcomes = unique(tmp.categorical_outcome);
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(tmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [ch1, ch2, t] = avg_photo_traces(otmp, tbounds, 'stimulus', 'filtered');
-                n = size(ch1,1);
-                subplot(length(states), 3, ((i+1)*3-3)+1)
-                hold on 
-                try
-                    semshade(ch1(:,2:end-1), 0.3, cols(o,:), cols(o,:), t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
-                catch
-                    % keyboard
-                    plot(t, ch1, 'DisplayName',sprintf('%s (n=%i)', outcome, n));
+        if ~isempty(tmp)
+            [pupil, ~] = avg_pupil_traces(tmp, [-0.5, 0], 'stimulus');
+            pupil = nanmean(nanmean(pupil, 2));
+            mpb(i+1) = pupil;
+        end
+    end     
+end
+
+function rps = responseProbSlope(filename, data, k)
+    results = load(filename);
+    states = 0:k-1;
+    stim_strengths = unique(data.stimulus_strength);
+    rps = zeros(1,length(states));
+    cols = distinguishable_colors(length(states));
+    % figure()
+    for i = states
+        rp = nan(1,length(stim_strengths));
+        tmp = data(results.predicted_states == i,:);
+        if ~isempty(tmp)
+            tmp_strengths = unique(tmp.stimulus_strength);
+            for ss = 1:length(tmp_strengths)
+                sstmp = filterTrials(tmp, 'stim_strength', tmp_strengths(ss));
+                if tmp_strengths(ss)
+                    rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                else
+                    rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
                 end
-                subplot(length(states), 3,((i+1)*3-3)+2)
-                hold on 
-                try
-                    semshade(ch2(:,2:end-1), 0.3, cols(o,:), cols(o,:), t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
-                catch
-                    % keyboard
-                    plot(t, ch2, 'DisplayName', sprintf('%s (n=%i)', outcome, n));
-                end
-                [pupil, t] = avg_pupil_traces(otmp, tbounds);
-                subplot(length(states), 3,((i+1)*3-3)+3)
-                hold on
-                try
-                    semshade(pupil(:,2:end-1), 0.3, cols(o, :), cols(o, :), t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
-                catch
-                    % keyboard
-                    plot(t, pupil, 'DisplayName', sprintf('State %i (n=%i)', i, n));
-                end
+                ind = find(stim_strengths == tmp_strengths(ss));
+                rp(ind) = size(rtmp,1) / size(sstmp,1);
             end
         end
-        subplot(length(states),3,((i+1)*3-3)+1)
-        xlabel('Time (s)', 'FontSize', 14)
-        ylabel('mPFC NE', 'FontSize', 14)
-        subplot(length(states),3,((i+1)*3-3)+2)
-        xlabel('Time (s)', 'FontSize', 14)
-        ylabel('S1 NE', 'FontSize', 14)
-        title(sprintf('State %i',i), 'FontSize', 14)
-        subplot(length(states),3,((i+1)*3-3)+3)
-        xlabel('Time (s)', 'FontSize', 14)
-        ylabel('Pupil Area', 'FontSize', 14)
-        legend()
+        % plot(stim_strengths.*10, rp, '*-', 'Color', cols(i+1,:))
+        % hold on
+        [p, ~] = polyfit(stim_strengths(1:5), rp(1:5), 1);
+        rps(i+1) = p(1);
     end
 end
 
-function mrp = meanResponseProb(filename, data, animal, k)
+function mrp = meanResponseProb(filename, data, k)
     results = load(filename);
     states = 0:k-1;
     stim_strengths = unique(data.stimulus_strength);
