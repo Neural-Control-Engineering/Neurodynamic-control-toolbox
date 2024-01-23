@@ -1,4 +1,4 @@
-function responseTimeVsStimStrength(data)
+function mat = responseTimeVsStimStrength(data)
     fig = figure();
     animals = fetchAnimals(data);
     cols = {'b', 'r', 'g', 'm'};
@@ -39,7 +39,8 @@ function responseTimeVsStimStrength(data)
         end
     end
     errorbar(stim_strengths(2:end) .* 10, nanmean(mat), nanstd(mat) ./ sqrt(size(mat,1)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('(N_{sessions}=%i)', length(sessions)))
-    % semshade(mat(:,2:end), 0.3, cols{a}, cols{a}, stim_strengths(2:end) .* 10, 1, sprintf('N_{animals}=4)'));
+    % errorbar(stim_strengths(2:end) .* 10, nanmean(animal_avg), nanstd(animal_avg) ./ sqrt(size(animal_avg,1)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('(N_{sessions}=%i)', length(sessions)))
+    % mat = animal_avg;
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Response Time (s)', 'FontSize', 14)
 end

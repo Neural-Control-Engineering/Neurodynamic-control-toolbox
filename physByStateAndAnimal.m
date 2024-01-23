@@ -39,36 +39,36 @@ psychver = 'byanimal';
 %     parpool(11)
 % end
 
-% data_ver = data_versions{1};
+data_ver = data_versions{end};
 % % data_ver = data_versions{1};
-% k = 4;
-% fformat = {data_ver, 'state_Python2mat.mat'};
-% base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-% a = 241;
-% filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
-% % plot_phys_by_states_outcomes(filename, data, a, k)
+k = 4;
+fformat = {data_ver, 'state_Python2mat.mat'};
+base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+a = 242;
+filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
+plot_phys_by_states_outcomes(filename, data, a, k)
 % tmp = filterTrials(data, 'animal', num2str(a));
 % plot_phys_by_states(filename, tmp, a, k, 'Analysis/paper_figures/figure4/')
 
-for dv = 1:length(data_versions)
-    data_ver = data_versions{dv};
-    fformat = {data_ver, 'state_Python2mat.mat'};
-    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-    outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
-    if ~exist(outdir, 'dir')
-        mkdir(outdir)
-    end
-    for a = animals
-        tmp = filterTrials(data, 'animal', num2str(a));
-        if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
-            tmp = removeFirstTrials(tmp);
-        end
-        for k = kstates
-            filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
-            plot_phys_by_states(filename, tmp, num2str(a), k, outdir, psychver)
-        end
-    end
-end
+% for dv = 1:length(data_versions)
+%     data_ver = data_versions{dv};
+%     fformat = {data_ver, 'state_Python2mat.mat'};
+%     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+%     outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
+%     if ~exist(outdir, 'dir')
+%         mkdir(outdir)
+%     end
+%     for a = animals
+%         tmp = filterTrials(data, 'animal', num2str(a));
+%         if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
+%             tmp = removeFirstTrials(tmp);
+%         end
+%         for k = kstates
+%             filename = sprintf('%s%i_%s_%i%s', base_path, a, fformat{1}, k, fformat{2});
+%             plot_phys_by_states(filename, tmp, num2str(a), k, outdir, psychver)
+%         end
+%     end
+% end
 
 function data = removeFirstTrials(data)
     sessions = unique(data.session_id);
@@ -87,7 +87,7 @@ function plot_phys_by_states_outcomes(filename, data, animal, k)
     hold on;
     states = 0:k-1;
     tbounds = [-0.5, 6.0];
-    outcomes = {'Hit', 'Miss', 'CR'};
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     cols = distinguishable_colors(length(outcomes));
     for i = states
         tmp = data(results.predicted_states == i,:);
@@ -114,7 +114,7 @@ function plot_phys_by_states_outcomes(filename, data, animal, k)
                     % keyboard
                     plot(t, ch2, 'DisplayName', sprintf('%s (n=%i)', outcome, n));
                 end
-                [pupil, t] = avg_pupil_traces(otmp, tbounds);
+                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1]);
                 subplot(length(states), 3,((i+1)*3-3)+3)
                 hold on
                 try
@@ -128,13 +128,19 @@ function plot_phys_by_states_outcomes(filename, data, animal, k)
         subplot(length(states),3,((i+1)*3-3)+1)
         xlabel('Time (s)', 'FontSize', 14)
         ylabel('mPFC NE', 'FontSize', 14)
+        xlim(tbounds)
+        ylim([-1.0,1.5])
         subplot(length(states),3,((i+1)*3-3)+2)
         xlabel('Time (s)', 'FontSize', 14)
         ylabel('S1 NE', 'FontSize', 14)
         title(sprintf('State %i',i), 'FontSize', 14)
+        xlim(tbounds)
+        ylim([-1.0,1.5])
         subplot(length(states),3,((i+1)*3-3)+3)
         xlabel('Time (s)', 'FontSize', 14)
         ylabel('Pupil Area', 'FontSize', 14)
+        xlim(tbounds)
+        ylim([-1,0.6])
         legend()
     end
 end

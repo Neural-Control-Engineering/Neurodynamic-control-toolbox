@@ -1,10 +1,11 @@
-function psychCurveByPupilArea(data)
+function [x, ss, tcile] = psychCurveByPupilArea(data)
     % ptiles = 25:25:100;
     ptiles = [33, 66, 100];
     low = prctile(data.pupil_base_before_stimulus, 0);
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(5);
     fig = figure();
+    rppa = {};
     for i = 1:length(ptiles)
         ptile = ptiles(i);
         high = prctile(data.pupil_base_before_stimulus, ptile);
@@ -14,18 +15,18 @@ function psychCurveByPupilArea(data)
         stim_strengths = unique(tmp.stimulus_strength);
         sessions = unique(tmp.session_id);
         animals = fetchAnimals(tmp);
-        % mat = nan(length(sessions), length(stim_strengths));
-        % for s = 1:length(sessions)
-        %     stmp = filterTrials(tmp, 'session_id', num2str(sessions(s)));
-        %     sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
-        %     fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
-        %     mat(s,1) = size(fatmp,1) / size(sstmp,1);
-        mat = nan(length(animals), length(stim_strengths));
-        for s = 1:length(animals)
-            stmp = filterTrials(tmp, 'animal', num2str(animals(s)));
+        mat = nan(length(sessions), length(stim_strengths));
+        for s = 1:length(sessions)
+            stmp = filterTrials(tmp, 'session_id', num2str(sessions(s)));
             sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
             fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
             mat(s,1) = size(fatmp,1) / size(sstmp,1);
+        % mat = nan(length(animals), length(stim_strengths));
+        % for s = 1:length(animals)
+        %     stmp = filterTrials(tmp, 'animal', num2str(animals(s)));
+        %     sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
+        %     fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+        %     mat(s,1) = size(fatmp,1) / size(sstmp,1);
             for ss = 2:length(stim_strengths)
                 sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(ss));
                 otmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
@@ -59,7 +60,26 @@ function psychCurveByPupilArea(data)
         n = size(mat,1);
         semshade(mat, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, sprintf('%s (n=%i)', l, n));
         hold on
+        rppa{i} = mat;
     end
+    x = [];
+    ss = {};
+    tcile = {};
+    all_count = 1;
+    for k = 1:length(ptiles)
+        for i = 1:size(rppa{k},1)
+            for j = 1:size(rppa{k},2)
+                if ~isnan(rppa{k}(i,j))
+                    x = [x, rppa{k}(i,k)];
+                    ss{all_count} = num2str(stim_strengths(j));
+                    tcile{all_count} = num2str(k);
+                    all_count = all_count + 1;
+                end
+            end
+        end
+    end
+
+    % keyboard
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Response Probability', 'FontSize', 14)
     leg = legend('location', 'southeast');
