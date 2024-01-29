@@ -27,11 +27,12 @@ ssd_version = 'v3';
                 % 'last_trial_behavior_no_bias', ...
                 % 'spontaneous_pupil_stim', ...
                 % 'spontaneous_s1_stim', ...
-data_versions = {'last_trial_behavior_no_bias', ...
-                'last_trial_behavior_drop_stim_no_bias', ...
-                'spontaneous_pupil_stim_1s_v2', ...
-                'spontaneous_pupil_stim_v2', ...
-                'spontaneous_pupil_stim'};
+% data_versions = {'last_trial_behavior_no_bias', ...
+%                 'last_trial_behavior_drop_stim_no_bias', ...
+%                 'spontaneous_pupil_stim_1s_v2', ...
+%                 'spontaneous_pupil_stim_v2', ...
+%                 'spontaneous_pupil_stim'};
+data_versions = {'just_stim'};
 
 for i = 1:length(data_versions)
     data_version = data_versions{i};
@@ -167,11 +168,19 @@ function genLapseData(data, outfile, version, shuffle, seed)
         preprocessed_session = sessions;
         preprocessed_label = num2cell(data.go_nogo);
         preprocessed_trial_number = data.sequential_trial_number;
-    elseif strcmp(version, 'spontaneous_pupil_stim')
+    % elseif strcmp(version, 'spontaneous_pupil_stim')
+    %     metrics = getSpontaneousMetrics(data, true);
+    %     stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
+    %     metrics = metrics(:,1);
+    %     preprocessed_input = [metrics, stim_strengths];
+    %     preprocessed_session = sessions;
+    %     preprocessed_label = num2cell(data.go_nogo);
+    %     preprocessed_trial_number = data.sequential_trial_number;
+    elseif strcmp(version, 'just_stim')
         metrics = getSpontaneousMetrics(data, true);
         stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
         metrics = metrics(:,1);
-        preprocessed_input = [metrics, stim_strengths];
+        preprocessed_input = [stim_strengths];
         preprocessed_session = sessions;
         preprocessed_label = num2cell(data.go_nogo);
         preprocessed_trial_number = data.sequential_trial_number;

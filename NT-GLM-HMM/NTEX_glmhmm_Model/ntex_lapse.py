@@ -12,7 +12,8 @@ np.random.seed(65)
 
 if __name__ == '__main__':
 
-    input_ver = 'last_trial_behavior_no_bias'
+    # input_ver = 'last_trial_behavior_no_bias'
+    input_ver = 'just_stim'
     # input_ver = 'spontaneous_pupil_stim'
     # input_ver = 'last_trial_behavior_drop_stim_no_bias'
     # input_ver = 'spontaneous_pupil_stim_v2'
