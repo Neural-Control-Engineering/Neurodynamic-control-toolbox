@@ -3,7 +3,7 @@
 % and version of the model.
 % Craig Kelley, NEC Lab, 9/8/23
 
-ssd_version = 'v2';
+ssd_version = 'v3';
 kstates = [2, 3, 4, 5, 6];
 % data_versions = {'last_trial_behavior_no_bias', ... 
 %     'spontaneous_mpfc_s1_pupil_normalized', ... 
@@ -16,10 +16,11 @@ kstates = [2, 3, 4, 5, 6];
 %     'behavior_mpfc_combo', ...
 %     'behavior_s1_combo', ...
 %     'behavior_pupil_combo'};
-data_versions = {'last_trial_behavior_no_bias', ...
-    'spontaneous_mpfc_stim', ...
-    'spontaneous_s1_stim', ...
-    'spontaneous_pupil_stim'};
+% data_versions = {'last_trial_behavior_no_bias', ...
+%     'spontaneous_mpfc_stim', ...
+%     'spontaneous_s1_stim', ...
+%     'spontaneous_pupil_stim'};
+data_versions = {'spontaneous_pupil_stim_v2'}
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 
@@ -44,15 +45,16 @@ animals_v2 = [240, 241, 242, 243];
 %     end
 % end
 data_ver = data_versions{1};
-k = 5;
+k = 4;
 animal = 241;
-% base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
 % plotTransitions(base_path, animal, data_ver, k, 0:4);
 titles = {'Prev. Trial Behavior + Stim. Strength', ...
         'mPFC NE + Stim. Strength', ...
         'S1 NE + Stim. Strength', ...
         'Pupil Area + Stim. Strength'};
-plotTransitionsAllInputs(animal, data_versions, ssd_version, k, 0:4, titles);
+% plotTransitionsAllInputs(animal, data_versions, ssd_version, k, 0:4, titles);
+fig = plotTransitions(base_path, animal, data_ver, k, 0:4)
 
 function fig = plotTransitionsAllNstates(base_path, animal, data_ver, kstates, folds)
 

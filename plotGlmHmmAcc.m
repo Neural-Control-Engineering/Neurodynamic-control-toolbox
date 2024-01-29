@@ -87,7 +87,8 @@ function fig = combineAnimals(animals, data_versions, kstates, lapse_ver)
         hold on
     end
     xticks(1:max(kstates)); xticklabels({'L.', kstates})
-    legend('location', 'southeast')
+    leg = legend('location', 'southeast');
+    title(leg, 'Model Inputs')
     xlim([0.75, max(kstates)+0.25])
     xlabel('Model / Number of HMM States', 'FontSize', 14)
     ylabel('Accuracy', 'FontSize', 14)
