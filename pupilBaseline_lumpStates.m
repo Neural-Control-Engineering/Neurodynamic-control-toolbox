@@ -238,6 +238,8 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     end
     tbounds = [-0.5,6.0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    % pupil = {zeros(a,k), zeros(a,k), zeros(a,k), zeros(a,k)};
+    ps = {};
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
@@ -273,29 +275,52 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                 for o = 1:length(outcomes)
                     otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
                     if ~isempty(otmp)
-                        [p, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-                        pupil{o} = [pupil{o}; p];
+                        [p, tp] = avg_pupil_traces(otmp, [-0.5, 0], 'stimulus');
+                        % pupil{o}(as,s) = mean(mean(p));
+                        pupil{o} = [pupil{o}; nanmean(p,2)];
+                    % else
+                    %     pupil{o}(as,s) = nan;
                     end
                 end
             end
         end
-        % subplot(1,4,1)
-        % semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
-        % hold on
-        % subplot(1,4,2)
-        % semshade(ne_ch1, 0.3, cols(s,:), cols(s,:), t);
-        % hold on
-        % subplot(1,4,3)
-        % semshade(ne_ch2, 0.3, cols(s,:), cols(s,:), t);
-        % hold on
-        % subplot(1,4,4)
-        for o = 1:length(outcomes)
-            axes(axs(o))
-            semshade(pupil{o}, 0.3, cols(s,:), cols(s,:), tp, 1, sprintf('State %i', s-1));
-            hold on
-            xlim(tbounds)
-        end
+        ps{s} = pupil;
     end
+
+    ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
+    for o = 1:length(outcomes)
+        for i = 1:4                                        
+            avgs(i) = nanmean(ps{i}{o});                       
+            errs(i) = nanstd(ps{i}{o}) / sqrt(length(ps{i}{o}));
+            axes(axs(o))
+            errorbar(i-1, avgs(i), errs(i), 'Color', cols(i,:))
+            hold on
+            bar(i-1, avgs(i), 'EdgeColor', cols(i,:), 'FaceColor', cols(i,:))
+        end
+        % axes(axs(o))
+        % errorbar([0:3], avgs, errs, 'k.')
+        % hold on
+        % bar([0:3], avgs, 'EdgeColor', 'k', 'FaceColor', 'k')
+        title(ttls{o})
+    end
+    
+    % for o = 1:length(outcomes)
+    %     axes(axs(o))
+    %     hold on
+    %     avg = zeros(1,length(size(pupil{o},1)));
+    %     err = zeros(1,length(size(pupil{o},1)));
+    %     for c = 1:length(ps{o})
+    %         avg(c) = nanmean(ps{o}{c});
+    %         err(c) = nanstd(ps{o}{c}) / sqrt(sum(~isnan(ps{o}{c})));
+    %     end
+    %     errorbar([0:3], avg, err, 'k.')
+    %     hold on
+    %     bar([0:3], avg, 'EdgeColor', 'k', 'FaceColor', 'k')
+    %     xticks([0:3])
+    %     title(ttls{o})
+    % end
+    xlabel(tl, 'States', 'FontSize', 16)
+    ylabel(tl, 'Baseline Pupil Area (z-score)', 'FontSize', 16)
     % subplot(1,4,1)
     % xlabel('Stimulus Strength (PSI)')
     % ylabel('Response Probability')
@@ -308,18 +333,18 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     % ylabel('NE_{S1} (z-score)')
     % subplot(1,4,4)
     % xlim(tbounds)
-    ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
-    for o = 1:length(outcomes)
-        axes(axs(o))
-        title(ttls{o}, 'FontSize', 16)
-        ylim([-1,2])
-    end
+    % ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
+    % for o = 1:length(outcomes)
+    %     axes(axs(o))
+    %     title(ttls{o}, 'FontSize', 16)
+    %     ylim([-1,2])
+    % end
     
-    ylabel(tl,'Pupil Area (z-score)', 'FontSize', 16)
-    % ylim([-0.3,0.4])
-    xlabel(tl, 'Time (s)', 'FontSize', 16)
-    axes(axs(1))
-    legend()
+    % ylabel(tl,'Pupil Area (z-score)', 'FontSize', 16)
+    % % ylim([-0.3,0.4])
+    % xlabel(tl, 'Time (s)', 'FontSize', 16)
+    % axes(axs(1))
+    % legend()
     % leg = legend()
     % title(leg, 'HMM State', 'FontSize', 16)
 end
