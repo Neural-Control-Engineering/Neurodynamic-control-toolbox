@@ -231,7 +231,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
 
     % average psychometric curves for each animal in each ordered state (starting with lowest)
     % figure('Position', [ 1151, 1516, 1830, 404])
-    figure()
+    figure('Position', [ 1220, 1418, 1707, 420])
     tl = tiledlayout(1,4);
     for i = 1:4
         axs(i) = nexttile;
@@ -275,9 +275,10 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                 for o = 1:length(outcomes)
                     otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
                     if ~isempty(otmp)
-                        [p, tp] = avg_pupil_traces(otmp, [-0.5, 0], 'stimulus');
+                        [pb, tp] = avg_pupil_traces(otmp, [-0.5, 0], 'stimulus');
+                        [pd, ~] = avg_pupil_traces(otmp, [0, 6.0], 'stimulus');
                         % pupil{o}(as,s) = mean(mean(p));
-                        pupil{o} = [pupil{o}; nanmean(p,2)];
+                        pupil{o} = [pupil{o}; nanmean(pd,2) - nanmean(pb,2)];
                     % else
                     %     pupil{o}(as,s) = nan;
                     end
@@ -301,7 +302,9 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         % errorbar([0:3], avgs, errs, 'k.')
         % hold on
         % bar([0:3], avgs, 'EdgeColor', 'k', 'FaceColor', 'k')
-        title(ttls{o})
+        xlim([-0.75, 3.75])
+        ylim([-0.15,1.3])
+        title(ttls{o}, 'FontSize', 16)
     end
     
     % for o = 1:length(outcomes)
@@ -320,7 +323,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     %     title(ttls{o})
     % end
     xlabel(tl, 'States', 'FontSize', 16)
-    ylabel(tl, 'Baseline Pupil Area (z-score)', 'FontSize', 16)
+    ylabel(tl, 'Pupil Dilation (z-score)', 'FontSize', 16)
     % subplot(1,4,1)
     % xlabel('Stimulus Strength (PSI)')
     % ylabel('Response Probability')

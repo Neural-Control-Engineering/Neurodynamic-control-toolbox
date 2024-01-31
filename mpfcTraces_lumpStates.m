@@ -241,8 +241,8 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
-        ne_ch1 = [];
-        ne_ch2 = [];
+        ne_ch1 = {[], [], [], []};
+        ne_ch2 = {[], [], [], []};
         pupil = {[], [], [], []};
         for as = 1:size(ordered_states,1)
             i = ordered_states(as,s);
@@ -273,8 +273,9 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                 for o = 1:length(outcomes)
                     otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
                     if ~isempty(otmp)
-                        [p, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-                        pupil{o} = [pupil{o}; p];
+                        % [p, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
+                        [ch1, ~, t] = avg_photo_traces(otmp, tbounds, 'stimulus','filtered');
+                        ne_ch1{o} = [ne_ch1{o}; ch1];
                     end
                 end
             end
@@ -291,7 +292,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         % subplot(1,4,4)
         for o = 1:length(outcomes)
             axes(axs(o))
-            semshade(pupil{o}, 0.3, cols(s,:), cols(s,:), tp, 1, sprintf('State %i', s-1));
+            semshade(ne_ch1{o}, 0.3, cols(s,:), cols(s,:), t, 1, sprintf('State %i', s-1));
             hold on
             xlim(tbounds)
         end
@@ -315,7 +316,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         ylim([-1,2])
     end
     
-    ylabel(tl,'Pupil Area (z-score)', 'FontSize', 16)
+    ylabel(tl,'NE_{mPFC} (z-score)', 'FontSize', 16)
     % ylim([-0.3,0.4])
     xlabel(tl, 'Time (s)', 'FontSize', 16)
     axes(axs(1))
