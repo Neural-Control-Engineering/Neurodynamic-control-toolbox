@@ -133,6 +133,74 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             preprocessed_label{i,1} = num2cell(tmp.go_nogo);
             preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
         end
+    elseif strcmp(version, 'just_stim')
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            metrics = getSpontaneousMetrics(tmp, true);
+            stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            if shuffle
+                metrics = metrics(randperm(size(metrics,1)),1);
+                preprocessed_input{i,1} = [stim_strengths];
+            else
+                metrics = metrics(:,1);
+                preprocessed_input{i,1} = [stim_strengths];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo);
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+        end
+    elseif strcmp(version, 'spontaneous_pupil_stim_v2')
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            % metrics = getSpontaneousMetrics(tmp, true);
+            [pupil, ~] = avg_pupil_traces(tmp, [-0.5, 0], 'stimulus');
+            metrics = nanmean(pupil,2);
+            stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            if shuffle
+                metrics = metrics(randperm(size(metrics,1)),1);
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            else
+                metrics = metrics(:,1);
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo);
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+        end
+    elseif strcmp(version, 'spontaneous_pupil_stim_1s_v2')
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            % metrics = getSpontaneousMetrics(tmp, true);
+            [pupil, ~] = avg_pupil_traces(tmp, [-1.0, 0], 'stimulus');
+            metrics = nanmean(pupil,2);
+            stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            if shuffle
+                metrics = metrics(randperm(size(metrics,1)),1);
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            else
+                metrics = metrics(:,1);
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo);
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+        end
+    elseif strcmp(version, 'spontaneous_pupil_stim_drop_outliers')
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            metrics = getSpontaneousMetrics(tmp, false);
+            stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            if shuffle
+                metrics = metrics(randperm(size(metrics,1)),1);
+                preprocessed_input{i,1} = [metrics, stim_strengths];
+            else
+                metrics = metrics(:,1);
+                preprocessed_input{i,1} = [metrics(metrics>-6 & metrics<6), stim_strengths(metrics>-6 & metrics<6)];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo(metrics>-6 & metrics<6));
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number(metrics>-6 & metrics<6);
+        end
     elseif strcmp(version, 'spontaneous_mpfc_s1_pupil_drop_stim')
         for i = 1:length(sessions)
             tmp = filterTrials(data, 'session_id', sessions{i});

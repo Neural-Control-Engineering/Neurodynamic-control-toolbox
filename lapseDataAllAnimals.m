@@ -1,7 +1,8 @@
-data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
-ssd_version = 'v2';
+ssd_version = 'v3';
 
 %% behavior from previous trial
 % data_versions = {'last_trial_behavior_no_bias', ... 
@@ -20,14 +21,22 @@ ssd_version = 'v2';
 %                 'spontaneous_pupil_stim'};
 % data_versions = {'dynamic_state'};
 % data_versions = {'spontaneous_mpfc_s1_stim'}
-data_versions = {'last_trial_behavior_no_bias', ...
-                'spontaneous_pupil_stim', ...
-                'spontaneous_s1_stim', ...
-                'random'};
+% data_versions = {'last_trial_behavior_drop_stim_no_bias'}; %, ...
+                % 'random'};
+
+                % 'last_trial_behavior_no_bias', ...
+                % 'spontaneous_pupil_stim', ...
+                % 'spontaneous_s1_stim', ...
+% data_versions = {'last_trial_behavior_no_bias', ...
+%                 'last_trial_behavior_drop_stim_no_bias', ...
+%                 'spontaneous_pupil_stim_1s_v2', ...
+%                 'spontaneous_pupil_stim_v2', ...
+%                 'spontaneous_pupil_stim'};
+data_versions = {'just_stim'};
 
 for i = 1:length(data_versions)
     data_version = data_versions{i};
-    outdir = sprintf('NT-GLM-HMM/data/lapse/%s/', data_version);
+    outdir = sprintf('NT-GLM-HMM/data/lapse/v3/%s/', data_version);
     if ~exist(outdir, 'dir')
         mkdir(outdir)
     end
@@ -159,10 +168,36 @@ function genLapseData(data, outfile, version, shuffle, seed)
         preprocessed_session = sessions;
         preprocessed_label = num2cell(data.go_nogo);
         preprocessed_trial_number = data.sequential_trial_number;
-    elseif strcmp(version, 'spontaneous_pupil_stim')
+    % elseif strcmp(version, 'spontaneous_pupil_stim')
+    %     metrics = getSpontaneousMetrics(data, true);
+    %     stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
+    %     metrics = metrics(:,1);
+    %     preprocessed_input = [metrics, stim_strengths];
+    %     preprocessed_session = sessions;
+    %     preprocessed_label = num2cell(data.go_nogo);
+    %     preprocessed_trial_number = data.sequential_trial_number;
+    elseif strcmp(version, 'just_stim')
         metrics = getSpontaneousMetrics(data, true);
         stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
         metrics = metrics(:,1);
+        preprocessed_input = [stim_strengths];
+        preprocessed_session = sessions;
+        preprocessed_label = num2cell(data.go_nogo);
+        preprocessed_trial_number = data.sequential_trial_number;
+    elseif strcmp(version, 'spontaneous_pupil_stim_v2')
+        % metrics = getSpontaneousMetrics(data, true);
+        [pupil, ~] = avg_pupil_traces(data, [-0.5, 0], 'stimulus');
+        metrics = nanmean(pupil,2);
+        stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
+        preprocessed_input = [metrics, stim_strengths];
+        preprocessed_session = sessions;
+        preprocessed_label = num2cell(data.go_nogo);
+        preprocessed_trial_number = data.sequential_trial_number;
+    elseif strcmp(version, 'spontaneous_pupil_stim_1s_v2')
+        % metrics = getSpontaneousMetrics(data, true);
+        [pupil, ~] = avg_pupil_traces(data, [-1.0, 0], 'stimulus');
+        metrics = nanmean(pupil,2);
+        stim_strengths = data.stimulus_strength ./ max(data.stimulus_strength);
         preprocessed_input = [metrics, stim_strengths];
         preprocessed_session = sessions;
         preprocessed_label = num2cell(data.go_nogo);
@@ -235,22 +270,14 @@ function genLapseData(data, outfile, version, shuffle, seed)
             preprocessed_trial_number{i,1} = tmp.sequential_trial_number(2:end);
         end
     elseif strcmp(version, 'last_trial_behavior_drop_stim_no_bias')
-        for i = 1:length(sessions)
-            tmp = filterTrials(data, 'session_id', sessions{i});
-            responses = tmp.go_nogo;
-            responses = responses(1:end-1);
-            reward_states = cellfun(@getRewardState, tmp.categorical_outcome);
-            reward_states = reward_states(1:end-1);
-            if shuffle
-                preprocessed_input{i,1} = [responses(randperm(length(responses))), ...
-                    reward_states(randperm(length(reward_states)))];
-            else
-                preprocessed_input{i,1} = [responses, reward_states];
-            end
-            preprocessed_session{i,1} = sessions{i};
-            preprocessed_label{i,1} = num2cell(tmp.go_nogo(2:end));
-            preprocessed_trial_number{i,1} = tmp.sequential_trial_number(2:end);
-        end
+        responses = data.go_nogo;
+        responses = responses(1:end-1);
+        reward_states = cellfun(@getRewardState, data.categorical_outcome);
+        reward_states = reward_states(1:end-1);
+        preprocessed_input = [responses, reward_states];
+        preprocessed_session = sessions;
+        preprocessed_label = num2cell(data.go_nogo(2:end));
+        preprocessed_trial_number = data.sequential_trial_number(2:end);
     elseif strcmp(version, 'behavior_pupil_mpfc_s1_combo')
         for i = 1:length(sessions)
             tmp = filterTrials(data, 'session_id', sessions{i});

@@ -6,7 +6,8 @@ animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243]; % version 2 of ssd data 
 animals = animals_v2;
 ssd_version = 'v2';
-kstates = [2, 3, 4, 5, 6];
+% kstates = [2, 3, 4, 5, 6];
+kstates = [2,3,4,5];
 % data_versions = {'last_trial_behavior_no_bias', ... 
 %     'spontaneous_mpfc_s1_pupil_normalized', ... 
 %     'last_trial_behavior_drop_stim_no_bias', ...
@@ -25,14 +26,17 @@ kstates = [2, 3, 4, 5, 6];
 %     'spontaneous_mpfc_stim', ...
 %     'spontaneous_pupil_stim', ...
 %     'dynamic_state'};
+% data_versions = {'last_trial_behavior_no_bias', ... 
+%     'spontaneous_pupil_stim', ...
+%     'last_trial_behavior_drop_stim_no_bias', ...
+%     'spontaneous_pupil_stim_v2', ...
+%     'spontaneous_pupil_stim_1s_v2'
+%      };
 data_versions = {'last_trial_behavior_no_bias', ... 
-    'spontaneous_mpfc_s1_pupil_normalized', ... 
-    'spontaneous_s1_stim', ...
-    'spontaneous_mpfc_stim', ...
-    'spontaneous_pupil_stim', ...
-    'spontaneous_mpfc_s1_stim', ...
     'last_trial_behavior_drop_stim_no_bias', ...
-    };
+    'just_stim', ...
+    'spontaneous_pupil_stim_v2', ...
+     };
 N_folds = 5;
 
 % for animal = animals
@@ -40,7 +44,55 @@ N_folds = 5;
 % end
 % fig = animalPlot(animals(1), ssd_version, data_versions, kstates, N_folds)
 
-fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds);
+% fig = allAnimals(animals, ssd_version, data_versions, kstates, N_folds);
+% best_fig = combineAnimals(animals, data_versions, kstates, 'best');
+all_fig = combineAnimals(animals, data_versions, kstates, 'all');
+
+function fig = combineAnimals(animals, data_versions, kstates, lapse_ver)
+    fig = figure('Visible', 'on');
+    hold on
+    cs = distinguishable_colors(length(data_versions));
+    avgs = zeros(1,length(kstates)+1);
+    stds = avgs;
+    for i = 1:length(data_versions)
+        results_dir = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ... 
+            'v3', data_versions{i});
+        fformat = {data_versions{i}, 'state_Python2mat.mat'};
+        for k = 1:length(kstates)
+            mat = [];
+            for animal = animals        
+                fname = sprintf('%s%i_%s_%i%s', results_dir, animal, fformat{1}, kstates(k), fformat{2});
+                tmp = load(fname);
+                mat = [mat; tmp.accuracy];
+            end
+            avgs(k+1) = mean(mean(mat));
+            stds(k+1) = std(reshape(mat, [1,numel(mat)])) / numel(mat);
+        end
+        accs = [];
+        for animal = animals
+            results_dir = sprintf('NT-GLM-HMM/data/lapse/%s/Lapse_Model/%i/', ... 
+                data_versions{i}, animal);
+            results = load(strcat(results_dir, 'results.mat'));
+            switch lapse_ver 
+                case 'best'
+                    accs = [accs; max(results.accuracy)];
+                case 'all'
+                    accs = [accs; results.accuracy];
+            end
+        end
+        avgs(1) = mean(accs ./ 100) ;
+        stds(1) = std(accs ./ 100) / length(accs);
+        % keyboard
+        errorbar(1:max(kstates), avgs, stds, 'Color', cs(i,:), 'DisplayName', strrep(data_versions{i}, '_', '-'))
+        hold on
+    end
+    xticks(1:max(kstates)); xticklabels({'L.', kstates})
+    leg = legend('location', 'southeast');
+    title(leg, 'Model Inputs')
+    xlim([0.75, max(kstates)+0.25])
+    xlabel('Model / Number of HMM States', 'FontSize', 14)
+    ylabel('Accuracy', 'FontSize', 14)
+end
 
 function fig = animalPlot(animal, ssd_version, data_versions, kstates, N_folds)
     % plots accuracy vs number of states for all models versions of single animal 

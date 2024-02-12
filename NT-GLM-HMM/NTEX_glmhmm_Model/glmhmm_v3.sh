@@ -21,8 +21,10 @@ cd ~/Neurodynamic-control-toolbox/NT-GLM-HMM/NTEX_glmhmm_Model/
 # datavers=('dynamic_state')
 # datavers=('spontaneous_mpfc_s1_stim')
 # datavers=('spontaneous_pupil_stim_drop_outliers')
-datavers=('spontaneous_pupil_stim_v2' \
-'spontaneous_pupil_stim_1s_v2')
+# datavers=('spontaneous_pupil_stim_v2' \
+# 'last_trial_behavior_no_bias' \
+# 'last_trial_behavior_drop_stim_no_bias')
+datavers=('just_stim')
 
 animals=(240 241 242 243)
 # animals=(243)
@@ -33,7 +35,7 @@ for animal in ${animals[@]}; do
         echo $dataver
         for K in ${K_states[@]}; do
             echo "$K states"
-            python3 glm_hmm_model.py --target=../data/v2/$dataver/unshuffled/"$animal"_"$dataver".mat --K_states=$K --results_dir=../data/v2/"$dataver"/unshuffled/results/
+            python3 glm_hmm_model.py --target=../data/v3/$dataver/unshuffled/"$animal"_"$dataver".mat --K_states=$K --results_dir=../data/v3/"$dataver"/unshuffled/results/
         done
     done
 done
