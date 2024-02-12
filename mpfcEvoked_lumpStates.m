@@ -276,7 +276,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                     otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
                     if ~isempty(otmp)
                         [ch1b, ~, ~] = avg_photo_traces(otmp, [-0.5,0], 'stimulus','filtered');
-                        [ch1d, ~, ~] = avg_photo_traces(otmp, [0,6.0], 'stimulus','filtered');
+                        [ch1d, ~, ~] = avg_photo_traces(otmp, [0,1.0], 'stimulus','filtered');
                         ne_ch1{o} = [ne_ch1{o}; nanmean(ch1d,2) - nanmean(ch1b,2)];
                     % else
                     %     pupil{o}(as,s) = nan;
@@ -305,7 +305,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         ylim([-0.2,1.1])
         title(ttls{o}, 'FontSize', 16)
     end
-    
+    keyboard
     % for o = 1:length(outcomes)
     %     axes(axs(o))
     %     hold on

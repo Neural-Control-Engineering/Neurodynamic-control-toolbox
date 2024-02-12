@@ -17,7 +17,7 @@ psychver = 'byanimal';
 reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
 % lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
 
-function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
+function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -38,23 +38,20 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
         ordered_states(a,:) = inds - 1;
     end
 
-    reaction_times = zeros(length(animals), k);
+    fractions = zeros(length(animals), k);
     for s = 1:k
         for as = 1:size(ordered_states,1)
             i = ordered_states(as,s);
             filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
             results = load(filename);
-            stim_strengths = unique(data.stimulus_strength);
-            rp = nan(1,length(stim_strengths));
             tmp = filterTrials(data, 'animal', num2str(animals(as)));
             statetmp = tmp(results.predicted_states == i,:);
-            statetmp = filterTrials(statetmp, 'categorical_outcome', 'Hit');
-            reaction_times(as,s) = nanmean(statetmp.response_time);
+            fractions(as,s) = size(statetmp,1) / size(tmp,1);
         end
     end
-    avg = nanmean(reaction_times);
-    for i = size(reaction_times,2)
-        err(i) = nanstd(reaction_times(:,i)) / sqrt(sum(~isnan(reaction_times(:,i))));
+    avg = nanmean(fractions);
+    for i = size(fractions,2)
+        err(i) = nanstd(fractions(:,i)) / sqrt(sum(~isnan(fractions(:,i))));
     end
     figure()
     errorbar(0:3, avg, err, 'k.')
@@ -63,7 +60,7 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
     xlim([-0.7,3.7])
     xticks([0:3])
     xlabel('State', 'FontSize', 16)
-    ylabel('Reaction Time (s)', 'FontSize', 16)
+    ylabel('Trials per State (s)', 'FontSize', 16)
 end
 
 function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, folds)

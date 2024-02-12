@@ -14,10 +14,10 @@ data_ver = data_versions{1};
 k = 4;
 base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
 psychver = 'byanimal';
-reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
+criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
 % lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
 
-function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
+function criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -38,23 +38,26 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
         ordered_states(a,:) = inds - 1;
     end
 
-    reaction_times = zeros(length(animals), k);
+    criteria = zeros(length(animals), k);
     for s = 1:k
         for as = 1:size(ordered_states,1)
             i = ordered_states(as,s);
             filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
             results = load(filename);
-            stim_strengths = unique(data.stimulus_strength);
-            rp = nan(1,length(stim_strengths));
             tmp = filterTrials(data, 'animal', num2str(animals(as)));
             statetmp = tmp(results.predicted_states == i,:);
-            statetmp = filterTrials(statetmp, 'categorical_outcome', 'Hit');
-            reaction_times(as,s) = nanmean(statetmp.response_time);
+            fatmp = filterTrials(statetmp, 'categorical_outcome', 'FA');
+            ctmp = filterTrials(statetmp, 'stim_strength', 0);
+            far = (size(fatmp,1)+0.5)/(size(ctmp,1)+1);
+            htmp = filterTrials(statetmp, 'categorical_outcome', 'Hit');
+            stmp = filterTrials(statetmp, 'stim_strength_greater_than', 0);
+            hr = (size(htmp,1)+0.5)/(size(stmp,1)+1);
+            criteria(as,s) = -0.5 * (norminv(hr) + norminv(far));
         end
     end
-    avg = nanmean(reaction_times);
-    for i = size(reaction_times,2)
-        err(i) = nanstd(reaction_times(:,i)) / sqrt(sum(~isnan(reaction_times(:,i))));
+    avg = nanmean(criteria);
+    for i = size(criteria,2)
+        err(i) = nanstd(criteria(:,i)) / sqrt(sum(~isnan(criteria(:,i))));
     end
     figure()
     errorbar(0:3, avg, err, 'k.')
@@ -63,7 +66,7 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
     xlim([-0.7,3.7])
     xticks([0:3])
     xlabel('State', 'FontSize', 16)
-    ylabel('Reaction Time (s)', 'FontSize', 16)
+    ylabel('Criterion', 'FontSize', 16)
 end
 
 function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, folds)
