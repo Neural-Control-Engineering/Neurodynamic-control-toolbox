@@ -1,4 +1,4 @@
-function psychCurveByMPFCNE(data, ver)
+function out = psychCurveByMPFCNE(data, ver)
 
     [mpfc, ~, ~] = avg_photo_traces(data, [-0.5, 0], 'stimulus', ver);
     baselines = nanmean(mpfc,2);
@@ -9,6 +9,7 @@ function psychCurveByMPFCNE(data, ver)
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(5);
     fig = figure();
+    out = {};
     for i = 1:length(ptiles)
         ptile = ptiles(i);
         high = prctile(baselines, ptile);
@@ -63,6 +64,7 @@ function psychCurveByMPFCNE(data, ver)
         n = size(mat,1);
         semshade(mat, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, sprintf('%s (n=%i)', l, n));
         hold on
+        out{i} = mat;
     end
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Response Probability', 'FontSize', 14)

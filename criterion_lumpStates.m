@@ -56,7 +56,7 @@ function criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals,
         end
     end
     avg = nanmean(criteria);
-    for i = size(criteria,2)
+    for i = 1:size(criteria,2)
         err(i) = nanstd(criteria(:,i)) / sqrt(sum(~isnan(criteria(:,i))));
     end
     figure()

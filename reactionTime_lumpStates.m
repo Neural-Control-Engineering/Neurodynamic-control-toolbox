@@ -53,7 +53,7 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
         end
     end
     avg = nanmean(reaction_times);
-    for i = size(reaction_times,2)
+    for i = 1:size(reaction_times,2)
         err(i) = nanstd(reaction_times(:,i)) / sqrt(sum(~isnan(reaction_times(:,i))));
     end
     figure()

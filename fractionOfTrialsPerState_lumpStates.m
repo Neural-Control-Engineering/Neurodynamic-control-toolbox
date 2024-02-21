@@ -14,7 +14,7 @@ data_ver = data_versions{1};
 k = 4;
 base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
 psychver = 'byanimal';
-reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
+fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
 % lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
 
 function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
@@ -50,8 +50,8 @@ function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals
         end
     end
     avg = nanmean(fractions);
-    for i = size(fractions,2)
-        err(i) = nanstd(fractions(:,i)) / sqrt(sum(~isnan(fractions(:,i))));
+    for i = 1:size(fractions,2)
+        err(i) = nanstd(fractions(:,i)) / 2; %sqrt(sum(~isnan(fractions(:,i))));
     end
     figure()
     errorbar(0:3, avg, err, 'k.')
