@@ -289,30 +289,45 @@ if ~strcmp(behavior_data.training_phase,"Phase 0") && pupil_fs == 10
             end
             prop = prop+1;
 
+            % 38: Channel 1 photometry (LP + z-score)
+            start_idx = onset_idx - (2 * photometry_fs);
+            if start_idx > 0
+                photometry = photometry_data{start_idx:onset_idx_next,[1,5]};
+                animal_summary_of_sessions{trial_num,prop} = photometry;
+            end
+            prop = prop+1;
+
             if width(photometry_data) > 3 % for old, single channel photometry data
-                % 38: Channel 2 baseline before onset tone
+                % 39: Channel 2 baseline before onset tone
                 start_idx = onset_idx - (photometry_baseline_window * photometry_fs);
                 if start_idx > 0
                     baseline_photometry = mean(photometry_data{start_idx:onset_idx,3});
                     animal_summary_of_sessions{trial_num,prop} = baseline_photometry;
                 end
                 prop = prop+1;
-                % 39: Channel 1 baseline before stimulus
+                % 40: Channel 2 baseline before stimulus
                 start_idx = stim_idx - (photometry_baseline_window * photometry_fs);
                 if start_idx > 0
                     baseline_photometry = mean(photometry_data{start_idx:stim_idx,3});
                     animal_summary_of_sessions{trial_num,prop} = baseline_photometry;
                 end
                 prop = prop+1;
-                % 40: Channel 2 photometry (z-score)
+                % 41: Channel 2 photometry (z-score)
                 start_idx = onset_idx - (2 * photometry_fs);
                 if start_idx > 0
                     photometry = photometry_data{start_idx:onset_idx_next,[1 3]};
                     animal_summary_of_sessions{trial_num,prop} = photometry;
                 end
                 prop = prop+1;      
+                start_idx = onset_idx - (2 * photometry_fs);
+                % 42: Channel 2 photometry (LP + zscore)
+                if start_idx > 0
+                    photometry = photometry_data{start_idx:onset_idx_next,[1,6]};
+                    animal_summary_of_sessions{trial_num,prop} = photometry;
+                end
+                prop = prop+1;
             else
-                prop = prop +3;
+                prop = prop +4;
             end
         else
             prop = prop+7;
@@ -539,7 +554,8 @@ if ~strcmp(behavior_data.training_phase,"Phase 0") && pupil_fs == 10
         else
             prop = prop + 11;
         end
-    
+
+
     end
         
     % Session behavior metrics
@@ -558,11 +574,11 @@ if ~strcmp(behavior_data.training_phase,"Phase 0") && pupil_fs == 10
     [dprime,criterion] = dprime_simple(Hit_rate,FA_rate);
     
     for i = 1:height(animal_summary_of_sessions)
-        % 53: psychometric curve for session
+        % 58: psychometric curve for session
         animal_summary_of_sessions{i,prop} = psychometric_performance; 
-        % 54: dprime
+        % 59: dprime
         animal_summary_of_sessions{i,prop+1} = dprime;
-        % 55: criterion
+        % 60: criterion
         animal_summary_of_sessions{i,prop+2} = criterion;
     end
     %prop = prop+3;

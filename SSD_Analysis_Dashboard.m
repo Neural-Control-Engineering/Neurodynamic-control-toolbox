@@ -47,13 +47,13 @@ pause(.5)
 close(wbar)
 
 % Make sure DLC data is up to date before compiling database
-updateDLCData(paths,resets,"pupil");
+%updateDLCData(paths,resets,"pupil");
 
 %% GENERATE DATASTORE OR LOAD DATASTORE
 
 % Indicate which phases to include and generate new database
-% analysis_params.phase_selection = {'Phase 0','Phase I','Phase II','Phase III'};
-% [Datastore] = generateDatabase(paths,analysis_params,animals_to_load,"combined");
+analysis_params.phase_selection = {'Phase III'};
+[Datastore] = generateDatabase(paths,analysis_params,animals_to_load,"combined");
 
 % Clean datastore to the standard version being used in analysis
 % filters.NT = ["NE"];
@@ -66,9 +66,8 @@ updateDLCData(paths,resets,"pupil");
 % Load SSDv1 NE data
 %Datastore = load(fullfile(paths.datastore,"NE_dstore_cleaned02-Aug-2023.mat"));
 
-% Load SSDv2 NE data
+%% Load SSDv2 NE data
 Datastore = load(fullfile(paths.datastore,"NE_dstore_cleaned_22-Aug-2023.mat"));
-
 %% PLOT AVERAGED PHOTOMETRY TRACES ALIGNED TO STIMULUS TIME
 % just want animals with recordings from both mPFC and S1 
 data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
@@ -181,3 +180,7 @@ for p = 1:length(phases)
         avgTracesBy(tmp, 'animal', animal, 'response', 'stimulus_time' ,tbounds, strrep(strcat(paths.repo_path,'Analysis/avgTracesAfterStim/', phases{p},'/'),' ', '_')); % separate averages by response (go / no go)
     end
 end
+%% CS PLOT AVG PUPIL DYNAMICS BY OUTCOME
+
+
+

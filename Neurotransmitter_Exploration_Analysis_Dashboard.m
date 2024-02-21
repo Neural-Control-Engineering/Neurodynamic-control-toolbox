@@ -95,12 +95,12 @@ state_data = load('state_data.mat');
 phases_to_include = "Phase III Cumulative";
 NT_to_include = "NE";
 exclude_missing_pupil = true;
-exclude_missing_photometry = true;
+exclude_missing_photometry = false;
 exclude_poor_performance = false;
 
-[cleaned_summary_of_sessions_1] = cleanCombinedData(combined_summary_of_sessions,phases_to_include,exclude_missing_pupil,exclude_missing_photometry,exclude_poor_performance,NT_to_include);
+[cleaned_summary_of_sessions_1] = cleanCombinedData(NE_dstore,phases_to_include,exclude_missing_pupil,exclude_missing_photometry,exclude_poor_performance,NT_to_include);
 %%
-exclude_poor_performance = true;
+exclude_poor_performance = false;
 [processed_trials_data] = cleanCombinedData(cleaned_summary_of_sessions_1,phases_to_include,exclude_missing_pupil,exclude_missing_photometry,exclude_poor_performance,NT_to_include);
 
 %% Pupil analyses
