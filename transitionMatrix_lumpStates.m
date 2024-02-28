@@ -21,10 +21,10 @@ titles = {'Prev. Trial Behavior + Stim. Strength', ...
 % plotTransitionsAllInputs(animal, data_versions, ssd_version, k, 0:4, titles);
 % fig = plotTransitions(base_path, animal, data_ver, k, 0:4)
 psychver = 'byanimal';
-lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4])
+all_mat = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
 % lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
 
-function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
+function all_mat = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);

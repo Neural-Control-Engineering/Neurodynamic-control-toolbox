@@ -16,7 +16,7 @@ data_versions = {'last_trial_behavior_no_bias', ...
 psychver = 'byanimal';
 
 % lumpByResponseProb(data_versions{1}, ssd_version, psychver, animals, data, k)
-lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k)
+ps = lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k);
 % lumpByResponseProb_plotByOutcome(data_versions{end}, ssd_version, psychver, animals, data, k)
 % lumpByResponseProbSlope(data_versions{1}, ssd_version, psychver, animals, data, k)
 % lumpByResponseProbSlope(data_versions{end}, ssd_version, psychver, animals, data, k)
@@ -204,7 +204,7 @@ function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data,
     subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
 end
 
-function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
+function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
