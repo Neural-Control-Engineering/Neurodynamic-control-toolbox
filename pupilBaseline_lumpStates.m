@@ -16,7 +16,71 @@ data_versions = {'last_trial_behavior_no_bias', ...
 psychver = 'byanimal';
 
 % lumpByResponseProb(data_versions{1}, ssd_version, psychver, animals, data, k)
-ps = lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k);
+[ps, animal_tag] = lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k);
+lens = zeros(1,4);
+for s = 1:4
+    lens(s) = length(ps{s}{1});
+end
+hit = nan(max(lens),4);
+for s = 1:4
+    hit(1:length(ps{s}{1}),s) = ps{s}{1};
+end
+
+lens = zeros(1,4);
+for s = 1:4
+    lens(s) = length(ps{s}{2});
+end
+miss = nan(max(lens),4);
+for s = 1:4
+    miss(1:length(ps{s}{2}),s) = ps{s}{2};
+end
+
+lens = zeros(1,4);
+for s = 1:4
+    lens(s) = length(ps{s}{3});
+end
+cr = nan(max(lens),4);
+for s = 1:4
+    cr(1:length(ps{s}{3}),s) = ps{s}{3};
+end
+
+lens = zeros(1,4);
+for s = 1:4
+    lens(s) = length(ps{s}{4});
+end
+fa = nan(max(lens),4);
+for s = 1:4
+    fa(1:length(ps{s}{4}),s) = ps{s}{4};
+end
+
+hit_t = table(animal_tag, hit(:,1), hit(:,2), hit(:,3), hit(:,4),  VariableNames=["animal","state0","state1","state2","state3"]);
+miss_t = table(animal_tag, miss(:,1), miss(:,2), miss(:,3), miss(:,4),  VariableNames=["animal","state0","state1","state2","state3"]);
+cr_t = table(animal_tag, cr(:,1), cr(:,2), cr(:,3), cr(:,4),  VariableNames=["animal","state0","state1","state2","state3"]);
+Meas = table([0,1,2,3]', VariableName="states");
+
+% fa_new = [];
+% animal_tag_fa = {};
+% count = 1;
+% for i = 1:size(fa,1)
+%     if sum(~isnan(fa(i,:))) > 1
+%         animal_tag_fa{count} = animal_tag{i};
+%         fa_new = [fa_new; fa(i,:)];
+%         count = count + 1;
+%     end
+% end
+fa_new = fa;
+animal_tag_fa = animal_tag;
+fa_t = table(animal_tag_fa, fa_new(:,1), fa_new(:,2), fa_new(:,3), fa_new(:,4),  VariableNames=["animal","state0","state1","state2","state3"]);
+
+hit_rm = fitrm(hit_t, "state0-state3~animal",WithinDesign=Meas);
+miss_rm = fitrm(miss_t, "state0-state3~animal",WithinDesign=Meas);
+cr_rm = fitrm(cr_t, "state0-state3~animal",WithinDesign=Meas);
+fa_rm = fitrm(fa_t, "state0-state3~animal",WithinDesign=Meas);
+
+hit_ranovatbl = ranova(hit_rm)
+miss_ranovatbl = ranova(miss_rm)
+cr_ranovatbl = ranova(cr_rm)
+fa_ranovatbl = ranova(fa_rm)
 % lumpByResponseProb_plotByOutcome(data_versions{end}, ssd_version, psychver, animals, data, k)
 % lumpByResponseProbSlope(data_versions{1}, ssd_version, psychver, animals, data, k)
 % lumpByResponseProbSlope(data_versions{end}, ssd_version, psychver, animals, data, k)
@@ -204,7 +268,7 @@ function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data,
     subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
 end
 
-function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
+function [ps, animal_tag] = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -240,13 +304,19 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     % pupil = {zeros(a,k), zeros(a,k), zeros(a,k), zeros(a,k)};
     ps = {};
+    sessions = unique(data.session_id);
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
         ne_ch1 = [];
         ne_ch2 = [];
         pupil = {[], [], [], []};
-        for as = 1:size(ordered_states,1)
+        sesh_pupil = cell(1,4);
+        % for as = 1:size(ordered_states,1)
+        for sesh = 1:length(sessions)
+            session_id = sessions{sesh};
+            sesh_spl = strsplit(session_id, '-');
+            as = str2num(sesh_spl{1})-240+1;
             i = ordered_states(as,s);
             filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
             results = load(filename);
@@ -254,6 +324,7 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
             rp = nan(1,length(stim_strengths));
             tmp = filterTrials(data, 'animal', num2str(animals(as)));
             statetmp = tmp(results.predicted_states == i,:);
+            statetmp = filterTrials(statetmp, 'session_id', session_id);
             if ~isempty(statetmp)
                 if strcmp(psychver, 'byanimal')
                     tmp_strengths = unique(statetmp.stimulus_strength);
@@ -277,14 +348,25 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
                     if ~isempty(otmp)
                         [p, tp] = avg_pupil_traces(otmp, [-0.5, 0], 'stimulus');
                         % pupil{o}(as,s) = mean(mean(p));
-                        pupil{o} = [pupil{o}; nanmean(p,2)];
-                    % else
-                    %     pupil{o}(as,s) = nan;
+                        pupil{o} = [pupil{o}; nanmean(nanmean(p,2))];
+                    else
+                        pupil{o} = [pupil{o}; nan];
                     end
+                end
+            else
+                for o = 1:4
+                    pupil{o} = [pupil{o}; nan];
                 end
             end
         end
         ps{s} = pupil;
+    end
+
+    animal_tag = cell(length(sessions),1);
+    for i = 1:length(sessions)
+        session_id = sessions{i};
+        sesh_spl = strsplit(session_id, '-');
+        animal_tag{i} = sesh_spl{1};
     end
 
     ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};

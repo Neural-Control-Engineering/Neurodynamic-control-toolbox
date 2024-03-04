@@ -5,7 +5,7 @@
 
 ssd_version = 'v3';
 kstates = [2, 3, 4, 5, 6];
-data_versions = {'spontaneous_pupil_stim_v2'}
+data_versions = {'spontaneous_pupil_stim_v2'};
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 animals = fetchAnimals(data);
@@ -14,10 +14,14 @@ data_ver = data_versions{1};
 k = 4;
 base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
 psychver = 'byanimal';
-reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
+[reaction_times, animal_tag] = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
+t = table(animal_tag, reaction_times(:,1), reaction_times(:,2), reaction_times(:,3), reaction_times(:,4), VariableNames=["animal","state0","state1","state2","state3"]);
+Meas = table([0,1,2,3]', VariableName="states");
+rm = fitrm(t, "state0-state3~animal",WithinDesign=Meas);
+ranovatbl = ranova(rm)
 % lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
 
-function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
+function [reaction_times, animal_tag] = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -38,9 +42,14 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
         ordered_states(a,:) = inds - 1;
     end
 
-    reaction_times = zeros(length(animals), k);
+    sessions = unique(data.session_id);
+    reaction_times = zeros(length(sessions), k);
     for s = 1:k
-        for as = 1:size(ordered_states,1)
+        % for as = 1:size(ordered_states,1)
+        for sesh = 1:length(sessions)
+            session_id = sessions{sesh};
+            sesh_spl = strsplit(session_id, '-');
+            as = str2num(sesh_spl{1})-240+1;
             i = ordered_states(as,s);
             filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
             results = load(filename);
@@ -49,17 +58,24 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
             tmp = filterTrials(data, 'animal', num2str(animals(as)));
             statetmp = tmp(results.predicted_states == i,:);
             statetmp = filterTrials(statetmp, 'categorical_outcome', 'Hit');
-            reaction_times(as,s) = nanmean(statetmp.response_time);
+            sstatetmp = filterTrials(statetmp, 'session_id', session_id);
+            reaction_times(sesh,s) = nanmean(sstatetmp.response_time);
         end
+    end
+    animal_tag = cell(length(sessions),1);
+    for i = 1:length(sessions)
+        session_id = sessions{i};
+        sesh_spl = strsplit(session_id, '-');
+        animal_tag{i} = sesh_spl{1};
     end
     avg = nanmean(reaction_times);
     for i = 1:size(reaction_times,2)
         err(i) = nanstd(reaction_times(:,i)) / sqrt(sum(~isnan(reaction_times(:,i))));
     end
     figure()
-    errorbar(0:3, avg, err, 'k.')
     hold on
-    bar(0:3, avg, 'FaceColor', 'k', 'EdgeColor', 'k')
+    bar(0:3, avg, 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', [0.5,0.5,0.5])
+    errorbar(0:3, avg, err, 'k.')
     xlim([-0.7,3.7])
     xticks([0:3])
     xlabel('State', 'FontSize', 16)
