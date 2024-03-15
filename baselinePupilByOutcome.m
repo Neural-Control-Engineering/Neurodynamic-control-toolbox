@@ -38,6 +38,8 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
                 else
                     session{o} = [session{o}; pupil];
                 end
+            else
+                session{o} = [session{o}; nan(1,8)];
             end
         end
     end
@@ -53,8 +55,8 @@ function [baselines_animal, baselines_session] = baselinePupilByOutcome(data, tb
     labels = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold'};
 
     for i = 1:length(baselines_session) 
-        avg(i) = mean(baselines_session{i});
-        err(i) = std(baselines_session{i}) / sqrt(length(baselines_session{i}));
+        avg(i) = nanmean(baselines_session{i});
+        err(i) = nanstd(baselines_session{i}) / sqrt(length(baselines_session{i}));
     end
     
     figure()

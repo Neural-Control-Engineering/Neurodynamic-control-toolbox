@@ -75,12 +75,12 @@ fa_t = table(animal_tag_fa, fa_new(:,1), fa_new(:,2), fa_new(:,3), fa_new(:,4), 
 hit_rm = fitrm(hit_t, "state0-state3~animal",WithinDesign=Meas);
 miss_rm = fitrm(miss_t, "state0-state3~animal",WithinDesign=Meas);
 cr_rm = fitrm(cr_t, "state0-state3~animal",WithinDesign=Meas);
-fa_rm = fitrm(fa_t, "state0-state3~animal",WithinDesign=Meas);
+% fa_rm = fitrm(fa_t, "state0-state3~animal",WithinDesign=Meas);
 
 hit_ranovatbl = ranova(hit_rm)
 miss_ranovatbl = ranova(miss_rm)
 cr_ranovatbl = ranova(cr_rm)
-fa_ranovatbl = ranova(fa_rm)
+% fa_ranovatbl = ranova(fa_rm)
 % lumpByResponseProb_plotByOutcome(data_versions{end}, ssd_version, psychver, animals, data, k)
 % lumpByResponseProbSlope(data_versions{1}, ssd_version, psychver, animals, data, k)
 % lumpByResponseProbSlope(data_versions{end}, ssd_version, psychver, animals, data, k)

@@ -238,6 +238,8 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     end
     tbounds = [-0.5,6.0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    ps = {};
+    sessions = unique(data.session_id);
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
@@ -245,6 +247,10 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         ne_ch2 = {[], [], [], []};
         pupil = {[], [], [], []};
         for as = 1:size(ordered_states,1)
+        % for sesh = 1:length(sessions)
+        %     session_id = sessions{sesh};
+        %     sesh_spl = strsplit(session_id, '-');
+        %     as = str2num(sesh_spl{1})-240+1;
             i = ordered_states(as,s);
             filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
             results = load(filename);
@@ -252,6 +258,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
             rp = nan(1,length(stim_strengths));
             tmp = filterTrials(data, 'animal', num2str(animals(as)));
             statetmp = tmp(results.predicted_states == i,:);
+            % statetmp = filterTrials(statetmp, 'session_id', session_id);
             if ~isempty(statetmp)
                 if strcmp(psychver, 'byanimal')
                     tmp_strengths = unique(statetmp.stimulus_strength);
@@ -274,11 +281,17 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                     otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
                     if ~isempty(otmp)
                         % [p, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-                        [ch1, ~, t] = avg_photo_traces(otmp, tbounds, 'stimulus','filtered');
+                        [ch1, ~, t] = avg_photo_traces(otmp, [0,2], 'stimulus','filtered');
                         ne_ch1{o} = [ne_ch1{o}; ch1];
-                    end
+                        % if size(ch1,1)>1
+                        %     ne_ch1{o} = [ne_ch1{o}; nanmean(ch1)];
+                        % else
+                        %     ne_ch1{o} = [ne_ch1{o}; ch1];
+                        % end
+                    end 
                 end
             end
+            ps{s} = ne_ch1;
         end
         % subplot(1,4,1)
         % semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
@@ -292,6 +305,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         % subplot(1,4,4)
         for o = 1:length(outcomes)
             axes(axs(o))
+            % keyboard
             semshade(ne_ch1{o}, 0.3, cols(s,:), cols(s,:), t, 1, sprintf('State %i', s-1));
             hold on
             xlim(tbounds)
@@ -323,6 +337,37 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     legend()
     % leg = legend()
     % title(leg, 'HMM State', 'FontSize', 16)
+    pcfig = figure();
+    cols = {'b', 'r', 'g', 'k'};
+    tl = tiledlayout(1,4);
+    pcaxs = zeros(1,4);
+    for i = 1:4
+        pcaxs(i) = nexttile;
+    end
+    % figure()
+    for i = 1:length(ps)
+        for o = 1:length(outcomes)
+            % keyboard
+            [coeff, score, ~, ~, explained] = pca(ps{i}{o});
+            % keyboard
+            axes(pcaxs(o))
+            % scatter3(score(:,1), score(:,2), score(:,3), 'MarkerEdgeColor', cols{i})
+            % keyboard
+            plot(score(:,1), score(:,2), 'o', 'Color', cols{i})
+            % xlim([-10,10])
+            % ylim([-10,10])
+            % plot(1:length(explained), explained, '*-', 'Color', cols{o})
+            hold on
+        end
+    end
+    axes(pcaxs(1)); title('Hit', 'FontSize', 16); %xlim([-150,150]); ylim([-30,30]);
+    xlabel('PC1', 'FontSize', 16); ylabel('PC2', 'FontSize', 16); zlabel('PC3', 'FontSize', 16)
+    axes(pcaxs(2)); title('Miss', 'FontSize', 16); %xlim([-150,150]); ylim([-30,30]);
+    xlabel('PC1', 'FontSize', 16); ylabel('PC2', 'FontSize', 16); zlabel('PC3', 'FontSize', 16)
+    axes(pcaxs(3)); title('Correct Rejection', 'FontSize', 16); % xlim([-150,150]); ylim([-30,30]);
+    xlabel('PC1', 'FontSize', 16); ylabel('PC2', 'FontSize', 16); zlabel('PC3', 'FontSize', 16)
+    axes(pcaxs(4)); title('False Alarm', 'FontSize', 16); % xlim([-150,150]); ylim([-30,30]);
+    xlabel('PC1', 'FontSize', 16); ylabel('PC2', 'FontSize', 16); zlabel('PC3', 'FontSize', 16)
 end
 
 function lumpByResponseProb_plotByOutcome(data_ver, ssd_version, psychver, animals, data, k)

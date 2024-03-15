@@ -1,4 +1,4 @@
-function reactionTimeByPupilBaseline(data)
+function session = reactionTimeByPupilBaseline(data)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);

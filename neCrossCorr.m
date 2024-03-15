@@ -62,6 +62,51 @@ function neCrossCorr(data, ver)
         end
     end
     session_lags = lag ./ Fs;
+
+    % correlations of trial shuffled data 
+    [mpfc, s1, t] = avg_photo_traces(data, tbounds, 'stimulus', ver);
+    x = randperm(size(mpfc,1),1000);
+
+    % y = randperm(size(mpfc,1),1000);
+    % while any(x==y)
+    %     y = randperm(size(mpfc,1),1000);
+    % end
+    % for i = 1:length(x)
+    %     ch1 = mpfc(x(i),:);
+    %     ch2 = s1(y(i),:);
+    %     [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+    %     try
+    %         shuffle_lags(i,:) = lag ./ Fs;
+    %         shuffle_cs(i,:) = c; % ./ length(ch1(2:end-1));
+    %     catch
+    %         shuffle_lags(i,:) = nan(1, size(lags,2));
+    %         shuffle_cs(i,:) = nan(1,size(cs,2));
+    %     end
+    % end
+
+    for i = 1:length(x)
+        session_id = data.session_id{x(i)};
+        trial_num = data.sequential_trial_number(x(i));
+        tmp = filterTrials(data, 'session_id', data.session_id{x(i)});
+        ind = randi(size(tmp,1),1);
+        while tmp.sequential_trial_number(ind) == trial_num
+            ind = randi(size(tmp,1), 1);
+        end
+        [~, s1_tmp, ~] = avg_photo_traces(tmp, tbounds, 'stimulus', ver);
+        ch1 = mpfc(x(i),:);
+        ch2 = s1_tmp(ind,:);
+        [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+        try
+            shuffle_lags(i,:) = lag ./ Fs;
+            shuffle_cs(i,:) = c; % ./ length(ch1(2:end-1));
+        catch
+            shuffle_lags(i,:) = nan(1, size(lags,2));
+            shuffle_cs(i,:) = nan(1,size(cs,2));
+        end
+    end
+    
+    
+        
     
     fig_sesh = figure();
     % session_xcor = session_xcor(:,(session_lags >= -4 & session_lags <= 4));
@@ -69,7 +114,11 @@ function neCrossCorr(data, ver)
     semshade(session_xcor, 0.3, 'k', 'k', session_lags, 1);
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel({'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
+    hold on
+    plot(session_lags, nanmean(shuffle_cs) + 3*nanstd(shuffle_cs)./sqrt(size(shuffle_cs,1)), 'g--')
+    keyboard
 
+    
     fig_animal = figure();
     % animal_xcor = animal_xcor(:,(animal_lags >= -4 & animal_lags <= 4));
     % animal_lags = animal_lags(animal_lags >= -4 & animal_lags <= 4);

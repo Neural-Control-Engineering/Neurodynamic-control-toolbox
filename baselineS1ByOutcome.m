@@ -1,10 +1,17 @@
-function [baselines_animal, baselines_session] = baselineS1ByOutcome(data, tbounds, alignTo, ver)
+function [baselines_animal, baselines_session, animal_tag] = baselineS1ByOutcome(data, tbounds, alignTo, ver)
     outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
 
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
     animal = {[], [], [], [], [], []};
     session = {[], [], [], [], [], []};
+
+    animal_tag = cell(length(sessions),1);
+    for i = 1:length(sessions)
+        session_id = sessions{i};
+        sesh_spl = strsplit(session_id, '-');
+        animal_tag{i} = sesh_spl{1};
+    end
 
     if ~exist('alignTo', 'var')
         alignTo = 'stimulus';

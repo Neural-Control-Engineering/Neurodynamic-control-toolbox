@@ -1,4 +1,4 @@
-function dPrimeByStimStrength_v2(data)
+function dp = dPrimeByStimStrength_v2(data)
     animals = fetchAnimals(data);
     
     fig_animal = figure();

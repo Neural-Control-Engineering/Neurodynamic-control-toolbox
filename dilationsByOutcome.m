@@ -38,6 +38,8 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
                 else
                     session{o} = [session{o}; pupil];
                 end
+            else
+                session{o} = [session{o}; nan(1,68)];
             end
         end
     end
@@ -57,8 +59,8 @@ function [dilations_animal, dilations_session] = dilationsByOutcome(data, tbound
     labels = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold'};
 
     for i = 1:length(dilations_session) 
-        avg(i) = mean(dilations_session{i});
-        err(i) = std(dilations_session{i}) / sqrt(length(dilations_session{i}));
+        avg(i) = nanmean(dilations_session{i});
+        err(i) = nanstd(dilations_session{i}) / sqrt(length(dilations_session{i}));
     end
     
     figure()

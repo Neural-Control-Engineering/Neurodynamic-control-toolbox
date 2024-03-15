@@ -45,6 +45,8 @@ function [animal, session] = baselineDilationCorrCoef(data, tbounds, alignTo)
                     dilations = evoked - baselines;
                     pcc = corrcoef(baselines, dilations);
                     session{o} = [session{o}; pcc(1,2)];
+                else
+                    session{o} = [session{o}; nan];
                 end
                 % else
                 %     keyboard
@@ -54,6 +56,8 @@ function [animal, session] = baselineDilationCorrCoef(data, tbounds, alignTo)
                 %     pcc = corrcoef(baselines, dilations);
                 %     session{o} = [session{o}; pcc];
                 % end
+            else
+                session{o} = [session{o}; nan];
             end
         end
     end

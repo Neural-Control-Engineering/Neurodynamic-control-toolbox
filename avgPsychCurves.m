@@ -1,4 +1,4 @@
-function avgPsychCurves(data)
+function mat = avgPsychCurves(data)
     animals = fetchAnimals(data);
     cols = {'b', 'r', 'g', 'm'};
     stim_strengths = unique(data.stimulus_strength);

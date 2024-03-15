@@ -1,4 +1,4 @@
-function dPrimeByPupilArea(data)
+function [x, ss, tcile] = dPrimeByPupilArea(data)
     % ptiles = 25:25:100;
     ptiles = [33, 66, 100];
     low = prctile(data.pupil_base_before_stimulus, 0);
@@ -61,10 +61,28 @@ function dPrimeByPupilArea(data)
         n = size(mat,1);
         semshade(mat, 0.3, cols(i,:), cols(i,:), stim_strengths(2:end) .* 10, 1, sprintf('%s (n=%i)', l, n));
         hold on
+        rppa{i} = mat;
     end
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('d''', 'FontSize', 14)
     
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline Pupil Area';
+
+    x = [];
+    ss = {};
+    tcile = {};
+    all_count = 1;
+    for k = 1:length(ptiles)
+        for i = 1:size(rppa{k},1)
+            for j = 1:size(rppa{k},2)
+                if ~isnan(rppa{k}(i,j))
+                    x = [x, rppa{k}(i,k)];
+                    ss{all_count} = num2str(stim_strengths(j+1));
+                    tcile{all_count} = num2str(k);
+                    all_count = all_count + 1;
+                end
+            end
+        end
+    end
 end
