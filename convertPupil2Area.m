@@ -66,7 +66,7 @@ if ~isempty(videos_to_convert)
             % Trim start/stop times
             analyzed_pupil_size = analyzed_pupil_size(analyzed_pupil_size(:,1) >  behavior_data.behavior_data.video_details.pupil(1)-1 & analyzed_pupil_size(:,1) <  behavior_data.behavior_data.video_details.pupil(2),:);
 
-            % Realign times to match behavior data
+            % Realign times to match behavior data3
             analyzed_pupil_size(:,1) = analyzed_pupil_size(:,1) - analyzed_pupil_size(1,1);
 
             analyzed_pupil_size(:,2) = filloutliers(analyzed_pupil_size(:,2),'linear',"movmedian",5);

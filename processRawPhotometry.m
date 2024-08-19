@@ -217,6 +217,20 @@ if ~isempty(photometry_to_load)
     processed_photometry_MWF0(:,1) = processed_photometry_MWF0(:,1) - params.drop_buffer_start;
     processed_photometry_MWF0(:,2) = zscore(processed_photometry_MWF0(:,2));
     processed_photometry_MWF0(:,3) = zscore(processed_photometry_MWF0(:,3));
+    
+    % Will save a 5hz low pass filtered version for each channel
+    Fs = round(photometry_fs);
+    t = processed_photometry_MWF0(:,1);
+    Fc = 5; % 5 Hz cutoff frequency
+    order = 4; % Choose the filter order
+    [b, a] = butter(order, Fc / (Fs/2), 'low');
+    
+    % Apply the zero-phase filtering using filtfilt
+    filtered_signal_2 = filtfilt(b, a, processed_photometry_MWF0(:,2));
+    filtered_signal_3 = filtfilt(b, a, processed_photometry_MWF0(:,3));    
+
+    processed_photometry_MWF0(:,5) = zscore(filtered_signal_2);
+    processed_photometry_MWF0(:,6) = zscore(filtered_signal_3);
     % For stability, "idx_start" and "idx_stop" are not reused but find
     % directly from target matrix's time column, though they are
     % supposed to stay same
