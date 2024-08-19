@@ -1,0 +1,127 @@
+Fig. 4C - Baseline S1 NE
+Repeated Measures ANOVA:
+                             SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                            _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):outcomes    0.58583     3     0.19528     1.7162    0.17269     0.1939     0.19049     0.20433 
+    animal:outcomes         0.19588     3    0.065292    0.57384    0.63432    0.55956     0.57459     0.45716 
+    Error(outcomes)          7.1682    63     0.11378                                                          
+
+Fig. 4D - Evoked Increase in NE 
+Repeated Measures ANOVA 
+                             SumSq     DF     MeanSq       F         pValue       pValueGG      pValueHF     pValueLB 
+                            _______    __    ________    ______    __________    __________    __________    _________
+
+    (Intercept):outcomes     2.9137     3     0.97123    10.021    1.7286e-05    0.00012515    5.5338e-05    0.0046615
+    animal:outcomes         0.41818     3     0.13939    1.4382       0.24007       0.24691       0.24436      0.24379
+    Error(outcomes)          6.1062    63    0.096923 
+
+Multiple comparison across outcomes:
+    outcomes_1    outcomes_2    Difference     StdErr       pValue        Lower       Upper  
+    __________    __________    __________    ________    __________    _________    ________
+
+        hit           miss          0.53815   0.071858    1.3281e-06    0.33786     0.73844
+        hit           cr           0.43986     0.10368     0.0019113      0.15085     0.72886
+        hit           fa            0.3239     0.12437      0.072512    -0.022756     0.67055
+        miss          hit          -0.53815    0.071858    1.3281e-06     -0.73844    -0.33786
+        miss          cr         -0.098296     0.076646       0.58362     -0.31193     0.11534
+        miss          fa          -0.21425      0.12125        0.3163     -0.55222     0.12372
+        cr            hit          -0.43986      0.10368     0.0019113     -0.72886    -0.15085
+        cr            miss          0.098296     0.076646       0.58362     -0.11534     0.31193
+        cr            fa          -0.11596      0.11665       0.75437     -0.44111     0.20919
+        fa            hit           -0.3239      0.12437      0.072512     -0.67055    0.022756
+        fa            miss           0.21425      0.12125        0.3163     -0.12372     0.55222
+        fa            cr           0.11596      0.11665       0.75437     -0.20919     0.44111
+
+Fig. 4E Reaction Time by Baseline NE 
+Repeated Measures ANOVA:
+                        SumSq      DF      MeanSq         F        pValue       pValueGG     pValueHF     pValueLB 
+                      _________    __    __________    _______    _________    __________    _________    _________
+
+(Intercept):level     0.010457     2     0.0052286      9.034    0.0002658    0.00030278    0.0002658    0.0043223
+animal:level         0.0024192     6     0.0004032    0.69664      0.65294        0.6496      0.65294      0.55898
+Error(level)           0.05209    90    0.00057877           
+
+Multiple Comparisons across Animals:
+    animal_1    animal_2    Difference     StdErr      pValue        Lower         Upper  
+    ________    ________    __________    ________    _________    __________    _________
+
+    {'240'}     {'241'}      0.064145     0.035949      0.29411     -0.031758      0.16005
+    {'240'}     {'242'}     -0.051352     0.029295      0.30917       -0.1295     0.026797
+    {'240'}     {'243'}     -0.062061     0.026818      0.10994       -0.1336    0.0094828
+    {'241'}     {'240'}     -0.064145     0.035949      0.29411      -0.16005     0.031758
+    {'241'}     {'242'}       -0.1155     0.038422     0.021655        -0.218    -0.012998
+    {'241'}     {'243'}      -0.12621     0.036569    0.0064926      -0.22376     -0.02865
+    {'242'}     {'240'}      0.051352     0.029295      0.30917     -0.026797       0.1295
+    {'242'}     {'241'}        0.1155     0.038422     0.021655      0.012998        0.218
+    {'242'}     {'243'}     -0.010708     0.030052      0.98429     -0.090878     0.069461
+    {'243'}     {'240'}      0.062061     0.026818      0.10994    -0.0094828       0.1336
+    {'243'}     {'241'}       0.12621     0.036569    0.0064926       0.02865      0.22376
+    {'243'}     {'242'}      0.010708     0.030052      0.98429     -0.069461     0.090878
+
+Multiple comparisons across levels:
+    level_1    level_2        Difference     StdErr       pValue        Lower         Upper   
+    _______    _______        __________    _________    _________    __________    __________
+
+       low          med       -0.0054165    0.0053104      0.56827     -0.018287     0.0074539
+       low          high        -0.021511    0.0055834    0.0010527     -0.035043     -0.007979
+       med          low        0.0054165    0.0053104      0.56827    -0.0074539      0.018287
+       med          high        -0.016094     0.004875    0.0052673      -0.02791    -0.0042792
+       high         low         0.021511    0.0055834    0.0010527      0.007979      0.035043
+       high         med         0.016094     0.004875    0.0052673     0.0042792       0.02791
+
+
+  
+-------------------------------------------------------------------------------------------------------------------------------
+                                        OLD
+-------------------------------------------------------------------------------------------------------------------------------
+
+Fig. 4C
+No significant difference across categorical outcomes (one-way anova, F=1.06, p=0.369)
+No significant difference for action vs. withheld (rank sum, p=0.696)
+
+Fig. 4D 
+Significant difference across outcomes (one-way anova, F=36.31, p=4.278e-18)
+Hit vs. Miss (multiple comparisons tukey's hsd, p=1.6543e-17)
+Hit vs. CR (multiple comparisons tukey's hsd, p=3.905e-19)
+Hit vs. FA (multiple comparisons tukey's hsd, p=0.0446)
+Miss vs. FA (multiple comparisons tukey's hsd, p=0.0001)
+CR vs. FA (multiple comparisons tukey's hsd, p=2.8430e-05)
+Action vs. withheld (rank sum, p=2.4685e-15)
+
+Fig. 4E 
+No significant difference in reaction time across baseline NE in S1 (one-way anova, F=0.95, p=0.388)
+
+Fig. 4F - 2-way anova for response probability against baseline NE in S1 and stimulus strength 
+  Source             Sum Sq.   d.f.   Mean Sq.     F      Prob>F
+----------------------------------------------------------------
+  ne                   0.569      2    0.2843      3.8    0.0226
+  stim_strength       98.361      6   16.3936    219.29   0     
+  ne:stim_strength     0.645     12    0.0538      0.72   0.7334
+  Error               73.71     986    0.0748                   
+  Total              173.257   1006                                                     
+
+Fig. 4I 
+No significant difference across categorical outcomes (one-way anova, F=1.46, p=0.2273)
+No significant difference for action vs. withheld (rank sum, p=0.7224)
+
+Fig. 4J
+Significant difference across outcomes (one-way anova, F=31.21, p=4.737e-16)
+Hit vs. Miss (multiple comparisons tukey's hsd, p=2.933e-17)
+Hit vs. CR (multiple comparisons tukey's hsd, p=8.815e-15)
+Hit vs. FA (multiple comparisons tukey's hsd, p=0.0172)
+Miss vs. FA (multiple comparisons tukey's hsd, p=0.0006)
+CR vs. FA (multiple comparisons tukey's hsd, p=0.0038)
+Action vs. withheld (rank sum, p=3.6315e-13)
+
+Fig. 4K
+No significant difference in reaction time across baseline NE in PFC (one-way anova, F=0.09, p=0.918)
+
+Fig. 4L 2-way anova for response probability against baseline NE in S1 and stimulus strength 
+  Source             Sum Sq.   d.f.   Mean Sq.     F      Prob>F
+----------------------------------------------------------------
+  ne                   0.66       2    0.33        4.27   0.0143
+  stim_strength       98.016      6   16.336     211.2    0     
+  ne:stim_strength     0.541     12    0.0451      0.58   0.8574
+  Error               76.653    991    0.0773                   
+  Total              175.847   1011                             

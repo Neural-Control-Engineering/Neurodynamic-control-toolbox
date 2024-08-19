@@ -1,0 +1,312 @@
+-------------------------------------------------------------------------------------------------------------------------------
+                                    Fig 7B - S1 NE Baseline 
+-------------------------------------------------------------------------------------------------------------------------------
+Hit:
+Repeated Measures ANOVA:
+
+                         SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                         _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.16223     3    0.054076    0.35892     0.7835     0.5864      0.5947     0.57522 
+    animal:states         0.19496     6    0.032493    0.21567    0.96592    0.82406     0.83201     0.81313 
+    Error(states)            2.26    15     0.15066                           
+
+-------------------------------------------------------------------------------------------------------------------------------
+Miss:
+Repeated Measures ANOVA:
+                           SumSq     DF    MeanSq       F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    _______    ______    _______    ________    ________    ________
+
+    (Intercept):states    0.57837     3    0.19279    1.2625    0.30322    0.30325     0.30383      0.2851 
+    animal:states           2.252     9    0.25023    1.6386    0.14485    0.17777     0.15658     0.23708 
+    Error(states)          5.0393    33    0.15271                                          
+
+-------------------------------------------------------------------------------------------------------------------------------
+Correct Rejection:
+Repeated Measures ANOVA:
+                           SumSq     DF    MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    _______    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.43804    3     0.14601    0.83497    0.50778    0.49097     0.50778     0.42822 
+    animal:states          1.2361    6     0.20601      1.178    0.39585    0.40314     0.39585     0.41919 
+    Error(states)          1.5739    9     0.17487                                                          
+
+-------------------------------------------------------------------------------------------------------------------------------
+False Alarm:
+One Way ANOVA:
+No significant difference (F=1.06, p=0.3819)
+
+-------------------------------------------------------------------------------------------------------------------------------
+All Outcomes:
+Repeated Measures ANOVA:
+                           SumSq     DF     MeanSq       F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    ________    ______    _______    ________    ________    ________
+
+    (Intercept):states    0.23655     3     0.07885    1.0032    0.40165    0.38375     0.39351     0.33482 
+    animal:states         0.19715     9    0.021905    0.2787    0.97678    0.94808     0.96495     0.83979 
+    Error(states)          3.0654    39    0.078599    
+
+-------------------------------------------------------------------------------------------------------------------------------
+                                    Fig 7C - S1 NE Evoked 
+-------------------------------------------------------------------------------------------------------------------------------
+Hit:
+Repeated Measures ANOVA:
+                           SumSq      DF     MeanSq         F        pValue     pValueGG    pValueHF    pValueLB
+                          ________    __    _________    ________    _______    ________    ________    ________
+
+    (Intercept):states    0.010438     3    0.0034794    0.030635    0.99248    0.89469     0.91218     0.86792 
+    animal:states          0.14395     6     0.023991     0.21123    0.96757    0.84101     0.85812     0.81645 
+    Error(states)           1.7036    15      0.11358                                                           
+
+-------------------------------------------------------------------------------------------------------------------------------
+Miss:
+Repeated Measures ANOVA:
+                           SumSq     DF     MeanSq       F         pValue      pValueGG     pValueHF     pValueLB
+                          _______    __    ________    ______    __________    _________    _________    ________
+
+    (Intercept):states    0.36243     3     0.12081    1.4224       0.25374      0.26144      0.25675     0.25809
+    animal:states          3.8009     9     0.42232    4.9725    0.00029681    0.0016777    0.0005407    0.020252
+    Error(states)          2.8028    33    0.084932                              
+
+Multiple Comparisons by state 
+    states_1    states_2    Difference     StdErr     pValue      Lower       Upper 
+    ________    ________    __________    ________    _______    ________    _______
+
+       0           1         -0.24327      0.11887     0.2296    -0.60102    0.11448
+       0           2        -0.012027      0.16267    0.99985    -0.50158    0.47753
+       0           3        -0.070779      0.17025    0.97462    -0.58314    0.44158
+       1           0          0.24327      0.11887     0.2296    -0.11448    0.60102
+       1           2          0.23124      0.11167    0.22166    -0.10484    0.56733
+       1           3          0.17249     0.094107    0.30963    -0.11073    0.45571
+       2           0         0.012027      0.16267    0.99985    -0.47753    0.50158
+       2           1         -0.23124      0.11167    0.22166    -0.56733    0.10484
+       2           3        -0.058752      0.12354    0.96294    -0.43057    0.31306
+       3           0         0.070779      0.17025    0.97462    -0.44158    0.58314
+       3           1         -0.17249     0.094107    0.30963    -0.45571    0.11073
+       3           2         0.058752      0.12354    0.96294    -0.31306    0.43057
+
+Multiple Comparisons by animal
+    animal_1    animal_2    Difference    StdErr     pValue      Lower       Upper 
+    ________    ________    __________    _______    _______    ________    _______
+
+    {'240'}     {'241'}      0.090223      0.2205    0.97574    -0.57337    0.75382
+    {'240'}     {'242'}       0.12758      0.1273     0.7514    -0.25555    0.51071
+    {'240'}     {'243'}       0.10519     0.13945      0.873    -0.31451    0.52489
+    {'241'}     {'240'}     -0.090223      0.2205    0.97574    -0.75382    0.57337
+    {'241'}     {'242'}      0.037359     0.21302    0.99796    -0.60374    0.67846
+    {'241'}     {'243'}      0.014966      0.2205    0.99988    -0.64863    0.67856
+    {'242'}     {'240'}      -0.12758      0.1273     0.7514    -0.51071    0.25555
+    {'242'}     {'241'}     -0.037359     0.21302    0.99796    -0.67846    0.60374
+    {'242'}     {'243'}     -0.022393      0.1273    0.99795    -0.40552    0.36073
+    {'243'}     {'240'}      -0.10519     0.13945      0.873    -0.52489    0.31451
+    {'243'}     {'241'}     -0.014966      0.2205    0.99988    -0.67856    0.64863
+    {'243'}     {'242'}      0.022393      0.1273    0.99795    -0.36073    0.40552
+
+-------------------------------------------------------------------------------------------------------------------------------
+Correct Rejection:
+Repeated Measures ANOVA:
+                           SumSq      DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          ________    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.049164    3     0.016388    0.14415    0.93085    0.79337     0.87467     0.72947 
+    animal:states            1.431    6       0.2385     2.0979    0.15277    0.24065     0.19539     0.26919 
+    Error(states)           1.0232    9      0.11368                                                          
+
+-------------------------------------------------------------------------------------------------------------------------------
+False Alarm:
+One Way ANOVA:
+No significant difference (F=2.58, p=0.0744).
+
+-------------------------------------------------------------------------------------------------------------------------------
+All Outcomes 
+Repeated measures ANOVA:
+                           SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.14318     3    0.047728    0.77695    0.51397    0.44789     0.46053     0.39408 
+    animal:states         0.40533     9    0.045037    0.73315    0.67618    0.60389      0.6171     0.55055 
+    Error(states)          2.3958    39     0.06143                                                          
+
+-------------------------------------------------------------------------------------------------------------------------------
+                                    Fig 7E - mPFC NE Baseline 
+-------------------------------------------------------------------------------------------------------------------------------
+Hit:
+Repeated Measures ANOVA:
+                           SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states     0.0581     3    0.019367    0.16405    0.91891    0.74887     0.78142      0.7022 
+    animal:states         0.28582     6    0.047637    0.40353    0.86529     0.7218     0.74626     0.68792 
+    Error(states)          1.7708    15     0.11805  
+
+-------------------------------------------------------------------------------------------------------------------------------
+Miss:
+Repeated Measures ANOVA:
+                           SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.14816     3    0.049387    0.24839    0.86189    0.78434     0.82583     0.62803 
+    animal:states         0.85531     9    0.095035    0.47796    0.87883    0.81901     0.85067     0.70407 
+    Error(states)          6.5615    33     0.19883    
+
+-------------------------------------------------------------------------------------------------------------------------------
+Correct Rejection:
+Repeated Measures ANOVA:
+                           SumSq     DF     MeanSq       F        pValue      pValueGG    pValueHF     pValueLB
+                          _______    __    ________    ______    _________    ________    _________    ________
+
+    (Intercept):states     0.5084    3      0.16947     5.532     0.019777    0.07425      0.041456     0.10012
+    animal:states          1.6511    6      0.27518    8.9828    0.0022111    0.02998     0.0095279    0.054128
+    Error(states)         0.27571    9     0.030634  
+
+Multiple Comparisons by state:
+    states_1    states_2    Difference     StdErr      pValue      Lower       Upper 
+    ________    ________    __________    ________    ________    ________    _______
+
+       0           1         -0.22571      0.14808     0.52156    -0.94029    0.48887
+       0           2         -0.06237      0.15163     0.97283    -0.79411    0.66937
+       0           3         -0.41518     0.060111    0.018715    -0.70525    -0.1251
+       1           0          0.22571      0.14808     0.52156    -0.48887    0.94029
+       1           2          0.16334     0.066474     0.24389    -0.15744    0.48412
+       1           3         -0.18947     0.095484     0.35832    -0.65024    0.27131
+       2           0          0.06237      0.15163     0.97283    -0.66937    0.79411
+       2           1         -0.16334     0.066474     0.24389    -0.48412    0.15744
+       2           3         -0.35281       0.1132     0.14747    -0.89908    0.19347
+       3           0          0.41518     0.060111    0.018715      0.1251    0.70525
+       3           1          0.18947     0.095484     0.35832    -0.27131    0.65024
+       3           2          0.35281       0.1132     0.14747    -0.19347    0.89908
+
+Multiple Comparisons by animal:
+    animal_1    animal_2    Difference     StdErr     pValue       Lower       Upper  
+    ________    ________    __________    ________    _______    _________    ________
+
+    {'241'}     {'242'}      0.011156     0.079377    0.98921     -0.32054     0.34285
+    {'241'}     {'243'}       0.20722     0.084192    0.17366     -0.14459     0.55904
+    {'242'}     {'241'}     -0.011156     0.079377    0.98921     -0.34285     0.32054
+    {'242'}     {'243'}       0.19607     0.062753     0.1026    -0.066158      0.4583
+    {'243'}     {'241'}      -0.20722     0.084192    0.17366     -0.55904     0.14459
+    {'243'}     {'242'}      -0.19607     0.062753     0.1026      -0.4583    0.066158
+
+-------------------------------------------------------------------------------------------------------------------------------
+False Alarm:
+One-Way ANOVA:
+No Significant differneces (F=1.59, p=0.2156)
+
+-------------------------------------------------------------------------------------------------------------------------------
+All Outcomes 
+Repeated measures ANOVA:
+                           SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.21618     3    0.072061     1.2581    0.30208    0.30003     0.30177     0.28231 
+    animal:states         0.50469     9    0.056076    0.97901    0.47215    0.45686     0.46194     0.43263 
+    Error(states)          2.2339    39    0.057279               
+
+-------------------------------------------------------------------------------------------------------------------------------
+                                    Fig 7E - mPFC NE Evoked 
+-------------------------------------------------------------------------------------------------------------------------------
+Hit:
+Repeated Measures ANOVA:
+                           SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.15298     3    0.050994    0.56465    0.64664    0.56604     0.62576     0.48623 
+    animal:states         0.29796     6    0.049661    0.54989    0.76281    0.68466     0.74259     0.60833 
+    Error(states)          1.3546    15     0.09031 
+
+-------------------------------------------------------------------------------------------------------------------------------
+Miss:
+Repeated Measures ANOVA:
+                           SumSq      DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          ________    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.076867     3    0.025622    0.25252    0.85896    0.78595     0.82862     0.62521 
+    animal:states          0.61026     9    0.067807    0.66828    0.73107    0.68044     0.70882     0.58892 
+    Error(states)           3.3483    33     0.10147      
+
+-------------------------------------------------------------------------------------------------------------------------------
+Correct Rejection:
+Repeated Measures ANOVA:
+                           SumSq     DF    MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    _______    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.31611    3     0.10537    0.97569     0.4461    0.43488      0.4461     0.39609 
+    animal:states         0.90705    6     0.15117     1.3998    0.31183     0.3313     0.31183     0.37203 
+    Error(states)         0.97195    9     0.10799     
+
+-------------------------------------------------------------------------------------------------------------------------------
+False Alarm:
+One Way ANOVA:
+No significant difference (F=0.86, p=0.4744).
+
+-------------------------------------------------------------------------------------------------------------------------------
+All Outcomes 
+Repeated measures ANOVA:
+                           SumSq     DF     MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
+                          _______    __    ________    _______    _______    ________    ________    ________
+
+    (Intercept):states    0.29986     3    0.099954     1.3518    0.27171     0.2762      0.2763     0.26586 
+    animal:states         0.55813     9    0.062014    0.83871    0.58551    0.54238     0.55363     0.49652 
+    Error(states)          2.8837    39     0.07394  
+    
+-------------------------------------------------------------------------------------------------------------------------------
+                                        OLD
+-------------------------------------------------------------------------------------------------------------------------------
+    
+Fig 7B - S1 NE Basline 
+Hit: 
+Significant difference in S1 baseline NE across states on hit trials (one-way anova, F=2.84, p=0.0366)
+S1 baseline NE in state 2 signifcantly differs from that in in state 3 (multiple comparisons, p=0.0250)
+
+Miss:
+No significant difference in S1 baseline NE across states on miss trials (one-way anova, F=1.81, p=0.1434)
+
+Correct rejection:
+No significant difference in S1 baseline NE across states on correct rejection trials (one-way anova, F=2.53, p=0.056)
+
+False alarm:
+No significant difference in S1 baseline NE across states on false alarm trials (one-way anova, F=0.29, p=0.8332)
+
+Fig. 7C - S1 Evoked NE
+Hit:
+No significant difference in S1 stimulus evoked increase in NE across states on hit trials (one-way anova, F=1.57, p=0.1939)
+
+Miss:
+Significant difference in S1 stimulus evoked increase in NE across states on miss trials (one-way anova, F=3.59; p=0.132)
+S1 stimulus evoked increase in NE in state 2 signifcantly differs from that in in state 3 (multiple comparisons, p=0.0069)
+
+Correct Rejection:
+Significant difference in S1 stimulus evoked increase in NE across states on correct rejection trials (one-way anova, F=5.65, p=0.0008)
+S1 stimulus evoked increase in NE in state 1 signifcantly differs from that in in state 3 (multiple comparisons, p=0.0149)
+S1 stimulus evoked increase in NE in state 2 signifcantly differs from that in in state 3 (multiple comparisons, p=0.0009)
+
+False Alarm:
+No significant difference in S1 stimulus evoked increase in NE across states on false alarm trials (one-way anova, F=1.64, p=0.1855)
+
+Fig 7E - mPFC Baseline NE 
+Hit:
+No significant difference in mPFC baseline NE across states on hit trials (one-way anova, F=2.22, p=0.0837)
+
+Miss:
+No significant difference in mPFC baseline NE across states on miss trials (one-way anova, F=0.43, p=0.7297)
+
+Correct rejection:
+No significant difference in mPFC baseline NE across states on correct rejection trials (one-way anova, F=0.98, p=0.3998)
+
+False Alarm:
+No significant difference in mPFC baseline NE across states on false alarm trials (one-way anova, F=0.41, p=0.7476)
+
+Fig 7F - mPFC Evoked NE increase 
+Hit:
+Significant difference in S1 stimulus evoked increase in NE across states on hit trials (one-way anova, F=4.76; p=0.0026)
+mPFC stimulus evoked increase in NE in state 1 significantly differs from that in state 2 (multiple comparisons, p=0.0109)
+mPFC stimulus evoked increase in NE in state 1 significantly differs from that in state 3 (multiple comparisons, p=0.0132)
+
+Miss:
+No significant difference in S1 stimulus evoked increase in NE across states on miss trials (one-way anova, F=0.57, p=0.6317)
+
+Correct Rejection:
+No significant difference in S1 stimulus evoked increase in NE across states on correct rejection trials (one-way anova, F=0.8, p=0.4933)
+
+False alarm:
+No significant difference in S1 stimulus evoked increase in NE across states on false alarm trials (one-way anova, F=1.96, p=0.1246)
