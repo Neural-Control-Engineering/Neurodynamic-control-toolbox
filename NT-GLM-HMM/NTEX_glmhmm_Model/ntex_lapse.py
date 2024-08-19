@@ -13,13 +13,13 @@ np.random.seed(65)
 if __name__ == '__main__':
 
     # input_ver = 'last_trial_behavior_no_bias'
-    input_ver = 'just_stim'
+    # input_ver = 'just_stim'
     # input_ver = 'spontaneous_pupil_stim'
     # input_ver = 'last_trial_behavior_drop_stim_no_bias'
     # input_ver = 'spontaneous_pupil_stim_v2'
-    # input_ver = 'spontaneous_s1_stim'
+    input_ver = 'spontaneous_mpfc_stim'
     # input_ver = 'random'
-    results_dir = '/home/genoma/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/v3/' + input_ver + '/'
+    results_dir = '/home/craig/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/v3/' + input_ver + '/'
 
     num_lapse_params = 2
     num_folds = 5    
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     best_model_each_animal = []
     for animal in animals:
 
-        loaded = loadmat('/home/genoma/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/v3/'+input_ver+'/'+str(animal)+'_' + input_ver + '.mat')
+        loaded = loadmat('/home/craig/Neurodynamic-control-toolbox/NT-GLM-HMM/data/lapse/v3/'+input_ver+'/'+str(animal)+'_' + input_ver + '.mat')
         inpt = loaded["preprocessed_input"]
         y = loaded["preprocessed_label"] 
         y = y.astype('int')     

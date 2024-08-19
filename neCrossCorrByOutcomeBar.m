@@ -61,7 +61,9 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOut
                     cs(i,:) = nan(1,size(cs,2));
                 end
             end
-            if size(cs,1) > 1
+            if isempty(cs)
+                session_xcor{o} = [session_xcor{o}; nan(1,size(cs,2))];
+            elseif size(cs,1) > 1
                 session_xcor{o} = [session_xcor{o}; nanmean(cs)];
             else
                 session_xcor{o} = [session_xcor{o}; cs];
@@ -69,7 +71,7 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = neCrossCorrByOut
         end
     end
     session_lags = lag ./ Fs;
-
+    keyboard
     animal_peaks = {[], [], [], [], [], [], [], []};
     animal_pl = animal_peaks;
     session_peaks = animal_peaks;
