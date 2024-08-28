@@ -67,7 +67,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, f
                 state_rp = [state_rp; rp];
             end
         end
-        lname = sprintf('State %i', s);
+        lname = sprintf('State %i', s-1);
         semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10, 1, lname);
         hold on
     end
