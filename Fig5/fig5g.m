@@ -5,7 +5,7 @@
 
 ssd_version = 'v3';
 kstates = [2, 3, 4, 5, 6];
-data_versions = {'spontaneous_pupil_stim_v2'}
+data_versions = {'spontaneous_pupil_stim_v2'};
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 animals = fetchAnimals(data);
@@ -57,9 +57,9 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
         err(i) = nanstd(reaction_times(:,i)) / sqrt(sum(~isnan(reaction_times(:,i))));
     end
     figure()
-    errorbar(0:3, avg, err, 'k.')
     hold on
-    bar(0:3, avg, 'FaceColor', 'k', 'EdgeColor', 'k')
+    bar(0:3, avg, 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', [0.5,0.5,0.5])
+    errorbar(0:3, avg, err, 'k.')
     xlim([-0.7,3.7])
     xticks([0:3])
     xlabel('State', 'FontSize', 16)

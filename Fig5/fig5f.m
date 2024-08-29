@@ -5,7 +5,7 @@
 
 ssd_version = 'v3';
 kstates = [2, 3, 4, 5, 6];
-data_versions = {'spontaneous_pupil_stim_v2'}
+data_versions = {'spontaneous_pupil_stim_v2'};
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 animals = fetchAnimals(data);
@@ -13,11 +13,18 @@ animals = fetchAnimals(data);
 data_ver = data_versions{1};
 k = 4;
 base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
+% plotTransitions(base_path, animal, data_ver, k, 0:4);
+titles = {'Prev. Trial Behavior + Stim. Strength', ...
+        'mPFC NE + Stim. Strength', ...
+        'S1 NE + Stim. Strength', ...
+        'Pupil Area + Stim. Strength'};
+% plotTransitionsAllInputs(animal, data_versions, ssd_version, k, 0:4, titles);
+% fig = plotTransitions(base_path, animal, data_ver, k, 0:4)
 psychver = 'byanimal';
-fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
+all_mat = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
 % lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
 
-function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
+function all_mat = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -38,29 +45,31 @@ function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals
         ordered_states(a,:) = inds - 1;
     end
 
-    fractions = zeros(length(animals), k);
-    for s = 1:k
-        for as = 1:size(ordered_states,1)
-            i = ordered_states(as,s);
-            filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
-            results = load(filename);
-            tmp = filterTrials(data, 'animal', num2str(animals(as)));
-            statetmp = tmp(results.predicted_states == i,:);
-            fractions(as,s) = size(statetmp,1) / size(tmp,1);
+    all_mat = zeros(k,k,length(animals));
+    for a = 1:length(animals)
+        tmp = filterTrials(data, 'animal', num2str(animals(a)));
+        mat = zeros(k,k,length(folds));
+        for f = folds
+            fname = sprintf('%s%i_%s_%istate_%ifold_params.mat', base_path, animals(a), data_ver, k, f);
+            params = load(fname);
+            states = params.params{2} + 10;
+            for i = 1:size(ordered_states,2)
+                states(states == (i-1)*10) == ordered_states(a,i);
+            end
+            % mat(:,:,f+1) = exp(reshape(params.params{2},[k,k]));
+            mat(:,:,f+1) = exp(reshape(states-10,[k,k]));
         end
+        
+        all_mat(:,:,a) = mean(mat, 3);
     end
-    avg = nanmean(fractions);
-    for i = 1:size(fractions,2)
-        err(i) = nanstd(fractions(:,i)) / 2; %sqrt(sum(~isnan(fractions(:,i))));
-    end
-    figure()
-    errorbar(0:3, avg, err, 'k.')
-    hold on
-    bar(0:3, avg, 'FaceColor', 'k', 'EdgeColor', 'k')
-    xlim([-0.7,3.7])
-    xticks([0:3])
-    xlabel('State', 'FontSize', 16)
-    ylabel('Trials per State (s)', 'FontSize', 16)
+    figure();
+    imagesc(0:k-1, 0:k-1, mean(all_mat,3))
+    xticks([0:4])
+    yticks([0:4])
+    ylabel('Current State', 'FontSize', 16)
+    xlabel('Next State', 'FontSize', 16)
+    cbar = colorbar();
+    ylabel(cbar, 'Transition Probability', 'FontSize', 16)
 end
 
 function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, folds)

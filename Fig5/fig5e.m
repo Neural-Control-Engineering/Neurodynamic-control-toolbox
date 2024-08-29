@@ -28,13 +28,13 @@ kstates = [2, 3, 4, 5, 6];
 %     'spontaneous_s1_stim', ...
 %     'spontaneous_pupil_stim'};
 % data = rmDiscrepantTrials(data);
-data_versions = {'spontaneous_pupil_stim_v2'}
+data_versions = {'spontaneous_pupil_stim_v2'};
 tls = {'Prev. Trial Behavior + Stim. Strength', 'mPFC NE + Stim. Strength', 'S1 NE + Stim. Strength', 'Pupil Area + Stim. Strength'};
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 animals = animals_v2;
 
-animal = 243;
+animal = 242;
 k = 4;
 probVsTrialAllVers(data_versions, animal, k, tls)
 

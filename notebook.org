@@ -1,0 +1,583 @@
+* [2023-8-2 Wed] - getting started 
+** installed conda, glm-hmm, etc 
+** papers from cody 
+*** “Mice Alternate between Discrete Strategies during Perceptual Decision-Making.”
+Zoe C. Ashwood, Nicholas A. Roy, Iris R. Stone, International Brain Laboratory, Anne E. Urai, Anne K. Churchland, Alexandre Pouget, and Jonathan W. Pillow. 2022.  Nature Neuroscience 25 (2): 201–12.
+**** combo of hidden markov model (corresponding to states like engaged) and generalized linear model (describing decision strategy / psychometric curve) 
+***** distinguished from regular glm or "lapse model" (bernouli states: engage or not)
+**** could be as many states as trials, but they found good performance w/ 3-5.  focus on three (engaged, bias left, bias right)
+**** evidence for discrete, rather than continuous states - glm-hmm outperforms continous model Psytrack
+**** glm-hmm - [[https://github.com/zashwood/ssm/blob/master/notebooks/2b%20Input%20Driven%20Observations%20(GLM-HMM).ipynb][explanation for using glm-hmm]]
+*** “An Optimized Acetylcholine Sensor for Monitoring in Vivo Cholinergic Activity.”
+Miao Jing, Yuexuan Li, Jianzhi Zeng, Pengcheng Huang, Miguel Skirzewski, Ornela Kljakic, Wanling Peng, et al. 2020.  Nature Methods 17 (11): 1139–46.
+**** Previously, cholinergic activity in vivo was mainly measured by electrophysiology recording of nicotinic
+receptor-mediated currents, by microdialysis followed with biochemical purification and identification, or, recently, by cell-based
+sensors such as CNiFERs that convert extracellular ACh dynamics to intracellular Ca2+ signaling for detection
+**** [ACh2.0] sensor converts the ACh-induced conformational change on M3R into a
+sensitive fluorescence response
+**** 3.0 > 2.0 
+
+* [2023-8-3 Thu] - getting into photometry data 
+** questions:
+*** pupil area already z-scored? - yes, as is photometry 
+*** meanings for categorical outcomes? - FA: false alarm, CR - correct rejection 
+*** do the photometry channels correspond to order of regions in file name? - no, check photomoetry_region_ch1
+** ffts 
+Fs = 1 / (NE_dstore.photometry_ch1{1,1}(2,1) - NE_dstore.photometry_ch1{1,1}(1,1));
+Y = fft(NE_dstore.photometry_ch1{1,1}(:,2)-mean(NE_dstore.photometry_ch1{1,1}(:,2)), n);
+f = Fs*(0:(n/2))/n;
+
+* [2023-8-4 Fri] - exploratory data analysis 
+** wrote a couple scripts for plotting FFTs 
+*** strong 10 Hz componenet during some sessions but not others 
+*** no obvious differences betweenn correct and incorrect trials in spectra 
+*** a number of sessions with elevate power < 15 Hz
+** wrote another couple for doing cross correlation between two NE photometry channels in
+S1 and mPFC 
+*** some have very nice correlation, others not so much
+*** ran into a non-integer (~95.5) sampling frequency 
+**** seems like round rather than cast to int works sometimes, need to add nans otherwise 
+
+* [2023-8-7 Mon] - more data analysis 
+** writing function for filtering the table based on different variables
+*** filterTrials.m - right now only does one filtering, could expand to cover more,
+but also can just call function multiple times 
+*** fetchAnimals.m - returns list of animals stored in the table 
+
+* [2023-8-8 Tue] - only differences so far in avg photometry data 
+** retooled fft functions 
+** added functions for computing the slope of the photometry data during last 0.5s 
+before stimulus 
+** set up cron job for syncing local analysis folder with google drive 
+
+* [2023-8-9 Wed] - filling out SSD_Analysis_Dashboard 
+** extra code leaving out for concision 
+%% Plot averaged photometry traces aligned to stimulus time with stim stength < 10 psi
+% just want animals with recordings from both mPFC and S1 
+data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% get all trials with stimulus strength < 10 PSI 
+data = filterTrials(data, 'stim_strength_less_than', 1.0);
+% get list of animals in filtered dataset 
+animals = fetchAnimals(data);
+% loop through animals, plot averaged trace for each
+t0 = -2; % begining of averaged epoch 
+t1 = 0; % end of average
+for i = 1:length(animals)
+    animal = num2str(animals(i));
+    avgTracesBy(data, 'animal', animal, 'outcome', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/stim_strengths_lt10/outcome/')); % separate averages by categorical outcome 
+    avgTracesBy(data, 'animal', animal, 'response', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/stim_strengths_lt10/response/')); % separate averages by response (go / no go)
+end
+
+%% Plot averaged photometry traces aligned to stimulus time with stim stength > 0 and < 10 psi
+% just want animals with recordings from both mPFC and S1 
+data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% get all trials with stimulus strength < 10 PSI 
+data = filterTrials(data, 'stim_strength_less_than', 1.0);
+data = filterTrials(data, 'stim_strength_greater_than', 0.0);
+% get list of animals in filtered dataset 
+animals = fetchAnimals(data);
+% loop through animals, plot averaged trace for each
+t0 = -2; % begining of averaged epoch 
+t1 = 0; % end of average
+for i = 1:length(animals)
+    animal = num2str(animals(i));
+    avgTracesBy(data, 'animal', animal, 'outcome', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/stim_strengths_lt10_gt0/outcome/')); % separate averages by categorical outcome 
+    avgTracesBy(data, 'animal', animal, 'response', t0, t1, fullfile(paths.repo_path,'Analysis/avgTraces/stim_strengths_lt10_gt0/response/')); % separate averages by response (go / no go)
+end
+
+* [2023-8-10 Thu] - generating npy files and using random forest classifier 
+** wrote function to store photometry, pupil area, outcome, and response from 
+Datastore to individual numpy files so can analyze in python later 
+** wrote a couple scripts to run random forest classifiers on either raw traces or 
+features 
+*** based off Gabe's code in branch GG-scratch 
+
+* [2023-8-11 Fri] - xcorr after stimulus 
+** interesting, nonuniform changes in xcorr between spontaneous 
+(before stimulus) and stim/response evoked (around response)
+
+* [2023-8-14 Mon] - returning to glmm hmm 
+** needed to make edits to example_code.py to get running 
+** what is difference/purpose of merge/parted?
+** cannot load arbitrary datastores
+** Questions for cody 
+*** where do preprocessed_Input_Output_example_merged.npz and preprocessed_Input_Output_example_parted.npz
+come from? 
+**** tried replacing *target* in convertMATtoDF.ipynb with file name for a single animal datastore/table 
+but no luck, suggested using h5py
+*** what is the difference between parted and merged?
+** per cody's suggestion, started with *Model_based_on_mat.ipynb* 
+*** So Model_based_on_mat.ipynb runs most of the way through if I edit the paths, but there is one undefined 
+variable Acc_HMM_load that shows up in the line Best_param = Param_HMM_5fold[Acc_HMM_5fold.index(max(Acc_HMM_load))].
+Should Acc_HMM_load really be Acc_HMM_5fold?
+Cody Slater
+Ah I can’t say off the top of my head but I think maybe that ended up getting defined later than it was initially used?
+I thought I had fixed that
+Craig Kelley
+doesn't show up elsewhere in the script, and that variable name is used in example_code.py, but seems unrelated
+
+* [2023-8-15 Tue] - more glm-gmm 
+** understanding preprocessed data 
+*** first trial ignored 
+*** first column: stimulus strength seems to be divided by 2.  why? needs to be scaled to 1?
+*** second column: previous response 
+*** third column: previous reward state 
+*** fourth column: all 1s for all sessions/trials, bias?
+** acc -> accuracy?
+
+* [2023-8-18 Fri] - glmhmm, avg traces, different phases 
+** replaced behavioaral data from prev trial with 
+NE data from prev trial in glmhmm, some improvement (>90%)
+** two directions for glmhmm 
+*** first (Qi): use behavioral data as original paper and look at differences in pupil, ne, etc in each state 
+*** second (Cody): use spontaneous physiological data prior to stimulus to create states 
+** averaging traces 
+*** looked at phase ii vs phase iii, some differences, need to check whether labels are right
+**** check out swapPhotometryChannels.m
+** big speedup using multiprocessing for glm-hmm 
+** TODOS 
+*** DONE: upgrade matlab on genoma 
+*** DONE: parallize glmhmm training/testing 
+*** DONE: figure out which trial is in which state 
+*** DONE: match hmm states to trials 
+
+* [2023-8-21 Mon] - more glm 
+** seems like glmhmm output labels/states align with original data structure 
+** spontaneous inputs 
+*** tried [pupil_onset, pupil_bfor_stim, ch1_onset, ch1_bfor_stim, ch2_onset, ch2_bfor_stim]
+**** 2 states: <acc>=0.775
+**** 3 states: <acc> = 0.80
+**** 4 states: <acc> = 0.84
+*** code for avg psycho curves: plot_psycho_curves_states.m 
+**** cody: I've find it's usually prudent to recover average curves per session and then average 
+the session curves to get the state specific curves. To at least see the comparison and make sure 
+it holds in a session dependent way
+
+* [2023-8-23 Wed] - v2 data 
+** glmhmm 
+*** 3 states: <acc>=0.82, separation of learning curves 
+
+* [2023-8-24 Thu] - a glm for each animal 
+** accuracy still approaching 90% when train separate model for each animal 
+** clear "disengaged" state when looking at psychometric curves associated with each state 
+** helping gabe run npxls analysis on genoma 
+** TODOS:
+*** TODO: clean up repo 
+*** DONE: plot physiology data associated with each HMM state
+
+* [2023-8-25 Fri] - todos 
+** TODOS
+*** DONE: compare states w/ and w/out physiology 
+**** DONE: physiology + prev trial behavior vs just behavior vs just phys 
+*** DONE: dropping out the stimulus strength 
+*** DONE: retrain on phys normalized to within animal bounds 
+*** TODO [eventually]: time series
+
+* [2023-8-28 Mon] - addressing todos 
+** compare states w/ and w/out physiology
+*** based on the avg phys traces, states do not line up when using prev 
+trial's behavior vs spontaneous phys 
+** dropping out the stimulus strength 
+*** ~65% accuracy for just previous trial behavior
+*** 58-82% accuracy for just spontaneous phys 
+** normalized to within-animal bounds - little to no difference in performance 
+
+* [2023-8-31 Thu] - more model versions, better characterization 
+** cody's plans "I have some more thoughts about where we could go:"
+*** DONE: Run a separate model using stimulus strength + previous response + pupil
+*** DONE: Run a separate model using stimulus strength + previous response + NE 
+(maybe two, one with mPFC NE and one with S1 NE)
+**** If the majority of the increase in accuracy is coming from one physiology data 
+over the other, we could consider not including the not useful data going forward
+*** DONE: Better compare the overlap in state assignment between each of the 
+7 versions of the model
+**** This is a challenge but could be of interest, from the original paper it is 
+assumed that the mice adopt a relatively stable decision making strategy as 
+identified by the behavioral data itself. We would thus expect that direct 
+brain-state recording would confirm such states - but it seems to not necessarily 
+be the case. Why is that? Of course the accuracy of the previous choice is going 
+to be hard to beat mathematically because it is so good at describing these 
+psychometric curves, but this approach is inherently biased by external factors 
+and not necessarily brain state
+**** Perhaps we can identify subsets of trials that the physiology data performs 
+better than than behavioral data (perhaps when behavior is unstable, ie many 
+varied responses in a short time period; or by exclusively looking at trials 
+when the mouse transitions to a response different from the previous)
+**** have something, if imperfect: *compareStates.m*
+**** DONE: work out plotting 
+*** Ideally for each model show:
+**** DONE: Elbow plot showing accuracy by number of states
+**** DONE: Transition matrix for each state
+***** transition matrices are being save to *training_cache/*
+***** need to save output someplace sensible 
+**** DONE: Weights assigned to each input for each state
+**** DONE: Session averaged photometry, stratified by outcome and stimulus strength
+**** DONE: Session average pupil, stratified by outcome and stimulus strength
+**** DONE: Session average psychometric curves, stratified by state
+**** TODO: Modify model to accept time series pupil and NE data and repeat for all 7 versions of the model
+
+* [2023-9-8 Fri] - fleshing out model results 
+** requests from cody and gabe 
+*** DONE: stability of states (probability over time i guess)
+*** DONE: just (pupil or mpfc or pupil) and stim strength 
+*** DONE: double check transition matrices 
+
+* [2023-9-9 Sat] - issue with alignments 
+** for models using last behavior, indices dont align with those of datastore 
+*** fixed.  needed to modify *psychCurveByStateAndAnimal.m* and *physByStateAndAnimal.m*
+*** DONE: fix *compareStates.m*
+** new script for saving datastores with state assignments for each trial / number of states 
+
+* [2023-9-11 Mon] - script for avg phys by outcome and stim strength 
+
+* [2023-9-18 Mon] - updated compare states script
+** now reflects different numbers of trials when using last trial's behavior versus
+physiology recordings from all trials
+
+* [2023-9-19 Tue] & [2023-9-21 Thu] - looking into using time series 
+** part of the issue will be that input data is saved as a cell array where 
+each element is a vector containing the input data.
+*** since time series will require three vectors, one of which has different sample 
+frequency than the other two, will need to go from vector to maybe cell array 
+**** flattening would mean each time point gets it's own weight, which isn't what we want 
+
+* [2023-9-24 Sun] - running model with dynamic state 
+** get ~95% right with full dynamic state of NE and pupil area 
+** issue with animal 243 
+*** a number of trials in which length of pupil recordin doesnt match length of photometry 
+recording 
+*** for now, just ignoring those trials 
+
+* [2023-9-25 Mon] - following up on dynamic state version 
+** ran 243 without the discrepant trials
+
+* [2023-10-2 Mon] - tried tensor component analysis 
+** no luck so far.  breaks on second fitting iteration, first ran ok but cant find any results 
+
+* [2023-10-10 Tue] - working toward paper 
+** ran model with mpfc+s1+stim 
+** we can use the model as a tool for decoding behaviorally relevant physiological states 
+*** in animal 241 and 242, with sufficiently many states, even NE+S1+stim matches performance of 
+pupil or prev. trial behavior 
+*** running for up to 9 states 
+** todos 
+*** DONE: for each animal, pick a number of states, and make nice physiology and psychometric 
+curve figures for each 
+
+* [2023-10-13 Fri] - preparing figures 
+** last two days started making figures for paper 
+*** HMM-GLM figs
+**** Model performance for each animal across number of states for different input combinations 
+**** Series of figs on specifics of single animal and comparison of two choices of N states 
+***** bar graph showing model performance with different input combos 
+***** summary figure of physiology and psychometric curves in each state for each input combo 
+***** bar graphs for magnitude of weights assigned to each input in each state 
+***** state probabilities/transitions for each input combo 
+*** characterizing behavior and dynamics 
+**** average psychometric curve for all animals 
+**** average physiology across animals by outcome aligned to stim 
+**** average physiology across animals by outcome alignd to response 
+**** average physiology across animals by stimulus strength aligned to stim 
+**** average physiology across animals by stimulus strength aligned to stim separated by outcome 
+**** average physiology across animals by stimulus strength aligned to response 
+**** average physiology across animals by stimulus strength aligned to response separated by outcome
+**** hit rate vs. false alarm rate 
+**** reaction time histogram 
+**** average physiology across aniamls by reaction time quintile aligned to stim 
+**** average physiology across aniamls by reaction time quintile aligned to response 
+*** TODOS 
+**** TODO: fix legend in "average physiology across animals by outcome alignd to response" and "to stimulus"
+**** DONE: plot hit vs. false alarm rates 
+**** TODO: "Weight" -> "|Weight|" in model weight bar graphs 
+**** DONE: add transition matrices for each model/input combo 
+**** DONE: fix legends for trials separated by stim strength 
+***** need 2 decimal places 
+**** DONE: increase window to +4s after stim for phys avgs 
+***** a lot of the interest is in baseline values, but could supplement with 
+****  DONE ask cody for:
+***** svgs of mouse cartoons describing fiber photometry recordings and behavioral task 
+***** DLC labelled pupil or something like Fig. 2A in Schriver et al 2020
+
+* [2023-10-17 Tue] - meeting w/ qi 
+** figure 1 
+*** add traces from NE and pupil
+*** raster plot and histogram for licks 
+** figure 2 - behavior/pupil
+*** add psychometric curves for each animal 
+*** move reaction times to fig 2
+*** plot reaction time vs stim strength 
+*** don't need hit rate vs false alarm 
+*** A-C schriver 2018
+*** mean pupil dilation 
+** figure 3 - mPFC and S1 NE 
+*** repeat figure 2 stuff for mpfc and s1 ne 
+*** aligned to stimulus 
+** TODOS 
+*** DONE: plot NE traces over whole session
+**** doesn't look like photo bleaching
+*** DONE: check if phys separated by response time quintile aligned to response is correct 
+**** miscommunication, 1st quantile for reaction time is shortest reaction time (fastest)
+so makes sense that animals with fastest reaction have ramp up in NE closest to reaction 
+*** DONE: add psychometric curves for each animal alongside avg psychometric curve 
+*** TODO: lapse model (different from 2 state model)
+*** TODO: avg performance given number of states for all animals 
+*** TODO: try just stimulus strength as model input
+*** TODO: try to get individual figs from cody's poster
+*** DONE: plot reaction time vs stim strength 
+** baseline pupil action vs nonaction reversed from brian's paper 
+
+* [2023-10-19 Thu] - figures 
+** figure 1 
+*** DONE: find example traces 
+**** for just hit trials: 2115, 2133, 2147
+**** all data: 900:910,
+*** DONE: lick raster and histogram 
+** figure 2  
+*** DONE: response histogram blue->black
+*** DONE: pupil area by stim strength - add legend with title 
+*** DONE: pupil area by stim strength - add xlabel 
+*** DONE: pupil area by stim strength - no acronyms
+*** DONE: pupil area by stim strength - indicate stim time 
+*** DONE: pupil area by outcome - add x-label and N
+*** DONE: pupil area by outcome - no acronyms 
+*** DONE: pupil area by outcome - indicate stim time  
+*** DONE: pupil by reaction time with legend with titles 
+** figure 3
+*** DONE: ne by outcome 
+*** DONE: ne by stim strength 
+*** DONE: ne by reaction time 
+*** DONE: evoked increase in NE by outcome 
+*** DONE: baseline NE by outcome 
+** questions 
+*** what are the window of opportunity and lockout window?
+
+* [2023-10-20 Fri] - more figures 
+** more or less done with panels for figs characterizing dynamics and methods 
+** DONE: consider plotting NE aligned to distractors 
+*** flat lines, pupil too 
+
+* [2023-10-23 Mon] - methods and dynamics figs, lapse model 
+** TODOS 
+*** DONE: fix y-label for figure 3B
+*** DONE: add licks to traces for fig 1
+*** DONE: look for better session for the lick histograms 
+**** so far, none look any better really 
+** figure 1 caption 
+Measuring dynamics of pupil and extracellular NE in S1 and mPFC during a sensory-detection
+decision making task. (A) Overview of recording GRABNE signals in cortex using optical fibers 
+during the decision making task.  (B) Examples of NE2h(?) expression in S1 (left) and mPFC (right).
+(C) Example image of pupil labeled using DLC for tracking pupil dyanmics. (D) Schematic overview 
+of sensory-detection decision making task. (E) Stimuli, behavioral responses (licks), cortical NE 
+traces, and pupilometry traces during a single trial. (F) Raster plots of licks during each trial of 
+a single session (top) and histograms of licks binned over all trials within a session (bottom) 
+for each categorical trial outcome. The red shaded region specifies a lockout period prior to stimulus, 
+during which licks result in a Miss, and the green shaded region specifies the window of opportunity, 
+during which licks in response to a stimulus must occur to register the trial as a Hit.
+** figure 2 caption 
+Characterization of behavior and pupil dynamics during a sensory-detection 
+decision making task. (A) Psychometric curves for each animal and average for 
+all animals (black dashed line). (B) Histogram of reaction times for all 
+trials. (C) Reaction time versus stimulus strength.  (D) Averaged pupil area aligned to stimulus 
+for each cateogrical trial outcome. (C) Average baseline pupil 
+areas for each categorical trial outcome and action performed by all animals.
+(D) Average pupil dilations for each categorical trial outcome and action performed 
+by the animal. (G) Averaged pupil area aligned to stimulus and separated by stimulus strength 
+averaged across all animals for each categorical trial outcome. (H) Averaged pupil area aligned 
+to first lick and separated by response time quintile for all Hit trials. (I) Averaged pupil area 
+aligned to distractor stimuli. Averages are across all animals unless noted otherwise.
+** figure 3 caption 
+Characterization of NE dynamics in S1 and mPFC during a sensory-detection 
+decision making task. (A) Averaged NE in mFPC (top row) and S1 (bottom row) for each 
+categorical trial outcome. (B) Average baseline NE in mPFC (left) and S1 (right) aligned to stimulus for each 
+categorical trial outcome and action performed by the animal. (C) Average stimulus evoked change 
+in NE in mPFC (left) and S1 (right) for each trial outcome and action performed by the animal.
+(D) Averaged NE in mPFC (top) and S1 (bottom) aligned to stimlus and separated by stimulus strength for each 
+categorical trial outcome. (E) Averaged NE in mPFC (left) and S1 (right) aligned to first lick and separated by 
+response time quintile for all Hit trials. (F) Averaged NE in mPFC (left) and S1 (right) aligned to distractor stimlui. 
+Averages are across all animals.
+** lapse model 
+*** can just feed in one session's worth of input data to lapse model and it runs 
+*** error when trying to use *calculate_predictie_acc_lapse_model*
+
+* [2023-10-24 Tue] - lapse model 
+** copied over training of lapse model from original repo and fed in 
+last_trial_behavior data from one animal and runs OK, makes plots, etc
+*** need to figure out if can recover accuracy 
+** edited a version of calculate_predictive_accuracy script to use with 
+our data
+*** runs ok, but seems to do just as well regardless of input
+**** for last_trial_behavior_no_bias 
+240
+0.7808435919023673
+241
+0.8831489455359423
+242
+0.8608899297423888
+243
+0.8192551968155684
+**** for spontaneous_pupil_stim 
+240
+0.788715953307393
+241
+0.8917112202218584
+242
+0.8567299409551635
+243
+0.8092436974789916
+**** tried with random data as input, get error because hessian is singular matrix
+
+* [2023-10-26 Thu] - running, but such high acc 
+** merged into main, shared with kunpeng 
+** was running fit on all data on all folds - fixed 
+** have a running version of the model, and even with breaking up the input data 
+for each fold, still get 79-88% accuracy 
+
+* [2023-10-27 Fri] - try to recover psych curves from lapse 
+** as is, lapse model does not assign states/predictions for each state 
+** LapseModel.py has method called *sample* which generates state assignments 
+and choice predictions for input trials 
+*** question is when to run.  each fold seems independent, but there's also 
+all of these initializations 
+** big variation in accuracy when using *sample* between initializations
+*** right now, the script prints the accuracy attained using *sample*
+for each animal averaged across folds/initializations 
+
+* [2023-10-30 Mon] - plotting psych curves and phys for lapse states 
+** lapse model does not produce clear "disengaged" state 
+** scripts for psych curves and phys by state 
+** TODO: set up version of *comparePhysAndPsych.m* for lapse model 
+*** may actually not be necessary since probably only looking at 3 states for 1 animal 
+** DONE: incorporate lapse in *plotGlmHmmAcc.m*
+** DONE: just previous trial behavior
+** DONE: check fold test vs validation percentage
+*** for each fold (1/5 of data), 80% train, 20% test, same as in ashwood
+
+* [2023-10-31 Tue] - characterize dynamics in different states 
+** bar graphs for NE and pupil dynamics for each outcome in each GLM-HMM state 
+*** DONE: baseline NE 
+*** DONE: increase in NE 
+*** DONE: baseline pupil 
+*** DONE: increase in pupil
+*** DONE: make them pretty
+**** DONE: add labels for each row 
+**** DONE: maybe do row corresoonds to modality rather than input type 
+**** hard to follow and would need smaller bars with 4 states
+
+* [2023-11-6 Mon] - more glm-hmm
+** ran lapse model for last trial behavior w/out stim 
+*** incorporated last trial behavior w/out stim in accuracy plot 
+** bar graphs for baseline and evoked in each state 
+
+* [2023-11-8 Wed] - xcorrs 
+** TODOS 
+*** DONE: PFC/S1 x pupil area 
+*** DONE: PFC x S1  
+
+* [2023-11-9 Thu] - more xcorr 
+** trying to normalize correlation by signal length - looks good 
+** may want to try something other than decimate()
+
+* [2023-11-10 Fri] - todos 
+** TODOS:
+*** DONE: dynamics bar graphs for each animal
+*** TODO: consider all dynamics from single animal + Nstates + input type 
+combo in single figure 
+
+* [2023-11-21 Tue] - cross correlation statistics 
+** comparing correlation at 0 second lag, all combos are significantly 
+different between correct and incorrect trials, not significant for 
+action vs. withhold trials.
+*** nothing is normal, ranksum, p < 0.05
+
+* [2023-11-30 Thu] - redo xcorr
+** need to use "Normalize" option for xcorr rather than normalize to signal length
+
+* [2023-12-11 Mon] - figures 
+** DONE: rescale reaction time hist to proportion of trials 
+** DONE: quantify xcorr by session 
+** DONE: xcorr panels for all trials
+** DONE: xcorr panels for action vs. withheld 
+
+* [2023-12-13 Wed] - more cross correlation 
+** DONE: NE x pupil derivative 
+** DONE: heatmap of sorted cross correlations 
+
+* [2024-1-2 Tue] - cross correlation stats 
+** standard cross correlation by session 
+*** significant diff hit v miss
+mPFC x S1 Peak Correlation Hit vs Miss: p=0.016660
+mPFC x S1 Peak Correlation Action vs Withheld: p=0.225563
+mPFC x S1 Lag of Peak Correlation Hit vs Miss: p=0.898069
+mPFC x S1 Lag of Peak Correlation Action vs Withheld: p=0.773680
+*** significant diff hit v miss
+pupil x mPFC Peak Correlation Hit vs Miss: p=0.008675
+pupil x mPFC Peak Correlation Action vs Withheld: p=0.253493
+pupil x mPFC Lag of Peak Correlation Hit vs Miss: p=0.769906
+pupil x mPFC Lag of Peak Correlation Action vs Withheld: p=0.407127
+*** trend toward diff hit v miss
+pupil x S1 Peak Correlation Hit vs Miss: p=0.050132
+pupil x S1 Peak Correlation Action vs Withheld: p=0.739642
+pupil x S1 Lag of Peak Correlation Hit vs Miss: p=0.133826
+pupil x S1 Lag of Peak Correlation Action vs Withheld: p=0.113656
+** pupil derivative cross correlation by session
+*** significant diff hit v miss and action vs. withheld 
+pupil x mPFC Peak Correlation Hit vs Miss: p=0.000001
+pupil x mPFC Peak Correlation Action vs Withheld: p=0.006031
+dPupil x mPFC Lag of Peak Correlation Hit vs Miss: p=0.452588
+dPupil x mPFC Lag of Peak Correlation Action vs Withheld: p=0.358238
+*** significant diff hit v miss and trend for action vs. withheld 
+dPupil x S1 Peak Correlation Hit vs Miss: p=0.000006
+dPupil x S1 Peak Correlation Action vs Withheld: p=0.063378
+dPupil x S1 Lag of Peak Correlation Hit vs Miss: p=0.615086
+dPupil x S1 Lag of Peak Correlation Action vs Withheld: p=0.938098
+** standard xcorr - all trials 
+*** mpfc x s1 action v withheld 
+**** significant diff in peak correlation
+mean mPFC x S1 Peak Correlation Action: 0.178
+mean mPFC x S1 Peak Correlation Withheld: 0.193
+mPFC x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.019523
+**** trend toward lower lag for action 
+mean mPFC x S1 Lag of Peak Correlation Action: -0.158
+mean mPFC x S1 Lag of Peak Correlation Withheld: -0.057
+mPFC x S1 Lag of Peak Correlation Action vs Withheld: Mann-Whitney p=0.054051
+*** mpfc x s1 hit v miss 
+**** significant diff in peak correlation 
+mean mPFC x S1 Peak Correlation Hit: 0.179
+mean mPFC x S1 Peak Correlation Miss: 0.207
+mPFC x S1 Peak Correlation Hit vs Miss: Mann-Whitney p=0.000002
+**** trend toward lower lag for hit 
+mean mPFC x S1 Lag of Peak Correlation Hit: -0.164
+mean mPFC x S1 Lag of Peak Correlation Miss: -0.055
+mPFC x S1 Lag of Peak Correlation Hit vs Miss: Mann-Whitney p=0.073591
+*** pupil x mpfc hit v miss
+**** significant diff in peak correlation
+mean pupil x mPFC Peak Correlation Hit: 0.096
+mean pupil x mPFC Peak Correlation Miss: 0.129
+pupil x mPFC Peak Correlation Hit vs Miss: Mann-Whitney p=0.009232
+*** pupil x s1 hit v miss 
+**** significant diff in peak correlation
+mean pupil x S1 Peak Correlation Hit: 0.113
+mean pupil x S1 Peak Correlation Miss: 0.132
+pupil x S1 Peak Correlation Hit vs Miss: Mann-Whitney p=0.036833
+** pupil derivative cross correlations - all trials 
+*** dPupil x mpfc action v withheld 
+**** significant diff in peak correlation 
+mean dPupil x mPFC Peak Correlation Action: 0.129
+mean dPupil x mPFC Peak Correlation Withheld: 0.139
+dPupil x mPFC Peak Correlation Action vs Withheld: Mann-Whitney p=0.006832
+*** dPupil x s1 action v Withheld
+**** significant diff in peak correlation 
+mean dPupil x S1 Peak Correlation Action: 0.132
+mean dPupil x S1 Peak Correlation Withheld: 0.139
+dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
+
+* [2024-1-5 Fri] - working w/ qi on results 
+** TODOS 
+*** DONE: one-way anova on reaction times 
+*** DONE: new example lick rasters/histograms 
+*** DONE: all phys per state figs for 3 and 4 hmm states 
+
+* [2024-8-28 Wed] - prepping code for paper 
+** scripts named after figures 
+** trim fat 
+** adding data and notebook 

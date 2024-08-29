@@ -14,10 +14,10 @@ data_ver = data_versions{1};
 k = 4;
 base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
 psychver = 'byanimal';
-lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
-stim_strengths = unique(data.stimulus_strength);
+fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
+% lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
 
-function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
+function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -38,42 +38,29 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, f
         ordered_states(a,:) = inds - 1;
     end
 
-    reaction_times = zeros(length(animals), k);
-    cols = distinguishable_colors(k);
+    fractions = zeros(length(animals), k);
     for s = 1:k
-        state_rp = [];
         for as = 1:size(ordered_states,1)
             i = ordered_states(as,s);
             filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
             results = load(filename);
-            stim_strengths = unique(data.stimulus_strength);
-            rp = nan(1,length(stim_strengths)-1);
             tmp = filterTrials(data, 'animal', num2str(animals(as)));
             statetmp = tmp(results.predicted_states == i,:);
-            if ~isempty(statetmp)
-                if strcmp(psychver, 'byanimal')
-                    tmp_strengths = unique(statetmp.stimulus_strength);
-                    for ss = 1:length(tmp_strengths)
-                        sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
-                        if tmp_strengths(ss)
-                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
-                        else
-                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
-                        end
-                        ind = find(stim_strengths == tmp_strengths(ss));
-                        rp(ind) = size(rtmp,1) / size(sstmp,1);
-                    end
-                end
-                state_rp = [state_rp; rp];
-            end
+            fractions(as,s) = size(statetmp,1) / size(tmp,1);
         end
-        lname = sprintf('State %i', s-1);
-        semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10, 1, lname);
-        hold on
     end
-    xlabel('Stimulus Strenght (PSI)', 'FontSize', 16)
-    ylabel('Response Probability', 'FontSize', 16)
-    legend()
+    avg = nanmean(fractions);
+    for i = 1:size(fractions,2)
+        err(i) = nanstd(fractions(:,i)) / 2; %sqrt(sum(~isnan(fractions(:,i))));
+    end
+    figure()
+    hold on
+    bar(0:3, avg, 'FaceColor', [0.5, 0.5, 0.5], 'EdgeColor', [0.5, 0.5, 0.5])
+    errorbar(0:3, avg, err, 'k.')
+    xlim([-0.7,3.7])
+    xticks([0:3])
+    xlabel('State', 'FontSize', 16)
+    ylabel('Trials per State (s)', 'FontSize', 16)
 end
 
 function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, folds)
