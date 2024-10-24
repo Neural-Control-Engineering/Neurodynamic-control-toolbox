@@ -17,5 +17,6 @@ fig5c
 fig5d
 fig5e
 fig5f
+fig5f_individualAnimals
 fig5g
 fig5h
