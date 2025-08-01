@@ -7,6 +7,8 @@ Repeated Measures ANOVA:
     animal:outcomes         0.19588     3    0.065292    0.57384    0.63432    0.55956     0.57459     0.45716 
     Error(outcomes)          7.1682    63     0.11378                                                          
 
+Responded vs Withhold - Wilcoxon signed-rank: p = 0.8540
+
 Fig. 4D - Evoked Increase in NE 
 Repeated Measures ANOVA 
                              SumSq     DF     MeanSq       F         pValue       pValueGG      pValueHF     pValueLB 

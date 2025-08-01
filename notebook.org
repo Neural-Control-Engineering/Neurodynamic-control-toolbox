@@ -581,3 +581,7 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 ** scripts named after figures 
 ** trim fat 
 ** adding data and notebook 
+
+* [2025-8-1 Fri] - back at it 
+** fleshing out stats 
+** fig 8 - ne mpfc x s1 cross correlation 

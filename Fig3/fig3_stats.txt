@@ -44,7 +44,7 @@ Multiple comparisons by animal:
     {'243'}     {'242'}       -0.10627     0.04633     0.13477     -0.23654         0.024
 
 Action vs. Withheld:
-Rank sum / Mann-Whitney: p=0.3130
+Wilcoxon Signed Rank: p=0.0044
 
 Correct vs. Incorrect :
-Rank sum / Mann-Whitney: p=0.5133
+Wilcoxon Signed Rank: p=0.1652

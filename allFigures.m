@@ -18,7 +18,8 @@ fig2f(data, tbounds, alignTo);
 fig2g(data, tbounds, alignTo);
 fig2h(data, tbounds, alignTo);
 fig2i(data);
-fig2jk(data);
+fig2j(data);
+fig2k(data);
 
 % figure 3
 fig3b(data, 'z-score');

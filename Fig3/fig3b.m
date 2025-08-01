@@ -62,13 +62,49 @@ function fig3b(data, ver)
         end
     end
     session_lags = lag ./ Fs;
+
+    shuff_xcor = [];
+    for ii = 1:100
+        s = randi(length(sessions));
+        tmp = filterTrials(data, 'session_id', num2str(sessions(s)));
+        [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus', ver);
+        Fs = getFs(data, 'photometry_ch1');
+        Fs = Fs(1);
+        cs = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
+        lags = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            x = randi([round(length(ch1)*0.25), round(length(ch1)*0.75)]);
+            ch1 = [ch1(x:end), ch1(1:x-1)];
+            % x = randi(length(ch2));
+            % ch2 = [ch2(x:end), ch2(1:x-1)];
+            % mpfc x s1 
+            [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+            try
+                lags(i,:) = lag ./ Fs;
+                cs(i,:) = c; % ./ length(ch1(2:end-1));
+            catch
+                lags(i,:) = nan(1, size(lags,2));
+                cs(i,:) = nan(1,size(cs,2));
+            end
+        end
+        if size(cs,1) > 1
+            shuff_xcor = [shuff_xcor; nanmean(cs)];
+        else
+            shuff_xcor = [shuff_xcor; cs];
+        end
+    end
     
     fig_sesh = figure();
     % session_xcor = session_xcor(:,(session_lags >= -4 & session_lags <= 4));
     % session_lags = session_lags(session_lags >= -4 & session_lags <= 4);
     semshade(session_xcor, 0.3, 'k', 'k', session_lags, 1);
+    hold on 
+    semshade(shuff_xcor, 0.3, 'r', 'r', session_lags, 1);
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel({'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
+    
 
     % fig_animal = figure();
     % % animal_xcor = animal_xcor(:,(animal_lags >= -4 & animal_lags <= 4));

@@ -101,4 +101,5 @@ function [x, ss, tcile] = fig2jk(data)
     ylabel('Response Probability', 'FontSize', 14)
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline Pupil Area';
+
 end

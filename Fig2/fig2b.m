@@ -91,4 +91,15 @@ function fig2b(data, tbounds, alignTo)
     % leg.Title.String = 'Stimulus Strength';
     % saveas(fig, 'Analysis/paper_figures/figure2/pupilByStimStrength.fig')
     % leg.Title.FontSize = 12;
+
+    mat = zeros(length(pupil_session), 49);
+    for i = 1:length(pupil_session)
+        for j = 1:size(pupil_session{i},1)
+            dilate = max(pupil_session{i}(j,6:end));
+            baseline = mean(pupil_session{i}(j,1:5));
+            mat(i,j) = dilate - baseline;
+        end
+    end
+
+    p = anova1(mat')
 end

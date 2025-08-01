@@ -1,4 +1,14 @@
 -------------------------------------------------------------------------------------------------------------------------------
+Panel B - Pupil Dilation vs. Stim strength
+One way ANOVA:
+
+Source      SS      df      MS        F       Prob>F   
+-------------------------------------------------------
+Columns   17.202      6   2.867     24.18   8.66837e-24
+Error     39.8345   336   0.11856                      
+Total     57.0365   342                                
+
+-------------------------------------------------------------------------------------------------------------------------------
 Panel E - Pupil Dilation vs. Baseline Pupil Area:
 Linear regression model:
     y ~ 1 + x1
@@ -108,6 +118,12 @@ Multiple comparisons by animal
     {'243'}     {'241'}      -0.21569     0.13717    0.41688    -0.60138       0.17
     {'243'}     {'242'}     -0.031187     0.12459     0.9943    -0.38151    0.31913
 
+Hit: -0.236 +/- 0.0230
+Miss: 0.155 +/- 0.0568
+CR: -0.142 +/- 0.0442
+FA: -0.427 +/- 0.1167
+Responded: -0.241 +/- 0.0224
+Withhold: 0.063 +/- 0.0407
 -------------------------------------------------------------------------------------------------------------------------------
 Panel H - Pupil dilations by outcome
 Action vs. withheld: Mann-Whitney Rank Sum: p=8.6214e-14
@@ -154,8 +170,15 @@ Multiple comparisons by animal
     {'243'}     {'241'}      -0.13353      0.10257     0.57296     -0.42195     0.15489
     {'243'}     {'242'}     -0.067617     0.093168     0.88558     -0.32959     0.19436
 
+Hit: 0.479 +/- 0.0406
+Miss: 0.0137 +/- 0.0331
+CR: -0.0326 +/- 0.0248
+FA: 0.3539 +/- 0.0724
+Responded: 0.4750 +/- 0.0403
+Withhold: 0.0062 +/- 0.0238
+
 -------------------------------------------------------------------------------------------------------------------------------
-Panel H - Reaction time by baseline pupil area 
+Panel I - Reaction time by baseline pupil area 
 Repeate measures ANOVA 
                              SumSq      DF      MeanSq        F       pValue     pValueGG    pValueHF    pValueLB
                            _________    __    __________    ______    _______    ________    ________    ________
@@ -165,7 +188,7 @@ Repeate measures ANOVA
     Error(tercile)          0.080617    90    0.00089575 
 
 -------------------------------------------------------------------------------------------------------------------------------
-Panel H - Response probability by baseline pupil area 
+Panel J - Response probability by baseline pupil area 
 Two way ANOVA 
     Source                 Sum sq.   d.f   Mean s1.    F      p
    --------                -------   ---   -------    ---    --- 
@@ -176,9 +199,10 @@ Two way ANOVA
   Total                   88.6297   983                            
 
 -------------------------------------------------------------------------------------------------------------------------------
-Panel I - Response probability by baseline pupil area 
+Panel K - Response probability by baseline pupil area 
   stim strength             0         5     0           0        1   
   tercile                 138.064     2    69.0322    125.06     1.9884e-48   
   stim strength:tercile     0        10     0           0        1   
   Error                   476.912   864     0.552                    
   Total                   614.976   881                              
+

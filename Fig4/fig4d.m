@@ -74,7 +74,7 @@ function [dilations_animal, dilations_session] = fig4d(data, tbounds, alignTo, v
         avg(i) = mean(dilations_animal{i});
         err(i) = std(dilations_animal{i}) / sqrt(length(dilations_animal{i}));
     end
-    
+    keyboard     
     % figure()
     % hold on
     % errorbar(x, avg, err, 'k.');

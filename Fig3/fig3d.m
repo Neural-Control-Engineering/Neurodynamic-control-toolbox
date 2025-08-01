@@ -118,7 +118,6 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
     xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold', 'Correct', 'Incorrect'})
     xtickangle(45)
     ylabel('Peak Cross Correlation')
-
     % fig_animal = figure();
     % errorbar([1:4, 6:7, 9:10], animal_avg, animal_err, 'k.')
     % hold on
