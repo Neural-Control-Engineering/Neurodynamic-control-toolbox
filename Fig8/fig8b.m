@@ -96,13 +96,115 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
             end
         end
     end
+    keyboard 
     figure(); hold on;
+    lags = linspace(tbounds(1), tbounds(1)*-1, size(session_xcor{s},2));
+    ind = find(lags == 0);
+    corrs = {};
     for s = 1:k 
-        semshade(session_xcor{s} - nanmean(shuff), 0.3, cols(s,:), cols(s,:), lags(1,:), 1);
+        mat = session_xcor{s} - nanmean(shuff);
+        mat = mat(:,ind);
+        plot(zeros(1,length(mat))+(s-1)+(rand(size(mat))-0.5)*0.3, mat, 'o', 'MarkerEdgeColor', [1,1,1], 'MarkerFaceColor', cols(s,:), 'MarkerSize', 5)
+        corrs{s} = mat;
     end
-    xlabel('Lag (s)', 'FontSize', 16)
-    ylabel('Shuffle Corrected Cross Correlation')
+    errorbar(0:(k-1), cellfun(@mean, corrs), cellfun(@ste, corrs), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    xlabel('HMM State', 'FontSize', 16)
+    ylabel({'Shuffle Corrected Cross Correlation', 'at 0s Lag'})
+    ylim([-0.2, 0.7])
+    yticks([-0.2, 0.7])
+    xticks(0:(k-1))
 end
+            % if ~isempty(statetmp)
+            %     for o = 1:length(outcomes)
+            %         otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
+            %         if ~isempty(otmp)
+            %             [mpfc, s1, ~] = avg_photo_traces(otmp, tbounds, 'stimulus','z-score');
+            %             keyboard 
+            %             Fs = getFs(data, 'photometry_ch1');
+            %             Fs = Fs(1);
+            %             cs = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
+            %             lags = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
+            %             for i = 1:size(mpfc,1)
+            %                 ch1 = mpfc(i,:);
+            %                 ch2 = s1(i,:);
+            %                 % mpfc x s1 
+            %                 [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1));%, 'normalized');
+            %                 try
+            %                     lags(i,:) = lag ./ Fs;
+            %                     cs(i,:) = c; % ./ length(ch1(2:end-1));
+            %                 catch
+            %                     lags(i,:) = nan(1, size(lags,2));
+            %                     cs(i,:) = nan(1,size(cs,2));
+            %                 end
+            %             end
+            %             if size(cs,1) > 1
+            %                 session_xcor{o} = [session_xcor{o}; nanmean(cs)];
+            %             else
+            %                 session_xcor{o} = [session_xcor{o}; cs];
+            %             end
+            %         end
+            %     end
+            % end
+        % end
+    %     for i = 1:length(session_xcor)
+    %         axes(axs(i))
+    %         semshade(session_xcor{i}, 0.3, cols(s,:), cols(s,:), lags(1,:), 1)
+    %     end
+    % end
+    % ylabel(tl, {'NE_{mPFC} x NE_{S1}', 'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
+    % xlabel(tl, 'Lag (s)', 'FontSize', 16)
+    % outcomes{3} = 'Correct Rejection';
+    % outcomes{4} = 'False Alarm';
+    % for i = 1:length(outcomes)
+    %     axes(axs(i))
+    %     title(outcomes{i}, 'FontSize', 16, 'FontWeight', 'normal')
+    % end
+    % unifyYLimits(fig)
+    
+    % for o = 1:length(outcomes)
+    %     axes(axs(o))
+    %     hold on
+    %     avg = zeros(1,length(size(pupil{o},1)));
+    %     err = zeros(1,length(size(pupil{o},1)));
+    %     for c = 1:length(ps{o})
+    %         avg(c) = nanmean(ps{o}{c});
+    %         err(c) = nanstd(ps{o}{c}) / sqrt(sum(~isnan(ps{o}{c})));
+    %     end
+    %     errorbar([0:3], avg, err, 'k.')
+    %     hold on
+    %     bar([0:3], avg, 'EdgeColor', 'k', 'FaceColor', 'k')
+    %     xticks([0:3])
+    %     title(ttls{o})
+    % end
+    % xlabel(tl, 'States', 'FontSize', 16)
+    % ylabel(tl, '\Delta NE_{S1} (z-score)', 'FontSize', 16)
+    % subplot(1,4,1)
+    % xlabel('Stimulus Strength (PSI)')
+    % ylabel('Response Probability')
+    % subplot(1,4,2)
+    % xlim(tbounds)
+    % ylabel('NE_{mPFC} (z-score)')
+    % subplot(1,4,3)
+    % xlim(tbounds)
+    % xlabel('Time (s)')
+    % ylabel('NE_{S1} (z-score)')
+    % subplot(1,4,4)
+    % xlim(tbounds)
+    % ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
+    % for o = 1:length(outcomes)
+    %     axes(axs(o))
+    %     title(ttls{o}, 'FontSize', 16)
+    %     ylim([-1,2])
+    % end
+    
+    % ylabel(tl,'Pupil Area (z-score)', 'FontSize', 16)
+    % % ylim([-0.3,0.4])
+    % xlabel(tl, 'Time (s)', 'FontSize', 16)
+    % axes(axs(1))
+    % legend()
+    % leg = legend()
+    % title(leg, 'HMM State', 'FontSize', 16)
+% end
 
 function data = removeFirstTrials(data)
     sessions = unique(data.session_id);

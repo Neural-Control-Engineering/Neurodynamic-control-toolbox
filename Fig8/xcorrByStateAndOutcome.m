@@ -44,14 +44,16 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
 
     % average psychometric curves for each animal in each ordered state (starting with lowest)
     % figure('Position', [ 1151, 1516, 1830, 404])
-    
     tbounds = [-4,0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     Fs = getFs(data, 'photometry_ch1');
     Fs = Fs(1);
     % pupil = {zeros(a,k), zeros(a,k), zeros(a,k), zeros(a,k)};
     ps = {};
-    session_xcor = {[], [], [], []};
+    session_xcor = {{[], [], [], []}, ...
+        {[], [], [], []}, ...
+        {[], [], [], []}, ...
+        {[], [], [], []}};
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
@@ -65,43 +67,52 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
             statetmp = tmp(results.predicted_states == i,:);
             sessions = unique(statetmp.session_id);
             for ss = 1:length(sessions)
-                tmp = filterTrials(statetmp, 'session_id', num2str(sessions(ss)));
-                [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus', ver);
-                Fs = getFs(data, 'photometry_ch1');
-                Fs = Fs(1);
-                cs = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
-                lags = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
-                for i = 1:size(mpfc,1)
-                    ch1 = mpfc(i,:);
-                    ch2 = s1(i,:);
-                    % mpfc x s1 
-                    [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
-                    try
-                        lags(i,:) = lag ./ Fs;
-                        cs(i,:) = c; % ./ length(ch1(2:end-1));
-                    catch
-                        lags(i,:) = nan(1, size(lags,2));
-                        cs(i,:) = nan(1,size(cs,2));
+                for o = 1:length(outcomes)
+                    otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
+                    tmp = filterTrials(otmp, 'session_id', num2str(sessions(ss)));
+                    [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus', ver);
+                    Fs = getFs(data, 'photometry_ch1');
+                    Fs = Fs(1);
+                    cs = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
+                    lags = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
+                    for i = 1:size(mpfc,1)
+                        ch1 = mpfc(i,:);
+                        ch2 = s1(i,:);
+                        % mpfc x s1 
+                        [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+                        try
+                            lags(i,:) = lag ./ Fs;
+                            cs(i,:) = c; % ./ length(ch1(2:end-1));
+                        catch
+                            lags(i,:) = nan(1, size(lags,2));
+                            cs(i,:) = nan(1,size(cs,2));
+                        end
                     end
-                end
-                if size(cs,1) > 1
-                    try
-                        session_xcor{s} = [session_xcor{s}; nanmean(cs)];
-                    catch
-                        keyboard 
+                    if size(cs,1) > 1
+                        try
+                            session_xcor{s}{o} = [session_xcor{s}{o}; nanmean(cs)];
+                        catch
+                            keyboard 
+                        end
+                    else
+                        session_xcor{s}{o} = [session_xcor{s}{o}; cs];
                     end
-                else
-                    session_xcor{s} = [session_xcor{s}; cs];
                 end
             end
         end
     end
-    figure(); hold on;
-    for s = 1:k 
-        semshade(session_xcor{s} - nanmean(shuff), 0.3, cols(s,:), cols(s,:), lags(1,:), 1);
+    fig = figure('Position', [ 1220, 1418, 1707, 420]);
+    tl = tiledlayout(1,4);
+    for o = 1:length(outcomes)
+        nexttile;
+        hold on 
+        for s = 1:k 
+            semshade(session_xcor{s}{o} - nanmean(shuff), 0.3, cols(s,:), cols(s,:), linspace(-4,4,size(session_xcor{s}{o},2)), 1);
+        end
+        title(outcomes{o})
     end
-    xlabel('Lag (s)', 'FontSize', 16)
-    ylabel('Shuffle Corrected Cross Correlation')
+    xlabel(tl, 'Lag (s)', 'FontSize', 16)
+    ylabel(tl, 'Shuffle Corrected Cross Correlation')
 end
 
 function data = removeFirstTrials(data)

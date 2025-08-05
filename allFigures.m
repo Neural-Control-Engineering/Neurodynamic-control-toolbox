@@ -22,7 +22,7 @@ fig2j(data);
 fig2k(data);
 
 % figure 3
-fig3b(data, 'z-score');
+shuff_xcor = fig3b(data, 'z-score');
 fig3c(data, 'z-score');
 fig3d(data, 'z-score', 'atzero');
 

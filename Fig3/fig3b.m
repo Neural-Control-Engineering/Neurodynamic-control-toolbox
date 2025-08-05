@@ -1,11 +1,11 @@
-function fig3b(data, ver)
+function shuff_xcor = fig3b(data, ver)
 
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
     
     animal_xcor = [];
     session_xcor = [];
-    tbounds = [-2,0];
+    tbounds = [-4,0];
 
     for a = 1:length(animals)
         tmp = filterTrials(data, 'animal', num2str(animals(a)));
@@ -64,7 +64,7 @@ function fig3b(data, ver)
     session_lags = lag ./ Fs;
 
     shuff_xcor = [];
-    for ii = 1:100
+    for ii = 1:1000
         s = randi(length(sessions));
         tmp = filterTrials(data, 'session_id', num2str(sessions(s)));
         [mpfc, s1, t] = avg_photo_traces(tmp, tbounds, 'stimulus', ver);
@@ -99,9 +99,12 @@ function fig3b(data, ver)
     fig_sesh = figure();
     % session_xcor = session_xcor(:,(session_lags >= -4 & session_lags <= 4));
     % session_lags = session_lags(session_lags >= -4 & session_lags <= 4);
+    for r = 1:size(session_xcor,1)
+        session_xcor(r,:) = session_xcor(r,:) - mean(shuff_xcor);
+    end
     semshade(session_xcor, 0.3, 'k', 'k', session_lags, 1);
-    hold on 
-    semshade(shuff_xcor, 0.3, 'r', 'r', session_lags, 1);
+    % hold on 
+    % semshade(shuff_xcor, 0.3, 'r', 'r', session_lags, 1);
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel({'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
     

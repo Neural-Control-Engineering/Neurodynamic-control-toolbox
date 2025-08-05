@@ -591,3 +591,34 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 *** TODO: Fig 2F responded vs withhold with signed rank 
 *** TODO: Fig 2G responded vs withhold with signed rank 
 *** TODO: check in about test for shuffled cross correlations 
+
+* [2025-8-5 Tue] - back to figs 
+** TODOS:
+*** TODO: shuffle corrected cross correlations 
+**** DONE: Fig3/fig3b.m 
+**** TODO: Fig3/fig3c.m 
+**** TODO: Fig3/fig3d.m 
+**** DONE: Fig8/fig8a.m 
+*** TODO: comparisons at 0s xcorr by state 
+*** TODO: xcorr ne x pupil 
+*** TODO: dots instead of bar graphs
+**** TODO: Fig2/fig2f.m 
+**** TODO: Fig2/fig2g.m 
+**** TODO: Fig2/fig2h.m 
+**** TODO: Fig2/fig2i.m 
+**** TODO: Fig3/fig3d.m 
+**** TODO: Fig4/fig4c.m
+**** TODO: Fig4/fig4d.m
+**** TODO: Fig4/fig4e.m
+**** TODO: Fig4/fig4i.m
+**** TODO: Fig4/fig4j.m
+**** TODO: Fig4/fig4k.m
+**** TODO: Fig5/fig5d.m
+**** TODO: Fig5/fig5g.m
+**** TODO: Fig5/fig5h.m
+**** TODO: Fig6/fig6b.m
+**** TODO: Fig6/fig6c.m
+**** TODO: Fig7/fig7b.m
+**** TODO: Fig7/fig7c.m
+**** TODO: Fig7/fig7e.m
+**** TODO: Fig7/fig7f.m
