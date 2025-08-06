@@ -1,11 +1,11 @@
-function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3c(data, ver)
+function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3c(data, ver, shuff)
 
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
     
     animal_xcor = {[], [], [], [], [], [], [], []};
     session_xcor = {[], [], [], [], [], [], [], []};
-    tbounds = [-2,0];
+    tbounds = [-4,0];
 
     outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}, {'Hit', 'CR'}, {'Miss', 'FA'}};
 
@@ -73,16 +73,25 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3c(data, ver)
     
     fig_sesh = figure();
     tl_sesh = tiledlayout(2,2);
+    outcomes{3} = 'Correct Rejection';
+    outcomes{4} = 'False Alarm';
     for o = 1:4
         axs_sesh(o) = nexttile;
-        semshade(session_xcor{o}, 0.3, 'k', 'k', session_lags, 1);
+        mat = session_xcor{o};
+        for r = 1:size(mat,1)
+            mat(r,:) = mat(r,:) - nanmean(shuff);
+        end
+        semshade(mat, 0.3, 'k', 'k', session_lags, 1);
         hold on
-        plot([0,0],[0,0.4],'k:')
-        title(outcomes{o}, 'FontSize', 16)
-        ylim([0,0.32])
+        % plot([0,0],[0,0.4],'k:')
+        title(outcomes{o}, 'FontSize', 16, 'FontWeight', 'normal')
+        % ylim([0,0.32])
+        xlim([-4,4])
     end
+    unifyYLimits(fig_sesh)
     xlabel(tl_sesh, 'Lag (s)', 'FontSize', 16)
-    ylabel(tl_sesh, {'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
+    ylabel(tl_sesh, {'NE_{mPFC} x NE_{S1}', 'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
+    keyboard 
 
     % fig_animal = figure();
     % tl_animal = tiledlayout(1,length(outcomes));

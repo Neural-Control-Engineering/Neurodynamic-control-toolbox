@@ -596,8 +596,8 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 ** TODOS:
 *** TODO: shuffle corrected cross correlations 
 **** DONE: Fig3/fig3b.m 
-**** TODO: Fig3/fig3c.m 
-**** TODO: Fig3/fig3d.m 
+**** DONE: Fig3/fig3c.m 
+**** DONE: Fig3/fig3d.m 
 **** DONE: Fig8/fig8a.m 
 *** TODO: comparisons at 0s xcorr by state 
 *** TODO: xcorr ne x pupil 

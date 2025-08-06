@@ -1,10 +1,10 @@
-function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver, peak_ver)
+function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver, peak_ver, shuff)
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
     
     animal_xcor = {[], [], [], [], [], [], [], []};
     session_xcor = {[], [], [], [], [], [], [], []};
-    tbounds = [-2,0];
+    tbounds = [-4,0];
 
     outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}, {'Hit', 'CR'}, {'Miss', 'FA'}};
 
@@ -77,21 +77,21 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
 
     for o = 1:length(outcomes)
         for r = 1:size(animal_xcor{o},1)
-            [peak, ind] = max(animal_xcor{o}(r,:));
+            [peak, ind] = max(animal_xcor{o}(r,:)-nanmean(shuff));
             % animal_peaks{o} = [animal_peaks{o}; peak];
             n = floor(length(animal_xcor{o}(r,:))/2);
             if strcmp(peak_ver, 'atzero')
-                animal_peaks{o} = [animal_peaks{o}; animal_xcor{o}(r,n)];
+                animal_peaks{o} = [animal_peaks{o}; animal_xcor{o}(r,n)-nanmean(shuff(:,n))];
             else
                 animal_peaks{o} = [animal_peaks{o}; peak];
             end
             animal_pl{o} = [animal_pl{o}; animal_lags(ind)];
         end
         for r = 1:size(session_xcor{o},1)
-            [peak, ind] = max(session_xcor{o}(r,:));
+            [peak, ind] = max(session_xcor{o}(r,:)-nanmean(shuff));
             n = floor(length(session_xcor{o}(r,:))/2);
             if strcmp(peak_ver, 'atzero')
-                session_peaks{o} = [session_peaks{o}; session_xcor{o}(r,n)];
+                session_peaks{o} = [session_peaks{o}; session_xcor{o}(r,n)-nanmean(shuff(:,n))];
             else
                 session_peaks{o} = [session_peaks{o}; peak];
             end
@@ -99,25 +99,21 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
         end
     end
 
-    session_avg = zeros(length(session_peaks), 1);
-    session_err = zeros(length(session_peaks), 1);
-    animal_avg = zeros(length(animal_peaks), 1);
-    animal_err = zeros(length(animal_peaks), 1);
-    for i = 1:length(session_peaks)
-        session_avg(i) = mean(session_peaks{i});
-        session_err(i) = std(session_peaks{i}) / sqrt(length(session_peaks{i}));
-        animal_avg(i) = mean(animal_peaks{i});
-        animal_err(i) = std(animal_peaks{i}) / sqrt(length(animal_peaks{i}));
-    end
-
     fig_session = figure();
-    errorbar([1:4, 6:7, 9:10], session_avg, session_err, 'k.')
-    hold on
-    bar([1:4, 6:7, 9:10], session_avg, 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', [0.5,0.5,0.5])
-    xticks([1:4, 6:7, 9:10])
+    hold on 
+    x = [1:4, 6:7, 9:10];
+    for i = 1:length(session_peaks)
+        plot(zeros(1,length(session_peaks{i}))+x(i)+(rand([1,length(session_peaks{i})])-0.5)*0.3, session_peaks{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
+    end
+    errorbar(x, cellfun(@mean, session_peaks), cellfun(@ste, session_peaks), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    xticks(x)
     xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold', 'Correct', 'Incorrect'})
     xtickangle(45)
-    ylabel('Peak Cross Correlation')
+    if strcmp(peak_ver, 'atzero')
+        ylabel('Cross Correlation at 0s Lag', 'FontSize', 16)
+    else
+        ylabel('Peak Correlation at 0s Lag', 'FontSize', 16)
+    end
     % fig_animal = figure();
     % errorbar([1:4, 6:7, 9:10], animal_avg, animal_err, 'k.')
     % hold on
@@ -126,6 +122,5 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
     % xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold', 'Correct', 'Incorrect'})
     % xtickangle(45)
     % ylabel('Peak Cross Correlation')
-
 
 end

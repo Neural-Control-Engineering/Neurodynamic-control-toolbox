@@ -66,12 +66,15 @@ function [animal, session] = fig2f(data, tbounds, alignTo)
     end
 
     x = [1:4, 6:7];
-    l = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withheld'};
+    l = {'Hit', 'Miss', 'CR', 'FA', 'Responded', 'Withheld'};
 
     fig_sesh = figure();
-    errorbar(x, sesh_avg, sesh_err, 'k.')
-    hold on
-    bar(x, sesh_avg, 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', [0.5,0.5,0.5])
+    hold on 
+    for i = 1:length(x)
+        plot(zeros(1,length(session{i}))+x(i)+(rand([1,length(session{i})])-0.5)*-0.3, ...
+            session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
+    end
+    errorbar(x, cellfun(@mean, session), cellfun(@ste, session), 'k.', 'CapSize', 15, 'LineWidth', 2)
     xticks(x)
     xticklabels(l)
     xtickangle(45)

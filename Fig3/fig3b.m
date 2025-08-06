@@ -106,7 +106,7 @@ function shuff_xcor = fig3b(data, ver)
     % hold on 
     % semshade(shuff_xcor, 0.3, 'r', 'r', session_lags, 1);
     xlabel('Lag (s)', 'FontSize', 16)
-    ylabel({'NE_{mPFC} x NE_{S1}', 'Normalized Cross Correlation'}, 'FontSize', 16)
+    ylabel({'NE_{mPFC} x NE_{S1}', 'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
     
 
     % fig_animal = figure();

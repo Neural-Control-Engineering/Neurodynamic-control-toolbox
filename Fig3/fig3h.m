@@ -1,4 +1,4 @@
-function shuff_xcor = fig3e(data, ver)
+function shuff_xcor = fig3h(data, ver)
 
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
@@ -17,7 +17,7 @@ function shuff_xcor = fig3e(data, ver)
             cs = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
             lags = zeros(size(tmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
             for i = 1:size(mpfc,1)
-                ch1 = mpfc(i,:);
+                ch1 = s1(i,:);
                 y = bandpassFilter(ch1, 0.1, 10, Fs);
                 ch1 = downsample(y, round(Fs/10));
                 ch2 = pupil(i,:);
@@ -50,7 +50,7 @@ function shuff_xcor = fig3e(data, ver)
             cs = zeros(size(tmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
             lags = zeros(size(tmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
             for i = 1:size(pupil,1)
-                ch1 = mpfc(i,:);
+                ch1 = s1(i,:);
                 y = bandpassFilter(ch1, 0.1, 10, Fs);
                 ch1 = downsample(y, round(Fs/10));
                 ch2 = pupil(i,:);
@@ -85,7 +85,7 @@ function shuff_xcor = fig3e(data, ver)
             cs = zeros(size(tmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
             lags = zeros(size(tmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
             for i = 1:size(pupil,1)
-                ch1 = mpfc(i,:);
+                ch1 = s1(i,:);
                 y = bandpassFilter(ch1, 0.1, 10, Fs);
                 ch1 = downsample(y, round(Fs/10));
                 ch2 = pupil(i,:);
@@ -121,7 +121,7 @@ function shuff_xcor = fig3e(data, ver)
     % hold on 
     % semshade(shuff_xcor, 0.3, 'r', 'r', session_lags, 1);
     xlabel('Lag (s)', 'FontSize', 16)
-    ylabel({'NE_{mPFC} x Pupil Area', 'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
+    ylabel({'NE_{S1} x Pupil Area', 'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
 
     % fig_animal = figure();
     % % animal_xcor = animal_xcor(:,(animal_lags >= -4 & animal_lags <= 4));

@@ -23,8 +23,14 @@ fig2k(data);
 
 % figure 3
 shuff_xcor = fig3b(data, 'z-score');
-fig3c(data, 'z-score');
-fig3d(data, 'z-score', 'atzero');
+fig3c(data, 'z-score', shuff_xcor);
+fig3d(data, 'z-score', 'atzero', shuff_xcor);
+shuff_ppfc = fig3e(data, 'z-score');
+fig3f(data, 'z-score', shuff_ppfc);
+fig3g(data, 'z-score', 'peak', shuff_ppfc);
+shuff_ps1 = fig3h(data, 'z-score');
+fig3i(data, 'z-score', shuff_ps1);
+fig3j(data, 'z-score', 'peak', shuff_ps1);
 
 % figure 4
 %% s1
