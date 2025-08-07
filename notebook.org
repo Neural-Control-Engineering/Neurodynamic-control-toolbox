@@ -594,31 +594,58 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 
 * [2025-8-5 Tue] - back to figs 
 ** TODOS:
-*** TODO: shuffle corrected cross correlations 
+*** DONE: shuffle corrected cross correlations 
 **** DONE: Fig3/fig3b.m 
 **** DONE: Fig3/fig3c.m 
 **** DONE: Fig3/fig3d.m 
 **** DONE: Fig8/fig8a.m 
 *** TODO: comparisons at 0s xcorr by state 
-*** TODO: xcorr ne x pupil 
-*** TODO: dots instead of bar graphs
+*** DONE: xcorr ne x pupil 
+*** DONE: dots instead of bar graphs
+**** DONE: Fig2/fig2f.m 
+**** DONE: Fig2/fig2g.m 
+**** DONE: Fig2/fig2h.m 
+**** DONE: Fig2/fig2i.m 
+**** DONE: Fig3/fig3d.m 
+**** DONE: Fig4/fig4c.m
+**** DONE: Fig4/fig4d.m
+**** DONE: Fig4/fig4e.m
+**** DONE: Fig4/fig4i.m
+**** DONE: Fig4/fig4j.m
+**** DONE: Fig4/fig4k.m
+**** DONE: Fig5/fig5d.m
+**** DONE: Fig5/fig5g.m
+**** DONE: Fig5/fig5h.m
+**** DONE: Fig6/fig6b.m
+**** DONE: Fig6/fig6c.m
+**** DONE: Fig7/fig7b.m
+**** DONE: Fig7/fig7c.m
+**** DONE: Fig7/fig7e.m
+**** DONE: Fig7/fig7f.m
+*** TODO: anova, signed rank / t-test into relevant figures 
+**** DONE: Fig2/fig2f.m 
+**** DONE: Fig2/fig2g.m 
+**** DONE: Fig2/fig2h.m 
+**** DONE: Fig2/fig2i.m 
+**** DONE: Fig3/fig3d.m 
+**** DONE: Fig4/fig4c.m
+**** DONE: Fig4/fig4d.m
+**** DONE: Fig4/fig4i.m
+**** DONE: Fig4/fig4e.m
+**** DONE: Fig4/fig4j.m
+**** DONE: Fig4/fig4k.m
+**** DONE: Fig5/fig5d.m
+**** DONE: Fig5/fig5g.m
+**** DONE: Fig5/fig5h.m
+**** TODO: Fig6/fig6b.m - unequal n 
+**** TODO: Fig6/fig6c.m - unequal n 
+**** TODO: Fig7/fig7b.m - unequal n 
+**** TODO: Fig7/fig7c.m - unequal n 
+**** TODO: Fig7/fig7e.m - unequal n 
+**** TODO: Fig7/fig7f.m - unequal n 
+*** DONE: turn HMM-GLM figs into functions 
+*** TODO: stats to fix 
 **** TODO: Fig2/fig2f.m 
 **** TODO: Fig2/fig2g.m 
 **** TODO: Fig2/fig2h.m 
 **** TODO: Fig2/fig2i.m 
-**** TODO: Fig3/fig3d.m 
-**** TODO: Fig4/fig4c.m
-**** TODO: Fig4/fig4d.m
-**** TODO: Fig4/fig4e.m
-**** TODO: Fig4/fig4i.m
-**** TODO: Fig4/fig4j.m
-**** TODO: Fig4/fig4k.m
-**** TODO: Fig5/fig5d.m
-**** TODO: Fig5/fig5g.m
-**** TODO: Fig5/fig5h.m
-**** TODO: Fig6/fig6b.m
-**** TODO: Fig6/fig6c.m
-**** TODO: Fig7/fig7b.m
-**** TODO: Fig7/fig7c.m
-**** TODO: Fig7/fig7e.m
-**** TODO: Fig7/fig7f.m

@@ -1,28 +1,6 @@
-% script for plotting physiology data based on states identified by glm-hmm
-% Craig Kelley, NEC Lab, 8/25/23
-
-% data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
-data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
-data(cellfun(@isempty, data.photometry_ch1),:) = [];
-animals = fetchAnimals(data);
-ssd_version = 'v3';
-kstates = [2, 3, 4, 5, 6];
-% boilerplate
-k = 4;
-data_versions = {'last_trial_behavior_no_bias', ... 
-    'last_trial_behavior_drop_stim_no_bias', ...
-    'spontaneous_pupil_stim_v2', ...
-     };
-psychver = 'byanimal';
-
-% lumpByResponseProb(data_versions{1}, ssd_version, psychver, animals, data, k)
-lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k)
-% lumpByResponseProb_plotByOutcome(data_versions{end}, ssd_version, psychver, animals, data, k)
-% lumpByResponseProbSlope(data_versions{1}, ssd_version, psychver, animals, data, k)
-% lumpByResponseProbSlope(data_versions{end}, ssd_version, psychver, animals, data, k)
-% lumpByPupilBaseline(data_versions{1}, ssd_version, psychver, animals, data, k)
-% lumpByPupilBaseline(data_versions{end}, ssd_version, psychver, animals, data, k)
-
+function fig7d(data, k, data_ver, ssd_version, psychver, animals)
+    lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k);
+end
 
 function lumpByPupilBaseline(data_ver, ssd_version, psychver, animals, data, k)
     % set paths 

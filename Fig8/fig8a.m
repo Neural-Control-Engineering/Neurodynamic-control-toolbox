@@ -1,21 +1,7 @@
-% script for plotting physiology data based on states identified by glm-hmm
-% Craig Kelley, NEC Lab, 8/25/23
-
-% data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
-data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
-data(cellfun(@isempty, data.photometry_ch1),:) = [];
-animals = fetchAnimals(data);
-ssd_version = 'v3';
-kstates = [2, 3, 4, 5, 6];
-% boilerplate
-k = 4;
-data_versions = {'last_trial_behavior_no_bias', ... 
-    'last_trial_behavior_drop_stim_no_bias', ...
-    'spontaneous_pupil_stim_v2', ...
-     };
-psychver = 'byanimal';
-
-ps = lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k, shuff_xcor);
+function fig8a(data, k, data_ver, ssd_version, psychver, animals, shuff)
+    ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, shuff);
+    % fprintf('Pupil baseline by outcome / state:\n')
+end
 
 function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, shuff)
     % set paths 

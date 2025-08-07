@@ -38,6 +38,8 @@ function [baselines_animal, baselines_session] = fig4c(data, tbounds, alignTo, v
                 else
                     session{o} = [session{o}; s1];
                 end
+            else
+                session{o} = [session{o}; nan(1,size(session{o},2))];
             end
         end
     end
@@ -57,14 +59,27 @@ function [baselines_animal, baselines_session] = fig4c(data, tbounds, alignTo, v
         err(i) = std(baselines_session{i}) / sqrt(length(baselines_session{i}));
     end
     
-    figure()
-    hold on
-    errorbar(x, avg, err, 'k.');
-    bar(x, avg, 'EdgeColor', [0.5,0.5,0.5], 'FaceColor', [0.5,0.5,0.5])
+    fig_sesh = figure();
+    hold on 
+    for i = 1:length(x)
+        plot(zeros(1,length(baselines_session{i}))+x(i)+(rand([1,length(baselines_session{i})])-0.5)*-0.3, ...
+            baselines_session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
+    end
+    errorbar(x, cellfun(@nanmean, baselines_session), cellfun(@ste, baselines_session), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    lims = ylim;
+    plot([5,5], lims, 'k--')
+    yticks([lims(1), 0, lims(2)])
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
     ylabel('Baseline NE_{S1} (z-score)')
+
+    mat = [baselines_session{1}, baselines_session{2}, baselines_session{4}, baselines_session{4}];
+    p = anova1(mat);
+    fprintf('S1 NE baseline:\n')
+    fprintf(sprintf('Outcome anova: p = %d\n', p))
+    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
+    % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{7}, baselines_session{8})))
 
     % for i = 1:length(baselines_animal) 
     %     avg(i) = mean(baselines_animal{i});

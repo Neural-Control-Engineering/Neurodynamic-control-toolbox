@@ -1,28 +1,8 @@
-% script for plotting physiology data based on states identified by glm-hmm
-% Craig Kelley, NEC Lab, 8/25/23
-
-% data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
-data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
-data(cellfun(@isempty, data.photometry_ch1),:) = [];
-animals = fetchAnimals(data);
-ssd_version = 'v3';
-kstates = [2, 3, 4, 5, 6];
-% boilerplate
-k = 4;
-data_versions = {'last_trial_behavior_no_bias', ... 
-    'last_trial_behavior_drop_stim_no_bias', ...
-    'spontaneous_pupil_stim_v2', ...
-     };
-psychver = 'byanimal';
-
-% lumpByResponseProb(data_versions{1}, ssd_version, psychver, animals, data, k)
-ps = lumpByResponseProb(data_versions{end}, ssd_version, psychver, animals, data, k);
-% lumpByResponseProb_plotByOutcome(data_versions{end}, ssd_version, psychver, animals, data, k)
-% lumpByResponseProbSlope(data_versions{1}, ssd_version, psychver, animals, data, k)
-% lumpByResponseProbSlope(data_versions{end}, ssd_version, psychver, animals, data, k)
-% lumpByPupilBaseline(data_versions{1}, ssd_version, psychver, animals, data, k)
-% lumpByPupilBaseline(data_versions{end}, ssd_version, psychver, animals, data, k)
-
+function fig6b(data, k, data_ver, ssd_version, psychver, animals)
+    ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k);
+    % fprintf('Pupil baseline by outcome / state:\n')
+    
+end
 
 function lumpByPupilBaseline(data_ver, ssd_version, psychver, animals, data, k)
     % set paths 
@@ -231,11 +211,7 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
 
     % average psychometric curves for each animal in each ordered state (starting with lowest)
     % figure('Position', [ 1151, 1516, 1830, 404])
-    figure('Position', [ 1220, 1418, 1707, 420])
-    tl = tiledlayout(1,4);
-    for i = 1:4
-        axs(i) = nexttile;
-    end
+    
     tbounds = [-0.5,6.0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     % pupil = {zeros(a,k), zeros(a,k), zeros(a,k), zeros(a,k)};
@@ -288,67 +264,29 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
     end
 
     ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
-    for o = 1:length(outcomes)
-        for i = 1:4                                        
-            avgs(i) = nanmean(ps{i}{o});                       
-            errs(i) = nanstd(ps{i}{o}) / sqrt(length(ps{i}{o}));
-            axes(axs(o))
-            errorbar(i-1, avgs(i), errs(i), 'Color', cols(i,:))
-            hold on
-            bar(i-1, avgs(i), 'EdgeColor', cols(i,:), 'FaceColor', cols(i,:))
-        end
-        % axes(axs(o))
-        % errorbar([0:3], avgs, errs, 'k.')
-        % hold on
-        % bar([0:3], avgs, 'EdgeColor', 'k', 'FaceColor', 'k')
-        xlim([-0.75, 3.75])
-        ylim([-0.8, 1])
-        title(ttls{o})
+    x = 0:(k-1);
+    fig = figure('Position', [ 1220, 1418, 1707, 420]);
+    tl = tiledlayout(1,4);
+    for i = 1:4
+        axs(i) = nexttile;
     end
-    
-    % for o = 1:length(outcomes)
-    %     axes(axs(o))
-    %     hold on
-    %     avg = zeros(1,length(size(pupil{o},1)));
-    %     err = zeros(1,length(size(pupil{o},1)));
-    %     for c = 1:length(ps{o})
-    %         avg(c) = nanmean(ps{o}{c});
-    %         err(c) = nanstd(ps{o}{c}) / sqrt(sum(~isnan(ps{o}{c})));
-    %     end
-    %     errorbar([0:3], avg, err, 'k.')
-    %     hold on
-    %     bar([0:3], avg, 'EdgeColor', 'k', 'FaceColor', 'k')
-    %     xticks([0:3])
-    %     title(ttls{o})
-    % end
+    for o = 1:length(outcomes)
+        axes(axs(o))
+        hold on
+        for i = 1:4
+            plot(zeros(1,length(ps{i}{o}))+x(i)+(rand([1,length(ps{i}{o})])-0.5)*0.3, ...
+                ps{i}{o}, 'o', 'MarkerSize', 5, 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1])
+        end
+        y = {ps{1}{o}, ps{2}{o}, ps{3}{o}, ps{4}{o}};
+        errorbar(x, cellfun(@nanmean, y), cellfun(@ste, y), 'k.', 'CapSize', 25, 'LineWidth', 1)
+        title(ttls{o}, 'FontSize', 16)
+        xticks(x)
+        xlim([x(1)-0.5, x(end)+0.5])
+    end
+    unifyYLimits(fig)
     xlabel(tl, 'States', 'FontSize', 16)
     ylabel(tl, 'Baseline Pupil Area (z-score)', 'FontSize', 16)
-    % subplot(1,4,1)
-    % xlabel('Stimulus Strength (PSI)')
-    % ylabel('Response Probability')
-    % subplot(1,4,2)
-    % xlim(tbounds)
-    % ylabel('NE_{mPFC} (z-score)')
-    % subplot(1,4,3)
-    % xlim(tbounds)
-    % xlabel('Time (s)')
-    % ylabel('NE_{S1} (z-score)')
-    % subplot(1,4,4)
-    % xlim(tbounds)
-    % ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
-    % for o = 1:length(outcomes)
-    %     axes(axs(o))
-    %     title(ttls{o}, 'FontSize', 16)
-    %     ylim([-1,2])
-    % end
     
-    % ylabel(tl,'Pupil Area (z-score)', 'FontSize', 16)
-    % % ylim([-0.3,0.4])
-    % xlabel(tl, 'Time (s)', 'FontSize', 16)
-    % axes(axs(1))
-    % legend()
-    % leg = legend()
-    % title(leg, 'HMM State', 'FontSize', 16)
 end
 
 function lumpByResponseProb_plotByOutcome(data_ver, ssd_version, psychver, animals, data, k)

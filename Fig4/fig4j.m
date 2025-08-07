@@ -38,6 +38,8 @@ function [dilations_animal, dilations_session] = fig4j(data, tbounds, alignTo, v
                 else
                     session{o} = [session{o}; mpfc];
                 end
+            else
+                session{o} = [session{o}; nan(1,size(session{o},2))];
             end
         end
     end
@@ -61,27 +63,26 @@ function [dilations_animal, dilations_session] = fig4j(data, tbounds, alignTo, v
         err(i) = std(dilations_session{i}) / sqrt(length(dilations_session{i}));
     end
     
-    figure()
-    bar(x, avg, 'EdgeColor', [0.5,0.5,0.5], 'FaceColor', [0.5,0.5,0.5])
-    hold on
-    errorbar(x, avg, err, 'k.');
+    fig_sesh = figure();
+    hold on 
+    for i = 1:length(x)
+        plot(zeros(1,length(dilations_session{i}))+x(i)+(rand([1,length(dilations_session{i})])-0.5)*-0.3, ...
+            dilations_session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
+    end
+    errorbar(x, cellfun(@nanmean, dilations_session), cellfun(@ste, dilations_session), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    lims = ylim;
+    plot([5,5], lims, 'k--')
+    yticks([lims(1), 0, lims(2)])
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
     ylabel('Mean Increase in NE_{mPFC} (z-score)')
 
-    % for i = 1:length(dilations_animal) 
-    %     avg(i) = mean(dilations_animal{i});
-    %     err(i) = std(dilations_animal{i}) / sqrt(length(dilations_animal{i}));
-    % end
-    
-    % figure()
-    % hold on
-    % errorbar(x, avg, err, 'k.');
-    % bar(x, avg, 'k')
-    % xticks(x)
-    % xticklabels(labels)
-    % xtickangle(45)
-    % ylabel('Mean Increase in NE_{mPFC} (z-score)')
+    mat = [dilations_session{1}, dilations_session{2}, dilations_session{4}, dilations_session{4}];
+    p = anova1(mat);
+    fprintf('S1 NE stim induced increase:\n')
+    fprintf(sprintf('Outcome anova: p = %d\n', p))
+    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
+    % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{7}, dilations_session{8})))
 
 end

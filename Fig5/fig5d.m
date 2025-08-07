@@ -1,21 +1,13 @@
-% Script for plotting transition probabilities between states
-% averaged over model folds.  Plots all states for each animal 
-% and version of the model.
-% Craig Kelley, NEC Lab, 9/8/23
+function fig5d(data, k, data_ver, ssd_version, psychver, animals)
 
-ssd_version = 'v3';
-kstates = [2, 3, 4, 5, 6];
-data_versions = {'spontaneous_pupil_stim_v2'};
-data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
-data(cellfun(@isempty, data.photometry_ch1),:) = [];
-animals = fetchAnimals(data);
+    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
 
-data_ver = data_versions{1};
-k = 4;
-base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-psychver = 'byanimal';
-fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
-% lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
+    fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
+    p = anova1(fractions);
+    fprintf('Trials per state/session:\n')
+    fprintf(sprintf('One way anova: p = %d\n', p))
+
+end
 
 function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
@@ -53,14 +45,22 @@ function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals
     for i = 1:size(fractions,2)
         err(i) = nanstd(fractions(:,i)) / 2; %sqrt(sum(~isnan(fractions(:,i))));
     end
-    figure()
-    hold on
-    bar(0:3, avg, 'FaceColor', [0.5, 0.5, 0.5], 'EdgeColor', [0.5, 0.5, 0.5])
-    errorbar(0:3, avg, err, 'k.')
-    xlim([-0.7,3.7])
-    xticks([0:3])
+    
+    x = 0:(k-1);
+    fig_sesh = figure();
+    hold on 
+    for i = 1:length(x)
+        plot(zeros(1,length(fractions(:,i)))+x(i)+(rand([1,length(fractions(:,i))])-0.5)*-0.3, ...
+            fractions(:,i), 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    end
+    errorbar(x, nanmean(fractions), ste(fractions), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    lims = ylim;
+    ylim([0,lims(2)])
+    yticks([0, lims(2)])
+    xticks(x)
     xlabel('State', 'FontSize', 16)
     ylabel('Trials per State (s)', 'FontSize', 16)
+
 end
 
 function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, folds)

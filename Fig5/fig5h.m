@@ -1,21 +1,11 @@
-% Script for plotting transition probabilities between states
-% averaged over model folds.  Plots all states for each animal 
-% and version of the model.
-% Craig Kelley, NEC Lab, 9/8/23
+function fig5h(data, k, data_ver, ssd_version, psychver, animals)
+    criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
 
-ssd_version = 'v3';
-kstates = [2, 3, 4, 5, 6];
-data_versions = {'spontaneous_pupil_stim_v2'};
-data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
-data(cellfun(@isempty, data.photometry_ch1),:) = [];
-animals = fetchAnimals(data);
+    p = anova1(criteria);
+    fprintf('Criterion by state:\n')
+    fprintf(sprintf('One way anova: p = %d\n', p))
 
-data_ver = data_versions{1};
-k = 4;
-base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-psychver = 'byanimal';
-criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, [0:4]);
-% lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, [0:4])
+end 
 
 function criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, folds)
     % set paths 
@@ -55,16 +45,18 @@ function criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals,
             criteria(as,s) = -0.5 * (norminv(hr) + norminv(far));
         end
     end
-    avg = nanmean(criteria);
-    for i = 1:size(criteria,2)
-        err(i) = nanstd(criteria(:,i)) / sqrt(sum(~isnan(criteria(:,i))));
+    x = 0:(k-1);
+    fig_sesh = figure();
+    hold on 
+    for i = 1:length(x)
+        plot(zeros(1,length(criteria(:,i)))+x(i)+(rand([1,length(criteria(:,i))])-0.5)*-0.3, ...
+            criteria(:,i), 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
     end
-    figure()
-    hold on
-    bar(0:3, avg, 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', [0.5,0.5,0.5])
-    errorbar(0:3, avg, err, 'k.')
-    xlim([-0.7,3.7])
-    xticks([0:3])
+    errorbar(x, nanmean(criteria), ste(criteria), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    lims = ylim;
+    ylim([lims(1),lims(2)])
+    yticks([lims(1), lims(2)])
+    xticks(x)
     xlabel('State', 'FontSize', 16)
     ylabel('Criterion', 'FontSize', 16)
 end

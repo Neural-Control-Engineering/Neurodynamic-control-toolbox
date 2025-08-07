@@ -38,16 +38,24 @@ function fig2i(data)
     x = 1:3;
     l = {'Low', 'Medium', 'High'};
 
-    sesh_fig = figure();
-    bar(x, sesh_avg, 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', [0.5,0.5,0.5])
-    hold on
-    errorbar(x, sesh_avg, sesh_err, 'k.')
+    fig_sesh = figure();
+    hold on 
+    for i = 1:length(x)
+        plot(zeros(1,length(session{i}))+x(i)+(rand([1,length(session{i})])-0.5)*-0.3, ...
+            session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
+    end
+    errorbar(x, cellfun(@mean, session), cellfun(@ste, session), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    lims = ylim;
+    ylim([0,lims(2)])
+    yticks([0, lims(2)])
     xticks(x)
     xticklabels(l)
     xtickangle(45)
     ylabel('Reaction Time (s)', 'FontSize', 16)
     xlabel('Baseline Pupil Area', 'FontSize', 16)
-    anova1(cell2mat(session))
+    p = anova1(cell2mat(session));
+    fprintf('Pupil area vs reaction time:\n')
+    fprintf(sprintf('One way anova: p = %d\n', p))
 
     % animal_fig = figure();
     % hold on
