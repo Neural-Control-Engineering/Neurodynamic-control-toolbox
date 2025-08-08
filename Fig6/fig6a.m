@@ -217,7 +217,8 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     tbounds = [-0.5,6.0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     for s = 1:k
-        cols = distinguishable_colors(k);
+        cols = distinguishable_colors(k+1);
+        cols(4,:) = [];
         state_rp = [];
         ne_ch1 = [];
         ne_ch2 = [];

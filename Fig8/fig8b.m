@@ -1,9 +1,13 @@
 function fig8b(data, k, data_ver, ssd_version, psychver, animals, shuff)
-    ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, shuff);
+    corrs = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, shuff);
+    corrs = [corrs{1}, corrs{2}, corrs{3}, corrs{4}];
+    p = anova1(corrs);
+    fprintf('Xcorr by state:\n')
+    fprintf(sprintf('one way anova: p = %d\n', p))
     % fprintf('Pupil baseline by outcome / state:\n')
 end
 
-function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, shuff)
+function corrs = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, shuff)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -38,6 +42,7 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
     % pupil = {zeros(a,k), zeros(a,k), zeros(a,k), zeros(a,k)};
     ps = {};
     session_xcor = {[], [], [], []};
+    session_cell = {{}, {}, {}, {}};
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
@@ -73,26 +78,36 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
                 if size(cs,1) > 1
                     try
                         session_xcor{s} = [session_xcor{s}; nanmean(cs)];
+                        session_cell{s} = vertcat(session_cell{s}, {sessions{ss}});
                     catch
                         keyboard 
                     end
                 else
                     session_xcor{s} = [session_xcor{s}; cs];
+                    session_cell{s} = vertcat(session_cell{s}, {sessions{ss}});
                 end
             end
         end
     end
+
     figure(); hold on;
     lags = linspace(tbounds(1), tbounds(1)*-1, size(session_xcor{s},2));
     ind = find(lags == 0);
     corrs = {};
+    sessions = unique(data.session_id);
     for s = 1:k 
         mat = session_xcor{s} - nanmean(shuff);
-        mat = mat(:,ind);
+        % mat = mat(:,ind);
+        mat = max(mat,[],2);
+        tmp = nan(length(sessions),1);
+        for i = 1:length(mat)
+            ind = find(strcmp(sessions, session_cell{s}{i}))
+            tmp(ind) = mat(i);
+        end
         plot(zeros(1,length(mat))+(s-1)+(rand(size(mat))-0.5)*0.3, mat, 'o', 'MarkerEdgeColor', [1,1,1], 'MarkerFaceColor', cols(s,:), 'MarkerSize', 5)
-        corrs{s} = mat;
+        corrs{s} = tmp;
     end
-    errorbar(0:(k-1), cellfun(@mean, corrs), cellfun(@ste, corrs), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    errorbar(0:(k-1), cellfun(@nanmean, corrs), cellfun(@ste, corrs), 'k.', 'CapSize', 15, 'LineWidth', 2)
     xlabel('HMM State', 'FontSize', 16)
     ylabel({'Shuffle Corrected Cross Correlation', 'at 0s Lag'})
     ylim([-0.2, 0.7])

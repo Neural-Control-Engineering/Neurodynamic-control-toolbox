@@ -1,7 +1,18 @@
 function fig6b(data, k, data_ver, ssd_version, psychver, animals)
-    ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k);
-    % fprintf('Pupil baseline by outcome / state:\n')
-    
+    [sesh_ps, all_sesh] = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k);
+    fprintf('Baseline Pupil Diameter:\n')
+    mat = [sesh_ps{1}{1}, sesh_ps{2}{1}, sesh_ps{3}{1}, sesh_ps{4}{1}];
+    p = anova1(mat);
+    fprintf(sprintf('Hit - one way anova: p = %d\n', p))
+    mat = [sesh_ps{1}{2}, sesh_ps{2}{2}, sesh_ps{3}{2}, sesh_ps{4}{2}];
+    p = anova1(mat);
+    fprintf(sprintf('Miss - one way anova: p = %d\n', p))
+    mat = [sesh_ps{1}{3}, sesh_ps{2}{3}, sesh_ps{3}{3}, sesh_ps{4}{3}];
+    p = anova1(mat);
+    fprintf(sprintf('CR - one way anova: p = %d\n', p))
+    mat = [sesh_ps{1}{4}, sesh_ps{2}{4}, sesh_ps{3}{4}, sesh_ps{4}{4}];
+    p = anova1(mat);
+    fprintf(sprintf('FA - one way anova: p = %d\n', p))
 end
 
 function lumpByPupilBaseline(data_ver, ssd_version, psychver, animals, data, k)
@@ -184,7 +195,7 @@ function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data,
     subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
 end
 
-function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
+function [sesh_ps, all_sesh] = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     % set paths 
     fformat = {data_ver, 'state_Python2mat.mat'};
     base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
@@ -216,12 +227,15 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     % pupil = {zeros(a,k), zeros(a,k), zeros(a,k), zeros(a,k)};
     ps = {};
+    all_sesh = {};
     for s = 1:k
-        cols = distinguishable_colors(k);
+        cols = distinguishable_colors(k+1);
+        cols(4,:) = [];
         state_rp = [];
         ne_ch1 = [];
         ne_ch2 = [];
         pupil = {[], [], [], []};
+        sesh = {{}, {}, {}, {}};
         for as = 1:size(ordered_states,1)
             i = ordered_states(as,s);
             filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
@@ -254,6 +268,7 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
                         [p, tp] = avg_pupil_traces(otmp, [-0.5, 0], 'stimulus');
                         % pupil{o}(as,s) = mean(mean(p));
                         pupil{o} = [pupil{o}; nanmean(p,2)];
+                        sesh{o} = vertcat(sesh{o}, cellstr(otmp.session_id));
                     % else
                     %     pupil{o}(as,s) = nan;
                     end
@@ -261,7 +276,22 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
             end
         end
         ps{s} = pupil;
+        all_sesh{s} = sesh;
     end
+
+    session_ids = unique(data.session_id);
+    sesh_ps = {};
+    for s = 1:k
+        sesh_ps{s} = {nan(length(session_ids),1), nan(length(session_ids),1), ...
+            nan(length(session_ids),1), nan(length(session_ids),1)};
+        for o = 1:length(outcomes)
+             sesh_ids = unique(all_sesh{s}{o});
+             for si = 1:length(sesh_ids)
+                ind = find(strcmp(session_ids, sesh_ids{si}));
+                sesh_ps{s}{o}(ind) = nanmean(ps{s}{o}(strcmp(all_sesh{s}{o},sesh_ids{si})));
+             end
+        end
+    end        
 
     ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
     x = 0:(k-1);
@@ -274,11 +304,11 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
         axes(axs(o))
         hold on
         for i = 1:4
-            plot(zeros(1,length(ps{i}{o}))+x(i)+(rand([1,length(ps{i}{o})])-0.5)*0.3, ...
-                ps{i}{o}, 'o', 'MarkerSize', 5, 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1])
+            plot(zeros(1,length(sesh_ps{i}{o}))+x(i)+(rand([1,length(sesh_ps{i}{o})])-0.5)*0.3, ...
+                sesh_ps{i}{o}, 'o', 'MarkerSize', 5, 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1])
         end
-        y = {ps{1}{o}, ps{2}{o}, ps{3}{o}, ps{4}{o}};
-        errorbar(x, cellfun(@nanmean, y), cellfun(@ste, y), 'k.', 'CapSize', 25, 'LineWidth', 1)
+        y = {sesh_ps{1}{o}, sesh_ps{2}{o}, sesh_ps{3}{o}, sesh_ps{4}{o}};
+        errorbar(x, cellfun(@nanmean, y), cellfun(@ste, y), 'k.', 'CapSize', 15, 'LineWidth', 2)
         title(ttls{o}, 'FontSize', 16)
         xticks(x)
         xlim([x(1)-0.5, x(end)+0.5])
