@@ -17,6 +17,7 @@ function fig2e(data, tbounds, alignTo)
         % plot(b, e, 'o', 'MarkerFaceColor', cols(s,:), 'MarkerSize', 2.0)
         % hold on
     end
+    fig = figure();
     scatter(baselines, dilations, 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1])
     x = baselines;
     y = dilations;
@@ -27,4 +28,6 @@ function fig2e(data, tbounds, alignTo)
     xlabel('Baseline Pupil Area (z-score)', 'FontSize', 16)
     ylabel('Pupil Dilation (z-score)', 'FontSize', 16)
     xlim([-2.5,5.1])
+    saveas(fig, 'Figures/fig2e.fig')
+    saveas(fig, 'Figures/fig2e.svg')
 end

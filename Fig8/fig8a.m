@@ -82,12 +82,14 @@ function ps = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data,
             end
         end
     end
-    figure(); hold on;
+    fig = figure(); hold on;
     for s = 1:k 
         semshade(session_xcor{s} - nanmean(shuff), 0.3, cols(s,:), cols(s,:), lags(1,:), 1);
     end
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel('Shuffle Corrected Cross Correlation')
+    saveas(fig, 'Figures/fig8a.fig')
+    saveas(fig, 'Figures/fig8a.svg')
 end
 
 function data = removeFirstTrials(data)

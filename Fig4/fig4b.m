@@ -54,19 +54,6 @@ function fig4b(data, tbounds, alignTo, ver)
     xlabel(tl_sesh, 'Time (s)', 'FontSize', 16)
     ylabel(tl_sesh, 'NE_{S1}', 'FontSize', 16)
     
-    % animal_fig = figure();
-    % tl_animal = tiledlayout(1,4);
-    % for i = 1:length(tls)
-    %     axs_sesh(i) = nexttile;
-    %     out = semshade(animal_ne{i}, 0.3, 'k', 'k', ...
-    %             t, 1, tls{i});
-    %     hold on
-    %     xlim(tbounds)
-    %     plot([0,0], [-3,3], 'k:', 'HandleVisibility', 'off')
-    %     title(tls{i}, 'FontSize', 16)
-    %     ylim([-0.3, 0.8])
-    % end
-    % xlabel(tl_animal, 'Time (s)', 'FontSize', 16)
-    % ylabel(tl_animal, 'NE_{S1}', 'FontSize', 16)
-    
+    saveas(session_fig, 'Figures/fig4b.fig')
+    saveas(session_fig, 'Figures/fig4b.svg')
 end

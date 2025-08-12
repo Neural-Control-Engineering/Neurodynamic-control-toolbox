@@ -90,7 +90,7 @@ function corrs = lumpByResponseProb(data_ver, ssd_version, psychver, animals, da
         end
     end
 
-    figure(); hold on;
+    fig = figure(); hold on;
     lags = linspace(tbounds(1), tbounds(1)*-1, size(session_xcor{s},2));
     ind = find(lags == 0);
     corrs = {};
@@ -113,6 +113,8 @@ function corrs = lumpByResponseProb(data_ver, ssd_version, psychver, animals, da
     ylim([-0.2, 0.7])
     yticks([-0.2, 0.7])
     xticks(0:(k-1))
+    saveas(fig, 'Figures/fig8b.fig')
+    saveas(fig, 'Figures/fig8b.svg')
 end
             % if ~isempty(statetmp)
             %     for o = 1:length(outcomes)

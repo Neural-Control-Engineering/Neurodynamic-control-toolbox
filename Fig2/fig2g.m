@@ -75,4 +75,7 @@ function [baselines_animal, baselines_session] = fig2g(data, tbounds, alignTo)
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
 
+    saveas(fig_sesh, 'Figures/fig2g.fig')
+    saveas(fig_sesh, 'Figures/fig2g.svg')
+
 end

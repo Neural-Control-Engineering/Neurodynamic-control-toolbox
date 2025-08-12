@@ -123,7 +123,7 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
     end
     mat = [session_peaks{1}, session_peaks{2}, session_peaks{3}, session_peaks{4}];
     p = anova1(mat);
-    fprintf(sprintf('Outcome anova: p = %d\n', p))
+    fprintf(sprintf('NE mPFC x S1 Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{5}, session_peaks{6})))
     fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{7}, session_peaks{8})))
     % fig_animal = figure();
@@ -134,5 +134,8 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
     % xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Responded', 'Withheld', 'Correct', 'Incorrect'})
     % xtickangle(45)
     % ylabel('Peak Cross Correlation')
+
+    saveas(fig_session, 'Figures/fig3d.fig')
+    saveas(fig_session, 'Figures/fig3d.svg')
 
 end

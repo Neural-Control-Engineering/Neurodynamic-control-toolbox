@@ -61,4 +61,7 @@ function [animal, session] = fig4k(data)
     fprintf('Reaction Time by Baseline NE mPFC:\n')
     fprintf(sprintf('One way anova: p = %d\n', p))
 
+    saveas(fig_sesh, 'Figures/fig4k.fig')
+    saveas(fig_sesh, 'Figures/fig4k.svg')
+
 end

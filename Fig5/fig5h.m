@@ -59,6 +59,8 @@ function criteria = lumpByResponseProb(data_ver, ssd_version, psychver, animals,
     xticks(x)
     xlabel('State', 'FontSize', 16)
     ylabel('Criterion', 'FontSize', 16)
+    saveas(fig_sesh, 'Figures/fig5h.fig')
+    saveas(fig_sesh, 'Figures/fig5h.svg')
 end
 
 function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, folds)

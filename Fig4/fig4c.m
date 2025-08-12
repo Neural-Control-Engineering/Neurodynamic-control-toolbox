@@ -79,6 +79,9 @@ function [baselines_animal, baselines_session] = fig4c(data, tbounds, alignTo, v
     fprintf('S1 NE baseline:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
+
+    saveas(fig_sesh, 'Figures/fig4c.fig')
+    saveas(fig_sesh, 'Figures/fig4c.svg')
     % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{7}, baselines_session{8})))
 
     % for i = 1:length(baselines_animal) 

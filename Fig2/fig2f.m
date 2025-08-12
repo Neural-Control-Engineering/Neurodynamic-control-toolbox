@@ -85,4 +85,7 @@ function [animal, session] = fig2f(data, tbounds, alignTo)
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session{5}, session{6})))
 
+    saveas(fig_sesh, 'Figures/fig2f.fig')
+    saveas(fig_sesh, 'Figures/fig2f.svg')
+
 end

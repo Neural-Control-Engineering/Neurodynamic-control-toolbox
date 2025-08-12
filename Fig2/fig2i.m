@@ -57,6 +57,9 @@ function fig2i(data)
     fprintf('Pupil area vs reaction time:\n')
     fprintf(sprintf('One way anova: p = %d\n', p))
 
+    saveas(fig_sesh, 'Figures/fig2i.fig')
+    saveas(fig_sesh, 'Figures/fig2i.svg')
+
     % animal_fig = figure();
     % hold on
     % errorbar(x, sesh_avg, sesh_err, 'k.')

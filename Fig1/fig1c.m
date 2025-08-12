@@ -43,4 +43,6 @@ function mat = fig1c(data)
     % mat = animal_avg;
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Response Time (s)', 'FontSize', 14)
+    saveas(fig, 'Figures/fig1c.fig')
+    saveas(fig, 'Figures/fig1c.svg')
 end

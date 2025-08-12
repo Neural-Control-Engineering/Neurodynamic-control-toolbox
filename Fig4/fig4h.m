@@ -53,5 +53,8 @@ function fig4h(data, tbounds, alignTo, ver)
     end
     xlabel(tl_sesh, 'Time (s)', 'FontSize', 16)
     ylabel(tl_sesh, 'NE_{mPFC}', 'FontSize', 16)
+
+    saveas(session_fig, 'Figures/fig4h.fig')
+    saveas(session_fig, 'Figures/fig4h.svg')
     
 end

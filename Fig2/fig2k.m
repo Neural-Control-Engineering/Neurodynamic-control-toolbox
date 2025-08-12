@@ -67,4 +67,7 @@ function dPrimeByPupilArea(data)
     
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline Pupil Area';
+
+    saveas(fig, 'Figures/fig2k.fig')
+    saveas(fig, 'Figures/fig2k.svg')
 end

@@ -318,6 +318,8 @@ function [sesh_ps, all_sesh] = lumpByResponseProb(data_ver, ssd_version, psychve
     
     xlabel(tl, 'States', 'FontSize', 16)
     ylabel(tl, 'Pupil Dilation (z-score)', 'FontSize', 16)
+    saveas(fig, 'Figures/fig6c.fig')
+    saveas(fig, 'Figures/fig6c.svg')
 end
 
 function lumpByResponseProb_plotByOutcome(data_ver, ssd_version, psychver, animals, data, k)

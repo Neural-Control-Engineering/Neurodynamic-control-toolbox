@@ -59,6 +59,8 @@ function [animal, session, t] = fig2c(data, tbounds, alignTo)
     end
     ylabel(tl_sesh, 'Pupil Area (z-score)', 'FontSize', 14)
     xlabel(tl_sesh, 'Time (s)', 'FontSize', 14)
+    saveas(fig_sesh, 'Figures/fig2c.fig')
+    saveas(fig_sesh, 'Figures/fig2c.svg')
 
     % fig_animal = figure('Visible', 'on', 'WindowState', 'maximized');
     % axs_animal = 1:length(outcomes);

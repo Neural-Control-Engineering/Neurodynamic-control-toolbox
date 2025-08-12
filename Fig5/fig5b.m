@@ -1,5 +1,7 @@
 function fig5b(animals, data_versions, kstates)
     all_fig = combineAnimals(animals, data_versions, kstates, 'all');
+    saveas(all_fig, 'Figures/fig5b.fig')
+    saveas(all_fig, 'Figures/fig5b.svg')
 end
 
 function fig = combineAnimals(animals, data_versions, kstates, lapse_ver)

@@ -60,6 +60,8 @@ function fractions = lumpByResponseProb(data_ver, ssd_version, psychver, animals
     xticks(x)
     xlabel('State', 'FontSize', 16)
     ylabel('Trials per State (s)', 'FontSize', 16)
+    saveas(fig_sesh, 'Figures/fig5d.fig')
+    saveas(fig_sesh, 'Figures/fig5d.svg')
 
 end
 

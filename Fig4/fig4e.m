@@ -61,15 +61,7 @@ function [animal, session] = fig4e(data)
     fprintf('Reaction Time by Baseline NE S1:\n')
     fprintf(sprintf('One way anova: p = %d\n', p))
 
-    % animal_fig = figure();
-    % hold on
-    % errorbar(x, sesh_avg, sesh_err, 'k.')
-    % bar(x, sesh_avg, 'FaceColor', 'k', 'EdgeColor', 'k')
-    % xticks(x)
-    % xticklabels(l)
-    % xtickangle(45)
-    % ylabel('Reaction Time (s)', 'FontSize', 16)
-    % xlabel('Baseline Pupil Area', 'FontSize', 16)
-    % anova1(cell2mat(animal))
+    saveas(fig_sesh, 'Figures/fig4e.fig')
+    saveas(fig_sesh, 'Figures/fig4e.svg')   
 
 end

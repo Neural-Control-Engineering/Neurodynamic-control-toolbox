@@ -140,5 +140,7 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3f(data, ver,
         end
     end
 
+    saveas(fig_sesh, 'Figures/fig3i.fig')
+    saveas(fig_sesh, 'Figures/fig3i.svg')
 
 end

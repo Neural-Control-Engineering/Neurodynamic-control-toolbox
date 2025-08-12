@@ -85,4 +85,7 @@ function [dilations_animal, dilations_session] = fig4j(data, tbounds, alignTo, v
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
     % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{7}, dilations_session{8})))
 
+    saveas(fig_sesh, 'Figures/fig4j.fig')
+    saveas(fig_sesh, 'Figures/fig4j.svg')
+
 end

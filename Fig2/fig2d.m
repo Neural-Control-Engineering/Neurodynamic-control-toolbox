@@ -77,7 +77,8 @@ function [animal, session, t] = fig2d(data, tbounds, alignTo)
     xlabel(tl_sesh, 'Time (s)', 'FontSize', 14)
     axes(axs_sesh(1))
     legend()
-
+    saveas(fig_sesh, 'Figures/fig2d.fig')
+    saveas(fig_sesh, 'Figures/fig2d.svg')
     % fig_animal = figure('Visible', 'on', 'WindowState', 'maximized');
     % tl_animal = tiledlayout(2,2);
     

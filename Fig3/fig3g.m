@@ -52,37 +52,43 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3g(data, ver,
         tmp = filterTrials(data, 'session_id', num2str(sessions(s)));
         for o = 1:length(outcomes)
             otmp = filterTrials(tmp, 'categorical_outcome', outcomes{o});
-            [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus', ver);
-            try
-                [pupil, tp] = avg_pupil_traces(otmp, tbounds, 'stimulus');
-                Fs = getFs(data, 'photometry_ch1');
-                Fs = Fs(1);
-                cs = zeros(size(otmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
-                lags = zeros(size(otmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
-                for i = 1:size(pupil,1)
-                    ch1 = mpfc(i,:);
-                    y = bandpassFilter(ch1, 0.1, 10, Fs);
-                    ch1 = downsample(y, round(Fs/10));
-                    ch2 = pupil(i,:);
-                    x = randi([round(length(ch1)*0.25), round(length(ch1)*0.75)]);
-                    ch1 = [ch1(x:end), ch1(1:x-1)];
-                    % x = randi(length(ch2));
-                    % ch2 = [ch2(x:end), ch2(1:x-1)];
-                    % mpfc x s1 
-                    [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
-                    try
-                        lags(i,:) = lag ./ Fs;
-                        cs(i,:) = c; % ./ length(ch1(2:end-1));
-                    catch
-                        lags(i,:) = nan(1, size(lags,2));
-                        cs(i,:) = nan(1,size(cs,2));
+            if ~isempty(otmp)
+                [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus', ver);
+                try
+                    [pupil, tp] = avg_pupil_traces(otmp, tbounds, 'stimulus');
+                    Fs = getFs(data, 'photometry_ch1');
+                    Fs = Fs(1);
+                    cs = zeros(size(otmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
+                    lags = zeros(size(otmp,1), length([tbounds(1):(1/10):tbounds(2)])*2-5);
+                    for i = 1:size(pupil,1)
+                        ch1 = mpfc(i,:);
+                        y = bandpassFilter(ch1, 0.1, 10, Fs);
+                        ch1 = downsample(y, round(Fs/10));
+                        ch2 = pupil(i,:);
+                        x = randi([round(length(ch1)*0.25), round(length(ch1)*0.75)]);
+                        ch1 = [ch1(x:end), ch1(1:x-1)];
+                        % x = randi(length(ch2));
+                        % ch2 = [ch2(x:end), ch2(1:x-1)];
+                        % mpfc x s1 
+                        [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+                        try
+                            lags(i,:) = lag ./ Fs;
+                            cs(i,:) = c; % ./ length(ch1(2:end-1));
+                        catch
+                            lags(i,:) = nan(1, size(lags,2));
+                            cs(i,:) = nan(1,size(cs,2));
+                        end
                     end
+                    if size(cs,1) > 1
+                        session_xcor{o} = [session_xcor{o}; nanmean(cs)];
+                    else
+                        session_xcor{o} = [session_xcor{o}; cs];
+                    end
+                catch
+                    session_xcor{o} = [session_xcor{o}; nan(1,size(session_xcor{o},2))];
                 end
-                if size(cs,1) > 1
-                    session_xcor{o} = [session_xcor{o}; nanmean(cs)];
-                else
-                    session_xcor{o} = [session_xcor{o}; cs];
-                end
+            else
+                session_xcor{o} = [session_xcor{o}; nan(1,size(session_xcor{o},2))];
             end
         end
     end
@@ -122,7 +128,7 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3g(data, ver,
     for i = 1:length(session_peaks)
         plot(zeros(1,length(session_peaks{i}))+x(i)+(rand([1,length(session_peaks{i})])-0.5)*0.3, session_peaks{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
     end
-    errorbar(x, cellfun(@mean, session_peaks), cellfun(@ste, session_peaks), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    errorbar(x, cellfun(@nanmean, session_peaks), cellfun(@ste, session_peaks), 'k.', 'CapSize', 15, 'LineWidth', 2)
     xticks(x)
     xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold', 'Correct', 'Incorrect'})
     xtickangle(45)
@@ -131,5 +137,12 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3g(data, ver,
     else
         ylabel('Peak Correlation at 0s Lag', 'FontSize', 16)
     end
+    mat = [session_peaks{1}, session_peaks{2}, session_peaks{3}, session_peaks{4}];
+    p = anova1(mat);
+    fprintf(sprintf('NE mPFC x pupil Outcome anova: p = %d\n', p))
+    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{5}, session_peaks{6})))
+    fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{7}, session_peaks{8})))
 
+    saveas(fig_session, 'Figures/fig3g.fig')
+    saveas(fig_session, 'Figures/fig3g.svg')
 end

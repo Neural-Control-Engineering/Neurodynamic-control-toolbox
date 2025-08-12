@@ -123,6 +123,8 @@ function shuff_xcor = fig3h(data, ver)
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel({'NE_{S1} x Pupil Area', 'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
 
+    saveas(fig_sesh, 'Figures/fig3h.fig')
+    saveas(fig_sesh, 'Figures/fig3h.svg')
     % fig_animal = figure();
     % % animal_xcor = animal_xcor(:,(animal_lags >= -4 & animal_lags <= 4));
     % % animal_lags = animal_lags(animal_lags >= -4 & animal_lags <= 4);

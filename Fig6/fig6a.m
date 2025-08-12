@@ -209,7 +209,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
 
     % average psychometric curves for each animal in each ordered state (starting with lowest)
     % figure('Position', [ 1151, 1516, 1830, 404])
-    figure('Position', [ 1220, 1418, 1707, 420])
+    fig = figure('Position', [ 1220, 1418, 1707, 420]);
     tl = tiledlayout(1,4);
     for i = 1:4
         axs(i) = nexttile;
@@ -301,6 +301,8 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     legend()
     % leg = legend()
     % title(leg, 'HMM State', 'FontSize', 16)
+    saveas(fig, 'Figures/fig6a.fig')
+    saveas(fig, 'Figures/fig6a.svg')
 end
 
 function lumpByResponseProb_plotByOutcome(data_ver, ssd_version, psychver, animals, data, k)

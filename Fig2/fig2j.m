@@ -102,4 +102,7 @@ function [x, ss, tcile] = fig2jk(data)
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline Pupil Area';
 
+    saveas(session_fig, 'Figures/fig2j.fig')
+    saveas(session_fig, 'Figures/fig2j.svg')
+
 end

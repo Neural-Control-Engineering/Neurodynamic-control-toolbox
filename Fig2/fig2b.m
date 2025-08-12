@@ -102,4 +102,7 @@ function fig2b(data, tbounds, alignTo)
     end
 
     p = anova1(mat')
+
+    saveas(session_fig, 'Figures/fig2b.fig')
+    saveas(session_fig, 'Figures/fig2b.svg')
 end

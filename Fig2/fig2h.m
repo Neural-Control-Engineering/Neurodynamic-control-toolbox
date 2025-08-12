@@ -83,5 +83,8 @@ function [dilations_animal, dilations_session] = fig2h(data, tbounds, alignTo)
     fprintf('Pupil dilations:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
+
+    saveas(fig_sesh, 'Figures/fig2h.fig')
+    saveas(fig_sesh, 'Figures/fig2h.svg')
     
 end

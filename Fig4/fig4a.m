@@ -70,21 +70,6 @@ function fig4a(data, tbounds, alignTo, ver)
     ylim([-0.22, 0.82])
     leg = legend();
     leg.Title.String = 'Stimulus Strength';
-    
-    % animal_fig = figure();
-    % hold on
-    % for i = 1:length(stim_strengths)
-    %     stim = stim_strengths(i);
-    %     l = sprintf('%.1f PSI', stim*10);
-    %     out = semshade(animal_ne{i}, 0.3, cols(i,:), cols(i,:), ...
-    %             t, 1, l);
-    % end
-    % xlim(tbounds)
-    % plot([0,0], [-3,3], 'k:', 'HandleVisibility', 'off')
-    % xlabel('Time (s)', 'FontSize', 16)
-    % ylabel('NE_{S1}', 'FontSize', 16)
-    % % ylim([-0.22, 0.52])
-    % leg = legend();
-    % leg.Title.String = 'Stimulus Strength';
-    
+    saveas(session_fig, 'Figures/fig4a.fig')
+    saveas(session_fig, 'Figures/fig4a.svg')
 end

@@ -91,7 +91,9 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3c(data, ver,
     unifyYLimits(fig_sesh)
     xlabel(tl_sesh, 'Lag (s)', 'FontSize', 16)
     ylabel(tl_sesh, {'NE_{mPFC} x NE_{S1}', 'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
-    keyboard 
+    
+    saveas(fig_sesh, 'Figures/fig3c.fig')
+    saveas(fig_sesh, 'Figures/fig3c.svg')
 
     % fig_animal = figure();
     % tl_animal = tiledlayout(1,length(outcomes));

@@ -1,4 +1,4 @@
-function fig1ef(data)
+function fig1f(data)
     animals = fetchAnimals(data);
     cols = {'b', 'r', 'g', 'm'};
     stim_strengths = unique(data.stimulus_strength);
@@ -9,66 +9,81 @@ function fig1ef(data)
         tmp = filterTrials(data, 'animal', num2str(animal));
         sessions = unique(tmp.session_id);
         stim_strengths = unique(tmp.stimulus_strength);
-        dp = nan(length(sessions),length(stim_strengths));
+        dp = nan(length(sessions),length(stim_strengths)-1);
         for s = 1:length(sessions)
             stmp = filterTrials(tmp, 'session_id', num2str(sessions(s)));
             stim_strengths = unique(stmp.stimulus_strength);
             sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
             otmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
-            far = size(otmp,1) / size(sstmp,1);
-            dp(s,1) = far;
+            % far = size(otmp,1) / size(sstmp,1);
+            % dp(s,1) = far;
             for ss = 2:length(stim_strengths)
                 sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(ss));
                 otmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
-                hr = size(otmp,1) / size(sstmp,1);
+                hit_count = size(otmp,1); 
+                target_count = size(sstmp,1);
+                otmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+                fa_count = size(otmp,1);
+                distractor_count = size(sstmp,1);
+                hr = (hit_count+0.5)/(target_count+1.0);
+                far = (fa_count+0.5)/(distractor_count+1.0);
                 if length(stim_strengths) == 2
-                    dp(s,end) = hr;
+                    dp(s,end) = norminv(hr) - norminv(far);
                 else
-                    dp(s, ss) = hr;
+                    dp(s, ss-1) = norminv(hr) - norminv(far);
                 end
             end
         end
         figure(fig_session)
-        plot(stim_strengths .* 10, nanmean(dp), 'color', [.5 .5 .5], 'linewidth', 2, 'DisplayName', sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
+        plot(stim_strengths(2:end)' .* 10, nanmean(dp), 'color', [.5 .5 .5], 'linewidth', 2, 'DisplayName', sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
         hold on
         figure(fig_animal)
-        plot(stim_strengths .* 10, nanmean(dp), 'color', [.5 .5 .5], 'linewidth', 2, 'DisplayName', sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
+        plot(stim_strengths(2:end)' .* 10, nanmean(dp), 'color', [.5 .5 .5], 'linewidth', 2, 'DisplayName', sprintf('Animal %i (N_{sessions}=%i)', a-1, length(sessions)));
         hold on
         animal_avg(a,:) = nanmean(dp);
     end
     % animals = fetchAnimals(data);
     % stim_strengths = unique(data.stimulus_strength);
     sessions = unique(data.session_id);
-    mat = nan(length(sessions), length(stim_strengths));
+    mat = nan(length(sessions), length(stim_strengths)-1);
     
     for s = 1:length(sessions)
         stmp = filterTrials(data, 'session_id', num2str(sessions(s)));
         stim_strengths = unique(stmp.stimulus_strength);
-        sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
-        otmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
-        far = size(otmp,1) / size(sstmp,1);
-        mat(s,1) = far;
+        % sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
+        % otmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+        % far = size(otmp,1) / size(sstmp,1);
+        % mat(s,1) = far;
         for ss = 2:length(stim_strengths)
             sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(ss));
             otmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+            hit_count = size(otmp,1); 
+            target_count = size(sstmp,1);
+            otmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+            fa_count = size(otmp,1);
+            distractor_count = size(sstmp,1);
+            hr = (hit_count+0.5)/(target_count+1.0);
+            far = (fa_count+0.5)/(distractor_count+1.0);
             if length(stim_strengths) == 2
-                mat(s,end) = size(otmp,1) / size(sstmp,1);
+                mat(s,end) = norminv(hr) - norminv(far);
             else
-                mat(s,ss) = size(otmp,1) / size(sstmp,1);
+                mat(s,ss-1) = norminv(hr) - norminv(far);
             end
         end
     end
     % mat = nansum(mat,1) ./ sum(~isnan(mat),1);
     % semshade(mat(:,2:end), 0.3, 'k', 'k', stim_strengths(2:end) .* 10, 1, sprintf('Mean: (N_{animals}=%i)', length(animals)));
     % plot(stim_strengths(2:end) .* 10, nanmean(mat(:,2:end)), 'k--', 'LineWidth', 2, 'DisplayName', sprintf('Mean: (N_{animals}=%i)', length(animals)))
-    figure(fig_session)
-    errorbar(stim_strengths .* 10, nanmean(mat), nanstd(mat) ./ sqrt(size(mat,1)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('(N_{sessions}=%i)', length(sessions)))
+    fig = figure(fig_session)
+    errorbar(stim_strengths(2:end) .* 10, nanmean(mat), nanstd(mat) ./ sqrt(size(mat,1)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('(N_{sessions}=%i)', length(sessions)))
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Response Probability', 'FontSize', 14)
     legend('location', 'southeast')
+    saveas(fig, 'Figures/fig1f.fig')
+    saveas(fig, 'Figures/fig1f.svg')
 
     figure(fig_animal)
-    errorbar(stim_strengths .* 10, nanmean(animal_avg), nanstd(animal_avg) ./ sqrt(size(animal_avg,1)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('(N_{animals}=%i)', size(animal_avg,1)))
+    errorbar(stim_strengths(2:end) .* 10, nanmean(animal_avg), nanstd(animal_avg) ./ sqrt(size(animal_avg,1)), 'color', 'k', 'linewidth', 2, 'DisplayName', sprintf('(N_{animals}=%i)', size(animal_avg,1)))
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('Response Probability', 'FontSize', 14)
     % legend('location', 'southeast')

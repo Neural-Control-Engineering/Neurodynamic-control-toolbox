@@ -1,0 +1,832 @@
+Figure 1:
+Figure 1c:
+Figure 1e:
+Figure 1f:
+
+fig = 
+
+  Figure (4) with properties:
+
+      Number: 4
+        Name: ''
+       Color: [0.9400 0.9400 0.9400]
+    Position: [1220 1298 560 420]
+       Units: 'pixels'
+
+  Use GET to show all properties
+
+Figure 2:
+Figure 2b:
+
+p =
+
+   8.6684e-24
+
+Figure 2c:
+Figure 2d:
+Figure 2e:
+
+mdl = 
+
+
+Linear regression model:
+    y ~ 1 + x1
+
+Estimated Coefficients:
+                   Estimate       SE         tStat       pValue   
+                   ________    _________    _______    ___________
+
+    (Intercept)       0.373    0.0089661     41.601    4.8222e-304
+    x1             -0.36084     0.010359    -34.832    2.0835e-226
+
+
+Number of observations: 3276, Error degrees of freedom: 3274
+Root Mean Squared Error: 0.495
+R-squared: 0.27,  Adjusted R-Squared: 0.27
+F-statistic vs. constant model: 1.21e+03, p-value = 2.08e-226
+Figure 2f:
+Pupil baseline vs dilation pearsons correlation coefficient:
+Outcome anova: p = 9.348998e-03
+Responded vs. Withheld, Wilcoxon signed-rank: p = 3.763181e-04
+Figure 2g:
+Pupil baseline:
+Outcome anova: p = 1.209715e-09
+Responded vs. Withheld, Wilcoxon signed-rank: p = 2.131197e-07
+Figure 2h:
+Pupil dilations:
+Outcome anova: p = 6.103717e-12
+Responded vs. Withheld, Wilcoxon signed-rank: p = 1.309054e-08
+Figure 2i:
+Pupil area vs reaction time:
+One way anova: p = 7.630358e-01
+Figure 2j:
+Figure 2k:
+Figure 3:
+Figure 3b:
+Figure 3c:
+Figure 3d:
+NE mPFC x S1 Outcome anova: p = 2.646066e-01
+Responded vs. Withheld, Wilcoxon signed-rank: p = 2.620095e-02
+Correct vs. Incorrect, Wilcoxon signed-rank: p = 4.720177e-02
+Figure 4:
+Figure 4a:
+Figure 4b:
+Figure 4c:
+S1 NE baseline:
+Outcome anova: p = 1.340601e-01
+Responded vs. Withheld, Wilcoxon signed-rank: p = 8.539939e-01
+Figure 4d:
+S1 NE stim induced increase:
+Outcome anova: p = 3.024798e-12
+Responded vs. Withheld, Wilcoxon signed-rank: p = 1.422358e-09
+Figure 4e:
+Reaction Time by Baseline NE S1:
+One way anova: p = 3.882734e-01
+Figure 4f:
+Figure 4g:
+Figure 4h:
+Figure 4i:
+mPFC NE baseline:
+Outcome anova: p = 1.478739e-01
+Responded vs. Withheld, Wilcoxon signed-rank: p = 6.015081e-01
+Figure 4j:
+S1 NE stim induced increase:
+Outcome anova: p = 7.161965e-12
+Responded vs. Withheld, Wilcoxon signed-rank: p = 5.095113e-09
+Figure 4k:
+Reaction Time by Baseline NE mPFC:
+One way anova: p = 9.180368e-01
+Figure 4l:
+Figure 5:
+Figure 5b:
+Figure 5c:
+Figure 5d:
+Trials per state/session:
+One way anova: p = 3.007588e-02
+Figure 5e:
+Reaction time by state:
+One way anova: p = 5.694826e-01
+Figure 5f:
+Criterion by state:
+One way anova: p = 7.293561e-02
+Figure 6:
+Figure 6a:
+Figure 6b:
+Baseline Pupil Diameter:
+Hit - one way anova: p = 1.932319e-02
+Miss - one way anova: p = 2.292065e-03
+CR - one way anova: p = 1.870149e-03
+FA - one way anova: p = 7.760807e-03
+Figure 6c:
+Pupil Dilation:
+Hit - one way anova: p = 3.144396e-01
+Miss - one way anova: p = 2.673812e-01
+CR - one way anova: p = 6.705265e-01
+FA - one way anova: p = 4.903710e-03
+Figure 7:
+Figure 7a:
+Figure 7b:
+S1 NE Baseline:
+Hit - one way anova: p = 1.273121e-01
+Miss - one way anova: p = 1.374755e-01
+CR - one way anova: p = 1.230440e-01
+FA - one way anova: p = 3.819298e-01
+Figure 7c:
+S1 NE Increase:
+Hit - one way anova: p = 6.192882e-01
+Miss - one way anova: p = 9.599444e-02
+CR - one way anova: p = 1.141679e-01
+FA - one way anova: p = 7.435748e-02
+Figure 7d:
+Figure 7e:
+mPFC NE Baseline:
+Hit - one way anova: p = 5.038694e-01
+Miss - one way anova: p = 9.466895e-01
+CR - one way anova: p = 7.266781e-01
+FA - one way anova: p = 2.156482e-01
+Figure 7f:
+mPFC NE Increase:
+Hit - one way anova: p = 1.811211e-01
+Miss - one way anova: p = 9.204178e-01
+CR - one way anova: p = 3.081894e-01
+FA - one way anova: p = 4.744092e-01
+Figure 8:
+Figure 8a:
+Figure 8b:
+
+ind =
+
+     2
+
+
+ind =
+
+     6
+
+
+ind =
+
+     7
+
+
+ind =
+
+     9
+
+
+ind =
+
+    15
+
+
+ind =
+
+    19
+
+
+ind =
+
+    21
+
+
+ind =
+
+    23
+
+
+ind =
+
+    24
+
+
+ind =
+
+    26
+
+
+ind =
+
+    27
+
+
+ind =
+
+    31
+
+
+ind =
+
+    33
+
+
+ind =
+
+    34
+
+
+ind =
+
+    35
+
+
+ind =
+
+    36
+
+
+ind =
+
+    37
+
+
+ind =
+
+    39
+
+
+ind =
+
+    40
+
+
+ind =
+
+    41
+
+
+ind =
+
+    43
+
+
+ind =
+
+    45
+
+
+ind =
+
+    46
+
+
+ind =
+
+    47
+
+
+ind =
+
+    48
+
+
+ind =
+
+    49
+
+
+ind =
+
+     2
+
+
+ind =
+
+     6
+
+
+ind =
+
+     7
+
+
+ind =
+
+     9
+
+
+ind =
+
+    15
+
+
+ind =
+
+    19
+
+
+ind =
+
+    21
+
+
+ind =
+
+    24
+
+
+ind =
+
+    26
+
+
+ind =
+
+    27
+
+
+ind =
+
+    31
+
+
+ind =
+
+    33
+
+
+ind =
+
+    34
+
+
+ind =
+
+    35
+
+
+ind =
+
+    36
+
+
+ind =
+
+    37
+
+
+ind =
+
+    39
+
+
+ind =
+
+    40
+
+
+ind =
+
+    41
+
+
+ind =
+
+    43
+
+
+ind =
+
+    45
+
+
+ind =
+
+    46
+
+
+ind =
+
+    47
+
+
+ind =
+
+    48
+
+
+ind =
+
+    49
+
+
+ind =
+
+     2
+
+
+ind =
+
+     3
+
+
+ind =
+
+     4
+
+
+ind =
+
+     5
+
+
+ind =
+
+     6
+
+
+ind =
+
+     7
+
+
+ind =
+
+     9
+
+
+ind =
+
+    10
+
+
+ind =
+
+    11
+
+
+ind =
+
+    12
+
+
+ind =
+
+    13
+
+
+ind =
+
+    14
+
+
+ind =
+
+    15
+
+
+ind =
+
+    16
+
+
+ind =
+
+    17
+
+
+ind =
+
+    18
+
+
+ind =
+
+    20
+
+
+ind =
+
+    21
+
+
+ind =
+
+    22
+
+
+ind =
+
+    23
+
+
+ind =
+
+    24
+
+
+ind =
+
+    25
+
+
+ind =
+
+    26
+
+
+ind =
+
+    27
+
+
+ind =
+
+    28
+
+
+ind =
+
+    29
+
+
+ind =
+
+    30
+
+
+ind =
+
+    31
+
+
+ind =
+
+    32
+
+
+ind =
+
+    33
+
+
+ind =
+
+    34
+
+
+ind =
+
+    35
+
+
+ind =
+
+    36
+
+
+ind =
+
+    37
+
+
+ind =
+
+    39
+
+
+ind =
+
+    40
+
+
+ind =
+
+    41
+
+
+ind =
+
+    43
+
+
+ind =
+
+    45
+
+
+ind =
+
+    47
+
+
+ind =
+
+    48
+
+
+ind =
+
+     1
+
+
+ind =
+
+     2
+
+
+ind =
+
+     3
+
+
+ind =
+
+     4
+
+
+ind =
+
+     5
+
+
+ind =
+
+     6
+
+
+ind =
+
+     7
+
+
+ind =
+
+     8
+
+
+ind =
+
+     9
+
+
+ind =
+
+    10
+
+
+ind =
+
+    11
+
+
+ind =
+
+    12
+
+
+ind =
+
+    13
+
+
+ind =
+
+    14
+
+
+ind =
+
+    15
+
+
+ind =
+
+    16
+
+
+ind =
+
+    17
+
+
+ind =
+
+    18
+
+
+ind =
+
+    20
+
+
+ind =
+
+    21
+
+
+ind =
+
+    22
+
+
+ind =
+
+    23
+
+
+ind =
+
+    24
+
+
+ind =
+
+    25
+
+
+ind =
+
+    26
+
+
+ind =
+
+    27
+
+
+ind =
+
+    28
+
+
+ind =
+
+    29
+
+
+ind =
+
+    30
+
+
+ind =
+
+    31
+
+
+ind =
+
+    32
+
+
+ind =
+
+    33
+
+
+ind =
+
+    34
+
+
+ind =
+
+    37
+
+
+ind =
+
+    38
+
+
+ind =
+
+    40
+
+
+ind =
+
+    42
+
+
+ind =
+
+    43
+
+
+ind =
+
+    44
+
+
+ind =
+
+    46
+
+
+ind =
+
+    47
+
+
+ind =
+
+    48
+
+
+ind =
+
+    49
+
+Xcorr by state:
+one way anova: p = 6.099767e-04

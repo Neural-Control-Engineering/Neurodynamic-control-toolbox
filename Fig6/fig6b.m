@@ -316,6 +316,8 @@ function [sesh_ps, all_sesh] = lumpByResponseProb(data_ver, ssd_version, psychve
     unifyYLimits(fig)
     xlabel(tl, 'States', 'FontSize', 16)
     ylabel(tl, 'Baseline Pupil Area (z-score)', 'FontSize', 16)
+    saveas(fig, 'Figures/fig6b.fig')
+    saveas(fig, 'Figures/fig6b.svg')
     
 end
 

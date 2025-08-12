@@ -622,7 +622,7 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 **** DONE: Fig7/fig7c.m
 **** DONE: Fig7/fig7e.m
 **** DONE: Fig7/fig7f.m
-*** TODO: anova, signed rank / t-test into relevant figures 
+*** DONE: anova, signed rank / t-test into relevant figures 
 **** DONE: Fig2/fig2f.m 
 **** DONE: Fig2/fig2g.m 
 **** DONE: Fig2/fig2h.m 
@@ -637,12 +637,12 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 **** DONE: Fig5/fig5d.m
 **** DONE: Fig5/fig5g.m
 **** DONE: Fig5/fig5h.m
-**** TODO: Fig6/fig6b.m - unequal n 
-**** TODO: Fig6/fig6c.m - unequal n 
-**** TODO: Fig7/fig7b.m - unequal n 
-**** TODO: Fig7/fig7c.m - unequal n 
-**** TODO: Fig7/fig7e.m - unequal n 
-**** TODO: Fig7/fig7f.m - unequal n 
+**** DONE: Fig6/fig6b.m - unequal n - fixed
+**** DONE: Fig6/fig6c.m - unequal n - fixed
+**** DONE: Fig7/fig7b.m - unequal n - fixed
+**** DONE: Fig7/fig7c.m - unequal n - fixed
+**** DONE: Fig7/fig7e.m - unequal n - fixed
+**** DONE: Fig7/fig7f.m - unequal n - fixed
 *** DONE: turn HMM-GLM figs into functions 
 *** TODO: stats to fix 
 **** TODO: Fig2/fig2f.m 

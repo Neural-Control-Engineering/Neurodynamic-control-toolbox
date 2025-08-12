@@ -26,7 +26,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, f
 
     reaction_times = zeros(length(animals), k);
     cols = distinguishable_colors(k);
-    figure();
+    fig = figure();
     for s = 1:k
         state_rp = [];
         for as = 1:size(ordered_states,1)
@@ -61,6 +61,8 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, f
     xlabel('Stimulus Strenght (PSI)', 'FontSize', 16)
     ylabel('Response Probability', 'FontSize', 16)
     legend()
+    saveas(fig, 'Figures/fig5c.fig')
+    saveas(fig, 'Figures/fig5c.svg')
 end
 
 function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k, folds)

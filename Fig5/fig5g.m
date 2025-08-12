@@ -57,6 +57,8 @@ function reaction_times = lumpByResponseProb(data_ver, ssd_version, psychver, an
     xlim([-0.5,3.5])
     xlabel('State', 'FontSize', 16)
     ylabel('Reaction Time (s)', 'FontSize', 16)
+    saveas(fig_sesh, 'Figures/fig5g.fig')
+    saveas(fig_sesh, 'Figures/fig5g.svg')
 
 end
 

@@ -70,4 +70,6 @@ function out = fig4f(data, ver)
     ylabel('Response Probability', 'FontSize', 14)
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline NE_{S1}';
+    saveas(fig, 'Figures/fig4f.fig')
+    saveas(fig, 'Figures/fig4f.svg')
 end
