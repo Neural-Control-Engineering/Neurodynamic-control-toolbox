@@ -1,4 +1,4 @@
-function [x, ss, tcile] = fig2jk(data)
+function [x, ss, tcile] = fig2j(data)
     % ptiles = 25:25:100;
     ptiles = [33, 66, 100];
     low = prctile(data.pupil_base_before_stimulus, 0);
@@ -8,6 +8,7 @@ function [x, ss, tcile] = fig2jk(data)
     session_fig = figure();
     rppa_session = {};
     rppa_animal = {};
+    fas = {};
     for i = 1:length(ptiles)
         ptile = ptiles(i);
         high = prctile(data.pupil_base_before_stimulus, ptile);
@@ -105,4 +106,12 @@ function [x, ss, tcile] = fig2jk(data)
     saveas(session_fig, 'Figures/fig2j.fig')
     saveas(session_fig, 'Figures/fig2j.svg')
 
+    terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2];
+    stim_strengths = stim_strengths .* 10;
+    mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}];
+    tbl = table(terciles, mat(:,1), mat(:,2), mat(:,3), mat(:,4), mat(:,5), mat(:,6), mat(:,7), 'VariableNames', {'tercile', 't0', 't1', 't2', 't3', 't4', 't5', 't6'});
+    rm = fitrm(tbl, 't0-t6 ~ tercile', 'WithinDesign', stim_strengths);
+    ranova(rm)
+
+    keyboard 
 end

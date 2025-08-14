@@ -1,10 +1,12 @@
-function dPrimeByPupilArea(data)
+function fig2k(data)
     % ptiles = 25:25:100;
     ptiles = [33, 66, 100];
     low = prctile(data.pupil_base_before_stimulus, 0);
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(5);
     fig = figure();
+    fas = {};
+    rppa_session = {};
     for i = 1:length(ptiles)
         ptile = ptiles(i);
         high = prctile(data.pupil_base_before_stimulus, ptile);
@@ -39,6 +41,7 @@ function dPrimeByPupilArea(data)
                 end
             end
         end
+        rppa_session{i} = mat;
         % mat = nan(size(tmp,1), length(stim_strengths));
         % for trial = 1:size(tmp,1)
         %     ind = find(stim_strengths == tmp.stimulus_strength(trial));
@@ -67,7 +70,14 @@ function dPrimeByPupilArea(data)
     
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline Pupil Area';
-
+    
     saveas(fig, 'Figures/fig2k.fig')
     saveas(fig, 'Figures/fig2k.svg')
+
+    terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2];
+    stim_strengths = stim_strengths(2:end) .* 10;
+    mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}];
+    tbl = table(terciles, mat(:,1), mat(:,2), mat(:,3), mat(:,4), mat(:,5), mat(:,6), 'VariableNames', {'tercile', 't0', 't1', 't2', 't3', 't4', 't5'});
+    rm = fitrm(tbl, 't0-t5 ~ tercile', 'WithinDesign', stim_strengths);
+    ranova(rm)
 end
