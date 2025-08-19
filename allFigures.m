@@ -29,6 +29,8 @@ close all
 
 % figure 2
 fprintf('Figure 2:\n')
+fprintf('Figure 2a:\n')
+fig2a(data)
 fprintf('Figure 2b:\n')
 fig2b(data, tbounds, alignTo);
 fprintf('Figure 2c:\n')
