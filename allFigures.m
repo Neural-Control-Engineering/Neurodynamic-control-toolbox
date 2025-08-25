@@ -17,6 +17,19 @@ data_version = 'spontaneous_pupil_stim_v2';
 k = 4;
 psychver = 'byanimal';
 
+% basic session analysis 
+session_ids = unique(data.session_id);
+trials = zeros(length(session_ids),1);
+durations = zeros(length(session_ids),1);
+for s = 1:length(session_ids)
+    session_id = session_ids{s};
+    tmp = data(strcmp(data.session_id, session_id),:);
+    trials(s) = size(tmp,1);
+    durations(s) = tmp.stimulus_time(end) + 6;
+end
+fprintf(sprintf('Trials per session: %d +/- %d\n', mean(trials), ste(trials)))
+fprintf(sprintf('Session duration (min): %d +/- %d\n', mean(durations ./ 60), ste(durations ./ 60)))
+
 % figure 1
 fprintf('Figure 1:\n')
 fprintf('Figure 1c:\n')
