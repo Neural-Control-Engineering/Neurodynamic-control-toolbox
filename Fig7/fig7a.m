@@ -216,6 +216,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     end
     tbounds = [-0.5,6.0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    all_ne = {};
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
@@ -257,6 +258,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                     end
                 end
             end
+            all_ne{s} = ne_ch2;
         end
         % subplot(1,4,1)
         % semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
@@ -293,6 +295,8 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         title(ttls{o}, 'FontSize', 16)
         ylim([-1,2])
     end
+
+    keyboard 
     
     ylabel(tl,'NE_{S1} (z-score)', 'FontSize', 16)
     % ylim([-0.3,0.4])

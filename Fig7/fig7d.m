@@ -216,6 +216,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     end
     tbounds = [-0.5,6.0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    all_ne = {};
     for s = 1:k
         cols = distinguishable_colors(k);
         state_rp = [];
@@ -257,6 +258,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                     end
                 end
             end
+            all_ne{s} = ne_ch1;
         end
         % subplot(1,4,1)
         % semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
@@ -299,6 +301,17 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
     xlabel(tl, 'Time (s)', 'FontSize', 16)
     axes(axs(1))
     legend()
+
+    % keyboard 
+    % y = [all_ne{1}{1}; all_ne{2}{1}; all_ne{3}{1}; all_ne{4}{1}];
+    % inds = [zeros(size(all_ne{1}{1},1),1)+1; zeros(size(all_ne{2}{1},1),1)+2; zeros(size(all_ne{3}{1},1),1)+3; zeros(size(all_ne{4}{1},1),1)+4];
+    % [~, score, ~, ~, explained] = pca(y);
+    % cols = distinguishable_colors(4);
+    % figure()
+    % hold on 
+    % for i = 1:4
+    %     scatter3(score(inds==i,1), score(inds==i,2), score(inds==i,3))
+    % end
 
     saveas(fig, 'Figures/fig7d.fig')
     saveas(fig, 'Figures/fig7d.svg')
