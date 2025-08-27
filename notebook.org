@@ -649,3 +649,11 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 **** TODO: Fig2/fig2g.m 
 **** TODO: Fig2/fig2h.m 
 **** TODO: Fig2/fig2i.m 
+
+* [2025-8-26 Tue] - review of results, onto discussion 
+** edits to results (on vorenus), mostly english 
+** NE dynamics by state
+*** currently text refers to pca clusters, hasn't actually been done yet
+** get rid of correct vs. incorrect for fig 3 for consistency w/ other figures?
+**** TODO: PCA of NE dynamics 
+*** question of whether to keep as is, edit figures, combine, etc.
