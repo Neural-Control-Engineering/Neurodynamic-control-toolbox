@@ -144,14 +144,14 @@ fig7a(data, k, data_version, ssd_version, psychver, animals)
 fprintf('Figure 7b:\n')
 fig7b(data, k, data_version, ssd_version, psychver, animals)
 fprintf('Figure 7c:\n')
-fig7c(data, k, data_version, ssd_version, psychver, animals)
+fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
 %% s2 
 fprintf('Figure 7d:\n')
 fig7d(data, k, data_version, ssd_version, psychver, animals)
 fprintf('Figure 7e:\n')
 fig7e(data, k, data_version, ssd_version, psychver, animals)
 fprintf('Figure 7f:\n')
-fig7f(data, k, data_version, ssd_version, psychver, animals)
+fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
 close all
 
 % figure 8 

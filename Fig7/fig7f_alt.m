@@ -1,185 +1,5 @@
-function fig7a(data, k, data_ver, ssd_version, psychver, animals)
+function fig7f_alt(data, k, data_ver, ssd_version, psychver, animals)
     lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k);
-end
-
-function lumpByPupilBaseline(data_ver, ssd_version, psychver, animals, data, k)
-    % set paths 
-    fformat = {data_ver, 'state_Python2mat.mat'};
-    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-    outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
-    if ~exist(outdir, 'dir')
-        mkdir(outdir)
-    end
-
-    mpbs = zeros(length(animals), k);
-    ordered_states = mpbs;
-    for a = 1:length(animals)
-        tmp = filterTrials(data, 'animal', num2str(animals(a)));
-        filename = sprintf('%s%i_%s_%i%s', base_path, animals(a), fformat{1}, k, fformat{2});
-        mpbs(a,:) = pupilBaseline(filename, tmp, k);
-        [~, inds] = sort(mpbs(a,:));
-        ordered_states(a,:) = inds - 1;
-    end
-
-    % average psychometric curves for each animal in each ordered state (starting with lowest)
-    figure('Position', [ 1151, 1516, 1830, 404])
-    tbounds = [-0.5,6.0];
-    for s = 1:k
-        cols = distinguishable_colors(k);
-        state_rp = [];
-        ne_ch1 = [];
-        ne_ch2 = [];
-        pupil = [];
-        for as = 1:size(ordered_states,1)
-            i = ordered_states(as,s);
-            filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
-            results = load(filename);
-            stim_strengths = unique(data.stimulus_strength);
-            rp = nan(1,length(stim_strengths));
-            tmp = filterTrials(data, 'animal', num2str(animals(as)));
-            statetmp = tmp(results.predicted_states == i,:);
-            if ~isempty(statetmp)
-                if strcmp(psychver, 'byanimal')
-                    tmp_strengths = unique(statetmp.stimulus_strength);
-                    for ss = 1:length(tmp_strengths)
-                        sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
-                        if tmp_strengths(ss)
-                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
-                        else
-                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
-                        end
-                        ind = find(stim_strengths == tmp_strengths(ss));
-                        rp(ind) = size(rtmp,1) / size(sstmp,1);
-                    end
-                end
-                state_rp = [state_rp; rp];
-                [ch1, ch2, t] = avg_photo_traces(statetmp, tbounds, 'stimulus', 'filtered');
-                ne_ch1 = [ne_ch1; nanmean(ch1)];
-                ne_ch2 = [ne_ch2; nanmean(ch2)];
-                [p, tp] = avg_pupil_traces(statetmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-                pupil = [pupil; p];
-            end
-        end
-        subplot(1,4,1)
-        semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
-        hold on
-        subplot(1,4,2)
-        semshade(ne_ch1, 0.3, cols(s,:), cols(s,:), t);
-        hold on
-        subplot(1,4,3)
-        semshade(ne_ch2, 0.3, cols(s,:), cols(s,:), t);
-        hold on
-        subplot(1,4,4)
-        semshade(pupil, 0.3, cols(s,:), cols(s,:), tp);
-        hold on
-    end
-    subplot(1,4,1)
-    xlabel('Stimulus Strength (PSI)')
-    ylabel('Response Probability')
-    subplot(1,4,2)
-    xlim(tbounds)
-    ylabel('NE_{mPFC} (z-score)')
-    subplot(1,4,3)
-    xlim(tbounds)
-    xlabel('Time (s)')
-    ylabel('NE_{S1} (z-score)')
-    subplot(1,4,4)
-    xlim(tbounds)
-    ylabel('Pupil Area (z-score)')
-    subplot(1,4,4); ylim([-0.6,0.61])
-    subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
-end
-
-function lumpByResponseProbSlope(data_ver, ssd_version, psychver, animals, data, k)
-    % set paths 
-    fformat = {data_ver, 'state_Python2mat.mat'};
-    base_path = sprintf('NT-GLM-HMM/data/%s/%s/unshuffled/results/', ssd_version, data_ver);
-    outdir = strcat(base_path, 'figures/phys_by_state/', psychver, '/');
-    if ~exist(outdir, 'dir')
-        mkdir(outdir)
-    end
-
-    if startsWith(data_ver, 'behvaior') || startsWith(data_ver, 'last_trial')
-        data = removeFirstTrials(data);
-    end
-
-    rpss = zeros(length(animals), k);
-    ordered_states = rpss;
-    for a = 1:length(animals)
-        tmp = filterTrials(data, 'animal', num2str(animals(a)));
-        filename = sprintf('%s%i_%s_%i%s', base_path, animals(a), fformat{1}, k, fformat{2});
-        rpss(a,:) = responseProbSlope(filename, tmp, k);
-        [~, inds] = sort(rpss(a,:));
-        ordered_states(a,:) = inds - 1;
-    end
-
-    % average psychometric curves for each animal in each ordered state (starting with lowest)
-    figure('Position', [ 1151, 1516, 1830, 404])
-    tbounds = [-0.5,6.0];
-    for s = 1:k
-        cols = distinguishable_colors(k);
-        state_rp = [];
-        ne_ch1 = [];
-        ne_ch2 = [];
-        pupil = [];
-        for as = 1:size(ordered_states,1)
-            i = ordered_states(as,s);
-            filename = sprintf('%s%i_%s_%i%s', base_path, animals(as), fformat{1}, k, fformat{2});
-            results = load(filename);
-            stim_strengths = unique(data.stimulus_strength);
-            rp = nan(1,length(stim_strengths));
-            tmp = filterTrials(data, 'animal', num2str(animals(as)));
-            statetmp = tmp(results.predicted_states == i,:);
-            if ~isempty(statetmp)
-                if strcmp(psychver, 'byanimal')
-                    tmp_strengths = unique(statetmp.stimulus_strength);
-                    for ss = 1:length(tmp_strengths)
-                        sstmp = filterTrials(statetmp, 'stim_strength', tmp_strengths(ss));
-                        if tmp_strengths(ss)
-                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
-                        else
-                            rtmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
-                        end
-                        ind = find(stim_strengths == tmp_strengths(ss));
-                        rp(ind) = size(rtmp,1) / size(sstmp,1);
-                    end
-                end
-                state_rp = [state_rp; rp];
-                [ch1, ch2, t] = avg_photo_traces(statetmp, tbounds, 'stimulus', 'filtered');
-                ne_ch1 = [ne_ch1; nanmean(ch1)];
-                ne_ch2 = [ne_ch2; nanmean(ch2)];
-                [p, tp] = avg_pupil_traces(statetmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-                pupil = [pupil; p];
-            end
-        end
-        subplot(1,4,1)
-        semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
-        hold on
-        subplot(1,4,2)
-        semshade(ne_ch1, 0.3, cols(s,:), cols(s,:), t);
-        hold on
-        subplot(1,4,3)
-        semshade(ne_ch2, 0.3, cols(s,:), cols(s,:), t);
-        hold on
-        subplot(1,4,4)
-        semshade(pupil, 0.3, cols(s,:), cols(s,:), tp);
-        hold on
-    end
-    subplot(1,4,1)
-    xlabel('Stimulus Strength (PSI)')
-    ylabel('Response Probability')
-    subplot(1,4,2)
-    xlim(tbounds)
-    ylabel('NE_{mPFC} (z-score)')
-    subplot(1,4,3)
-    xlim(tbounds)
-    xlabel('Time (s)')
-    ylabel('NE_{S1} (z-score)')
-    subplot(1,4,4)
-    xlim(tbounds)
-    ylabel('Pupil Area (z-score)')
-    subplot(1,4,4); ylim([-0.6,0.61])
-    subplot(1,4,2); ylim([-0.5,0.8]); subplot(1,4,3); ylim([-0.5,0.8])
 end
 
 function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
@@ -209,11 +29,7 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
 
     % average psychometric curves for each animal in each ordered state (starting with lowest)
     % figure('Position', [ 1151, 1516, 1830, 404])
-    fig = figure('Position', [ 1220, 1418, 1707, 420]);
-    tl = tiledlayout(1,4);
-    for i = 1:4
-        axs(i) = nexttile;
-    end
+    
     tbounds = [-0.5,6.0];
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     all_ne = {};
@@ -253,56 +69,74 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
                     otmp = filterTrials(statetmp, 'categorical_outcome', outcomes{o});
                     if ~isempty(otmp)
                         % [p, tp] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], 'stimulus');
-                        [~, ch2, t] = avg_photo_traces(otmp, tbounds, 'stimulus','filtered');
-                        ne_ch2{o} = [ne_ch2{o}; ch2];
+                        [ch1, ~, t] = avg_photo_traces(otmp, tbounds, 'stimulus','filtered');
+                        ne_ch1{o} = [ne_ch1{o}; ch1];
                     end
                 end
             end
-            all_ne{s} = ne_ch2;
-        end
-        % subplot(1,4,1)
-        % semshade(state_rp, 0.3, cols(s,:), cols(s,:), stim_strengths .* 10);
-        % hold on
-        % subplot(1,4,2)
-        % semshade(ne_ch1, 0.3, cols(s,:), cols(s,:), t);
-        % hold on
-        % subplot(1,4,3)
-        % semshade(ne_ch2, 0.3, cols(s,:), cols(s,:), t);
-        % hold on
-        % subplot(1,4,4)
-        for o = 1:length(outcomes)
-            axes(axs(o))
-            semshade(ne_ch2{o}, 0.3, cols(s,:), cols(s,:), t, 1, sprintf('State %i', s-1));
-            hold on
-            xlim(tbounds)
+            all_ne{s} = ne_ch1;
         end
     end
-    % subplot(1,4,1)
-    % xlabel('Stimulus Strength (PSI)')
-    % ylabel('Response Probability')
-    % subplot(1,4,2)
-    % xlim(tbounds)
-    % ylabel('NE_{mPFC} (z-score)')
-    % subplot(1,4,3)
-    % xlim(tbounds)
-    % xlabel('Time (s)')
-    % ylabel('NE_{S1} (z-score)')
-    % subplot(1,4,4)
-    % xlim(tbounds)
-    ttls = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
-    for o = 1:length(outcomes)
-        axes(axs(o))
-        title(ttls{o}, 'FontSize', 16)
-        ylim([-1,2])
-    end
+
     
-    ylabel(tl,'NE_{S1} (z-score)', 'FontSize', 16)
-    % ylim([-0.3,0.4])
-    xlabel(tl, 'Time (s)', 'FontSize', 16)
-    axes(axs(1))
-    legend()
-    saveas(fig, 'Figures/fig7a.fig')
-    saveas(fig, 'Figures/fig7a.svg')
+    y = [];
+    inds = [];
+    outcomes = [];
+    for o = 1:4
+        y = [y; all_ne{1}{o}; all_ne{2}{o}; all_ne{3}{o}; all_ne{4}{o}];
+        inds = [inds; zeros(size(all_ne{1}{o},1),1)+1; zeros(size(all_ne{2}{o},1),1)+2; zeros(size(all_ne{3}{o},1),1)+3; zeros(size(all_ne{4}{o},1),1)+4];
+        outcomes = [outcomes; zeros(size(all_ne{1}{o},1),1)+o; zeros(size(all_ne{2}{o},1),1)+o; zeros(size(all_ne{3}{o},1),1)+o; zeros(size(all_ne{4}{o},1),1)+o];
+    end
+    [~, all_score, ~, ~, ~] = pca(y);
+    fig_bar = figure('Position', [ 1220, 1418, 1707, 420]);
+    tl = tiledlayout(1,4);
+    cols = distinguishable_colors(4);
+    for o = 1:4
+        axs(o) = nexttile;
+        hold on 
+        for i = 1:4
+            score = all_score(inds==i & outcomes == o,:);
+            errorbar(nanmean(score(:,1)), nanmean(score(:,2)), ste(score(:,2)), ste(score(:,2)), ste(score(:,1)), ste(score(:,1)), 'o', 'Color', cols(i,:), 'LineWidth', 2)
+        end
+    end
+    ylabel(tl,'NE_{mPFC} PC2', 'FontSize', 16)
+    xlabel(tl, 'NE_{mPFC} PC1', 'FontSize', 16)
+
+    fig_dot = figure('Position', [ 1220, 1418, 1707, 420]);
+    tl = tiledlayout(1,4);
+    cols = distinguishable_colors(4);
+    for o = 1:4
+        axs(o) = nexttile;
+        hold on 
+        for i = 1:4
+            score = all_score(inds==i & outcomes == o,:);
+            plot(score(:,1), score(:,2), '.', 'Color', cols(i,:))
+        end
+    end
+    ylabel(tl,'NE_{S1} PC2', 'FontSize', 16)
+    xlabel(tl, 'NE_{S1} PC1', 'FontSize', 16)    
+
+    % figure()
+    % for o = 1:4
+    %     axs(o) = nexttile;
+    %     y = [all_ne{1}{o}; all_ne{2}{o}; all_ne{3}{o}; all_ne{4}{o}];
+    %     inds = [zeros(size(all_ne{1}{o},1),1)+1; zeros(size(all_ne{2}{o},1),1)+2; zeros(size(all_ne{3}{o},1),1)+3; zeros(size(all_ne{4}{o},1),1)+4];
+    %     [~, score, ~, ~, explained] = pca(y);
+    %     hold on 
+    %     for i = 1:4
+    %         % scatter3(nanmean(score(inds==i,1)), nanmean(score(inds==i,2)), nanmean(score(inds==i,3)), 36, cols(i,:))
+    %         errorbar(nanmean(score(inds==i,1)), nanmean(score(inds==i,2)), ste(score(inds==i,2)), ste(score(inds==i,2)), ste(score(inds==i,1)), ste(score(inds==i,1)), 'o', 'Color', cols(i,:))
+    %     end
+    % end
+
+    % ylabel(tl,'NE_{mPFC} PC2', 'FontSize', 16)
+    % xlabel(tl, 'NE_{mPFC} PC1', 'FontSize', 16)    
+    % unifyYLimits(fig)
+
+    saveas(fig_bar, 'Figures/fig7f_alt_bar.fig')
+    saveas(fig_bar, 'Figures/fig7f_alt_bar.svg')
+    saveas(fig_dot, 'Figures/fig7f_alt_dot.fig')
+    saveas(fig_dot, 'Figures/fig7f_alt_dot.svg')
     % leg = legend()
     % title(leg, 'HMM State', 'FontSize', 16)
 end
