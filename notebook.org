@@ -657,3 +657,37 @@ dPupil x S1 Peak Correlation Action vs Withheld: Mann-Whitney p=0.044479
 ** get rid of correct vs. incorrect for fig 3 for consistency w/ other figures?
 **** TODO: PCA of NE dynamics 
 *** question of whether to keep as is, edit figures, combine, etc.
+
+* [2025-9-8 Mon] 
+** missing stats 
+*** 2E 
+R-squared: 0.27,  Adjusted R-Squared: 0.27
+F-statistic vs. constant model: 1.21e+03, p-value = 2.08e-226
+*** 2G 
+Anova: p = 9.348998e-03
+Responded vs. Withheld, Wilcoxon signed-rank: p = 3.763181e-04
+*** 2I 
+One way anova: p = 7.630358e-01
+*** 2J,K 
+-------------------------------------------------------------------------------------------------------------------------------
+Panel J - Response probability by baseline pupil area 
+Two way ANOVA 
+    Source                 Sum sq.   d.f   Mean s1.    F      p
+   --------                -------   ---   -------    ---    --- 
+  stim strength            0.0012     6    0.0002     0      1     
+  tercile                  1.1303     2    0.56516    6.22   0.0021
+  stim strength:tercile    0.0104    12    0.00087    0.01   1     
+  Error                   87.4866   963    0.09085                 
+  Total                   88.6297   983                            
+
+-------------------------------------------------------------------------------------------------------------------------------
+Panel K - Response probability by baseline pupil area 
+  stim strength             0         5     0           0        1   
+  tercile                 138.064     2    69.0322    125.06     1.9884e-48   
+  stim strength:tercile     0        10     0           0        1   
+  Error                   476.912   864     0.552                    
+  Total                   614.976   881                              
+*** 3D
+NE mPFC x S1 Outcome anova: p = 2.646066e-01
+Responded vs. Withheld, Wilcoxon signed-rank: p = 2.620095e-02
+Correct vs. Incorrect, Wilcoxon signed-rank: p = 4.720177e-02
