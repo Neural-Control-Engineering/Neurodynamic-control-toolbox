@@ -80,11 +80,12 @@ function [animal, session] = fig2f(data, tbounds, alignTo)
     ylabel({'Pearson''s correlation coefficient', '(pupil baseline vs. dilation)'})
 
     mat = [session{1}, session{2}, session{4}, session{4}];
-    p = anova1(mat);
+    [p, ~, stats] = anova1(mat);
     fprintf('Pupil baseline vs dilation pearsons correlation coefficient:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session{5}, session{6})))
-
+    multcompare(stats)
+    keyboard
     saveas(fig_sesh, 'Figures/fig2f.fig')
     saveas(fig_sesh, 'Figures/fig2f.svg')
 
