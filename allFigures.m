@@ -1,6 +1,6 @@
 diary ssd_stats.txt
 addpath(genpath('./'))
-Datastore = load('~/Downloads/Combined-Datastore_created_14-Jan-2024.mat');
+Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
