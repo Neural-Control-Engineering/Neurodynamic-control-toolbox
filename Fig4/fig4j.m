@@ -78,13 +78,15 @@ function [dilations_animal, dilations_session] = fig4j(data, tbounds, alignTo, v
     xtickangle(45)
     ylabel('Mean Increase in NE_{mPFC} (z-score)')
 
-    mat = [dilations_session{1}, dilations_session{2}, dilations_session{4}, dilations_session{4}];
-    p = anova1(mat);
+    mat = [dilations_session{1}, dilations_session{2}, dilations_session{3}, dilations_session{4}];
+    [p, ~, stats] = anova1(mat);
     fprintf('S1 NE stim induced increase:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
     % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{7}, dilations_session{8})))
-
+    mc = multcompare(stats)
+    keyboard 
+    
     saveas(fig_sesh, 'Figures/fig4j.fig')
     saveas(fig_sesh, 'Figures/fig4j.svg')
 

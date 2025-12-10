@@ -2,17 +2,21 @@ function fig6b(data, k, data_ver, ssd_version, psychver, animals)
     [sesh_ps, all_sesh] = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k);
     fprintf('Baseline Pupil Diameter:\n')
     mat = [sesh_ps{1}{1}, sesh_ps{2}{1}, sesh_ps{3}{1}, sesh_ps{4}{1}];
-    p = anova1(mat);
+    [p, ~, stats] = anova1(mat);
     fprintf(sprintf('Hit - one way anova: p = %d\n', p))
+    mc_hit = multcompare(stats)
     mat = [sesh_ps{1}{2}, sesh_ps{2}{2}, sesh_ps{3}{2}, sesh_ps{4}{2}];
-    p = anova1(mat);
+    [p, ~, stats] = anova1(mat);
     fprintf(sprintf('Miss - one way anova: p = %d\n', p))
+    mc_miss = multcompare(stats)
     mat = [sesh_ps{1}{3}, sesh_ps{2}{3}, sesh_ps{3}{3}, sesh_ps{4}{3}];
-    p = anova1(mat);
+    [p, ~, stats] = anova1(mat);
     fprintf(sprintf('CR - one way anova: p = %d\n', p))
+    mc_cr = multcompare(stats)
     mat = [sesh_ps{1}{4}, sesh_ps{2}{4}, sesh_ps{3}{4}, sesh_ps{4}{4}];
-    p = anova1(mat);
+    [p, ~, stats] = anova1(mat);
     fprintf(sprintf('FA - one way anova: p = %d\n', p))
+    mc_fa = multcompare(stats)
 end
 
 function lumpByPupilBaseline(data_ver, ssd_version, psychver, animals, data, k)

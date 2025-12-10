@@ -691,3 +691,58 @@ Panel K - Response probability by baseline pupil area
 NE mPFC x S1 Outcome anova: p = 2.646066e-01
 Responded vs. Withheld, Wilcoxon signed-rank: p = 2.620095e-02
 Correct vs. Incorrect, Wilcoxon signed-rank: p = 4.720177e-02
+
+* [2025-9-10 Wed] 
+** stats to fix in text 
+*** fig 2F
+*** fig 2G
+*** fig 2H
+*** fig 3C
+*** fig 3D
+*** fig 4C
+*** fig 4D
+*** fig 4I
+*** fig 4J
+
+* [2025-11-19 Wed] - introduction 
+**
+Integrating sensory information, responding to behaviorally relevant stimuli, and ignoring 
+behaviorally irrelevant stimuli is essential to animal survival.
+Goal-directed behaviors require the coordinated activity of mulitple brain regions:
+thalamus and sensory cortices process and encode stimuli; prefrontal cortex is involved 
+in decision making, planning, and working memory; and neuromodulatory brainstem nuclei 
+dynamically modulate processing in other brain regions through attention and arousal.
+(https://www.sciencedirect.com/science/article/pii/S1364661314001570
+https://www.biorxiv.org/content/10.1101/2025.09.23.677709v1.full 
+https://www.nature.com/articles/s41593-024-01787-0)
+In particular, activity in the locus coeruleus, the brain's primary source of norepinephrine, has been shown
+to modulate feedforward processing of behaviorally-relevant stimuli and correlate with performance in goal-directed behaviors
+(Hirata et al., 2006; Devilbiss et al., 2006; Rodenkirch et al., 2019; Rajkowski et al., 1994; Usher et al., 1999).
+Recent developments in genetically encoded fluorescent sensors in vivo 
+have opened a window onto the dynamics of norepinephrine released during sensory processing, 
+learned behaviors, and sleep 
+(https://www.ncbi.nlm.nih.gov/pubmed/30922875
+https://doi.org/10.1038/s41586-022-04782-2
+https://www.ncbi.nlm.nih.gov/pubmed/35798980
+https://www.ncbi.nlm.nih.gov/pubmed/37474807
+Liu et al. 2025).
+
+Pupil diameter is a reliable physiological biomarker of arousal and predictor of task performance 
+in sensory signal detection tasks (Schriver et al. 2018; Narasimhan et al. 2023).  
+There is also strong evidence of a link between neural activity in LC and dynamic 
+changes in pupil diameter; however, the relationships between LC activity, pupil area, 
+and arousal are strongly nonlinear.  Although large pupil dilations often coincided with 
+bursts of LC firing (reflecting arousal or salient stimuli), pupil area alone
+is a poor index of spiking activity in LC (Yang et al. 2023).  While arousal is a strong predictor of behavior,
+mice exhibit distinct strategies during goal directed behaviors that do not neatly map to arousal level (Ashwood et al. 2022)
+The relationship between pupil area and noradrenergic dynamics to those behavioral strategies remains unclear.
+
+Here we explored the relationships between pupil dynamics, noradrenergic dynamics, and behavior in 
+a somatosensory signal detection task. Mice were trained to ignore auditory distractors and respond 
+to behaviorally relevant tactile signals in pursuit of water rewards. We simultaneous montiored pupil
+dynamics and fluorescent GRABNE signals in somatosensory and prefrontal cortices during task execution.
+We found that baseline pupil area and baseline synchronization of GRABNE signals were strong predictors of behavior, 
+but not baseline cortical GRABNE levels.
+We also employed a generalized linear model - hidden Markov model framework developed by Ashwood et al. (2022) to predict 
+performance and identify distinct behavioral states. 
+We found that baseline pupil area was a better predictor of behavior than task performance on previous trials.

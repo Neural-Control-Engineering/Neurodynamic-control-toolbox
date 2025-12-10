@@ -155,3 +155,416 @@ Figure 8a:
 Figure 8b:
 Xcorr by state:
 one way anova: p = 6.099767e-04
+addpath(genpath('./'))
+Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
+data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
+animals = fetchAnimals(data);
+data(cellfun(@isempty, data.photometry_ch1),:) = [];
+tbounds = [-0.5, 6.0];
+alignTo = 'stimulus';
+ssd_version = 'v3';
+kstates = [2,3,4,5];
+data_versions = {'last_trial_behavior_no_bias', ... 
+    'last_trial_behavior_drop_stim_no_bias', ...
+    'just_stim', ...
+    'spontaneous_pupil_stim_v2', ...
+     };
+data_version = 'spontaneous_pupil_stim_v2';
+k = 4;
+psychver = 'byanimal';
+fig7b(data, k, data_version, ssd_version, psychver, animals)
+S1 NE Baseline:
+Hit - one way anova: p = 1.273121e-01
+Miss - one way anova: p = 1.374755e-01
+CR - one way anova: p = 1.230440e-01
+FA - one way anova: p = 3.819298e-01
+fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
+[Warning: Columns of X are linearly dependent to within machine precision.
+Using only the first 272 components to compute TSQUARED.] 
+[> In pca>localTSquared (line 515)
+In pca (line 361)
+In fig7c_alt>lumpByResponseProb (line 90)
+In fig7c_alt (line 2)] 
+NE S1 PC Comparisons
+
+Hit:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 5.679527e-01
+State 0 vs state 2:
+Mann Whitney: p = 5.079300e-01
+State 0 vs state 3:
+Mann Whitney: p = 6.573495e-02
+State 1 vs state 2:
+Mann Whitney: p = 8.659856e-01
+State 1 vs state 3:
+Mann Whitney: p = 1.483884e-02
+State 2 vs state 3:
+Mann Whitney: p = 1.926406e-03
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 1.540925e-02
+State 0 vs state 2:
+Mann Whitney: p = 6.049741e-02
+State 0 vs state 3:
+Mann Whitney: p = 2.992124e-01
+State 1 vs state 2:
+Mann Whitney: p = 3.527812e-01
+State 1 vs state 3:
+Mann Whitney: p = 1.421635e-02
+State 2 vs state 3:
+Mann Whitney: p = 3.882053e-02
+
+Miss:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 4.948266e-02
+State 0 vs state 2:
+Mann Whitney: p = 9.296466e-01
+State 0 vs state 3:
+Mann Whitney: p = 7.839441e-03
+State 1 vs state 2:
+Mann Whitney: p = 3.182683e-02
+State 1 vs state 3:
+Mann Whitney: p = 7.057901e-01
+State 2 vs state 3:
+Mann Whitney: p = 3.493202e-03
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 3.545552e-01
+State 0 vs state 2:
+Mann Whitney: p = 5.664908e-05
+State 0 vs state 3:
+Mann Whitney: p = 5.731878e-01
+State 1 vs state 2:
+Mann Whitney: p = 6.278904e-03
+State 1 vs state 3:
+Mann Whitney: p = 5.853202e-01
+State 2 vs state 3:
+Mann Whitney: p = 2.243782e-04
+
+CR:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 2.746205e-01
+State 0 vs state 2:
+Mann Whitney: p = 9.852496e-01
+State 0 vs state 3:
+Mann Whitney: p = 5.967875e-02
+State 1 vs state 2:
+Mann Whitney: p = 1.763500e-01
+State 1 vs state 3:
+Mann Whitney: p = 5.701579e-01
+State 2 vs state 3:
+Mann Whitney: p = 1.577926e-02
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 1.908574e-02
+State 0 vs state 2:
+Mann Whitney: p = 2.444675e-03
+State 0 vs state 3:
+Mann Whitney: p = 8.342609e-01
+State 1 vs state 2:
+Mann Whitney: p = 7.774860e-01
+State 1 vs state 3:
+Mann Whitney: p = 1.496798e-03
+State 2 vs state 3:
+Mann Whitney: p = 2.751996e-05
+
+FA:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 8.857143e-01
+State 0 vs state 2:
+Mann Whitney: p = 1.483354e-01
+State 0 vs state 3:
+Mann Whitney: p = 7.035589e-01
+State 1 vs state 2:
+Mann Whitney: p = 2.824591e-01
+State 1 vs state 3:
+Mann Whitney: p = 9.214134e-01
+State 2 vs state 3:
+Mann Whitney: p = 6.150357e-02
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 4.857143e-01
+State 0 vs state 2:
+Mann Whitney: p = 2.824591e-01
+State 0 vs state 3:
+Mann Whitney: p = 1.629426e-01
+State 1 vs state 2:
+Mann Whitney: p = 4.363852e-01
+State 1 vs state 3:
+Mann Whitney: p = 7.035589e-01
+State 2 vs state 3:
+Mann Whitney: p = 3.414363e-01
+close all
+fig7c(data, k, data_version, ssd_version, psychver, animals)
+S1 NE Increase:
+Hit - one way anova: p = 6.192882e-01
+Miss - one way anova: p = 9.599444e-02
+CR - one way anova: p = 1.141679e-01
+FA - one way anova: p = 7.435748e-02
+close all
+fig7e(data, k, data_version, ssd_version, psychver, animals)
+mPFC NE Baseline:
+Hit - one way anova: p = 5.038694e-01
+Miss - one way anova: p = 9.466895e-01
+CR - one way anova: p = 7.266781e-01
+FA - one way anova: p = 2.156482e-01
+close all
+fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
+[Warning: Columns of X are linearly dependent to within machine precision.
+Using only the first 272 components to compute TSQUARED.] 
+[> In pca>localTSquared (line 515)
+In pca (line 361)
+In fig7c_alt>lumpByResponseProb (line 90)
+In fig7c_alt (line 2)] 
+NE S1 PC Comparisons
+
+Hit:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 5.679527e-01
+State 0 vs state 2:
+Mann Whitney: p = 5.079300e-01
+State 0 vs state 3:
+Mann Whitney: p = 6.573495e-02
+State 1 vs state 2:
+Mann Whitney: p = 8.659856e-01
+State 1 vs state 3:
+Mann Whitney: p = 1.483884e-02
+State 2 vs state 3:
+Mann Whitney: p = 1.926406e-03
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 1.540925e-02
+State 0 vs state 2:
+Mann Whitney: p = 6.049741e-02
+State 0 vs state 3:
+Mann Whitney: p = 2.992124e-01
+State 1 vs state 2:
+Mann Whitney: p = 3.527812e-01
+State 1 vs state 3:
+Mann Whitney: p = 1.421635e-02
+State 2 vs state 3:
+Mann Whitney: p = 3.882053e-02
+
+Miss:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 4.948266e-02
+State 0 vs state 2:
+Mann Whitney: p = 9.296466e-01
+State 0 vs state 3:
+Mann Whitney: p = 7.839441e-03
+State 1 vs state 2:
+Mann Whitney: p = 3.182683e-02
+State 1 vs state 3:
+Mann Whitney: p = 7.057901e-01
+State 2 vs state 3:
+Mann Whitney: p = 3.493202e-03
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 3.545552e-01
+State 0 vs state 2:
+Mann Whitney: p = 5.664908e-05
+State 0 vs state 3:
+Mann Whitney: p = 5.731878e-01
+State 1 vs state 2:
+Mann Whitney: p = 6.278904e-03
+State 1 vs state 3:
+Mann Whitney: p = 5.853202e-01
+State 2 vs state 3:
+Mann Whitney: p = 2.243782e-04
+
+CR:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 2.746205e-01
+State 0 vs state 2:
+Mann Whitney: p = 9.852496e-01
+State 0 vs state 3:
+Mann Whitney: p = 5.967875e-02
+State 1 vs state 2:
+Mann Whitney: p = 1.763500e-01
+State 1 vs state 3:
+Mann Whitney: p = 5.701579e-01
+State 2 vs state 3:
+Mann Whitney: p = 1.577926e-02
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 1.908574e-02
+State 0 vs state 2:
+Mann Whitney: p = 2.444675e-03
+State 0 vs state 3:
+Mann Whitney: p = 8.342609e-01
+State 1 vs state 2:
+Mann Whitney: p = 7.774860e-01
+State 1 vs state 3:
+Mann Whitney: p = 1.496798e-03
+State 2 vs state 3:
+Mann Whitney: p = 2.751996e-05
+
+FA:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 8.857143e-01
+State 0 vs state 2:
+Mann Whitney: p = 1.483354e-01
+State 0 vs state 3:
+Mann Whitney: p = 7.035589e-01
+State 1 vs state 2:
+Mann Whitney: p = 2.824591e-01
+State 1 vs state 3:
+Mann Whitney: p = 9.214134e-01
+State 2 vs state 3:
+Mann Whitney: p = 6.150357e-02
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 4.857143e-01
+State 0 vs state 2:
+Mann Whitney: p = 2.824591e-01
+State 0 vs state 3:
+Mann Whitney: p = 1.629426e-01
+State 1 vs state 2:
+Mann Whitney: p = 4.363852e-01
+State 1 vs state 3:
+Mann Whitney: p = 7.035589e-01
+State 2 vs state 3:
+Mann Whitney: p = 3.414363e-01
+close all
+fig7f(data, k, data_version, ssd_version, psychver, animals)
+mPFC NE Increase:
+Hit - one way anova: p = 1.811211e-01
+Miss - one way anova: p = 9.204178e-01
+CR - one way anova: p = 3.081894e-01
+FA - one way anova: p = 4.744092e-01
+close all
+fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
+[Warning: Columns of X are linearly dependent to within machine precision.
+Using only the first 271 components to compute TSQUARED.] 
+[> In pca>localTSquared (line 515)
+In pca (line 361)
+In fig7f_alt>lumpByResponseProb (line 90)
+In fig7f_alt (line 2)] 
+fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
+[Warning: Columns of X are linearly dependent to within machine precision.
+Using only the first 271 components to compute TSQUARED.] 
+[> In pca>localTSquared (line 515)
+In pca (line 361)
+In fig7f_alt>lumpByResponseProb (line 90)
+In fig7f_alt (line 2)] 
+NE S1 PC Comparisons
+
+Hit:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 1.831933e-01
+State 0 vs state 2:
+Mann Whitney: p = 1.273192e-01
+State 0 vs state 3:
+Mann Whitney: p = 6.962866e-01
+State 1 vs state 2:
+Mann Whitney: p = 7.565684e-01
+State 1 vs state 3:
+Mann Whitney: p = 2.782565e-02
+State 2 vs state 3:
+Mann Whitney: p = 4.293928e-04
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 5.589975e-03
+State 0 vs state 2:
+Mann Whitney: p = 8.831637e-07
+State 0 vs state 3:
+Mann Whitney: p = 1.701142e-08
+State 1 vs state 2:
+Mann Whitney: p = 9.992329e-05
+State 1 vs state 3:
+Mann Whitney: p = 1.675514e-07
+State 2 vs state 3:
+Mann Whitney: p = 1.723083e-01
+
+Miss:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 4.301588e-01
+State 0 vs state 2:
+Mann Whitney: p = 5.814742e-01
+State 0 vs state 3:
+Mann Whitney: p = 2.117248e-01
+State 1 vs state 2:
+Mann Whitney: p = 6.565400e-01
+State 1 vs state 3:
+Mann Whitney: p = 9.702136e-01
+State 2 vs state 3:
+Mann Whitney: p = 4.578140e-01
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 8.492201e-01
+State 0 vs state 2:
+Mann Whitney: p = 2.572133e-01
+State 0 vs state 3:
+Mann Whitney: p = 2.505517e-01
+State 1 vs state 2:
+Mann Whitney: p = 2.352877e-01
+State 1 vs state 3:
+Mann Whitney: p = 3.099019e-01
+State 2 vs state 3:
+Mann Whitney: p = 5.820096e-03
+
+CR:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 6.424067e-01
+State 0 vs state 2:
+Mann Whitney: p = 5.283663e-01
+State 0 vs state 3:
+Mann Whitney: p = 9.608405e-02
+State 1 vs state 2:
+Mann Whitney: p = 8.713012e-01
+State 1 vs state 3:
+Mann Whitney: p = 3.185612e-01
+State 2 vs state 3:
+Mann Whitney: p = 1.830202e-01
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 9.611746e-02
+State 0 vs state 2:
+Mann Whitney: p = 1.067242e-02
+State 0 vs state 3:
+Mann Whitney: p = 8.068907e-01
+State 1 vs state 2:
+Mann Whitney: p = 6.434548e-01
+State 1 vs state 3:
+Mann Whitney: p = 1.975091e-02
+State 2 vs state 3:
+Mann Whitney: p = 4.265172e-04
+
+FA:
+First dimension:
+State 0 vs state 1:
+Mann Whitney: p = 2.000000e-01
+State 0 vs state 2:
+Mann Whitney: p = 2.377100e-02
+State 0 vs state 3:
+Mann Whitney: p = 4.690421e-02
+State 1 vs state 2:
+Mann Whitney: p = 1.702780e-01
+State 1 vs state 3:
+Mann Whitney: p = 3.746043e-01
+State 2 vs state 3:
+Mann Whitney: p = 1.931742e-01
+Second dimension:
+State 0 vs state 1:
+Mann Whitney: p = 3.428571e-01
+State 0 vs state 2:
+Mann Whitney: p = 4.949407e-02
+State 0 vs state 3:
+Mann Whitney: p = 9.126679e-03
+State 1 vs state 2:
+Mann Whitney: p = 3.541542e-01
+State 1 vs state 3:
+Mann Whitney: p = 7.888734e-01
+State 2 vs state 3:
+Mann Whitney: p = 4.307876e-02

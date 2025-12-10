@@ -78,11 +78,13 @@ function [dilations_animal, dilations_session] = fig2h(data, tbounds, alignTo)
     xtickangle(45)
     ylabel('Mean Pupil Dilation (z-score)')
 
-    mat = [dilations_session{1}, dilations_session{2}, dilations_session{4}, dilations_session{4}];
-    p = anova1(mat);
+    mat = [dilations_session{1}, dilations_session{2}, dilations_session{3}, dilations_session{4}];
+    [p, ~, stats] = anova1(mat);
     fprintf('Pupil dilations:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
+    mc = multcompare(stats)
+    keyboard 
 
     saveas(fig_sesh, 'Figures/fig2h.fig')
     saveas(fig_sesh, 'Figures/fig2h.svg')

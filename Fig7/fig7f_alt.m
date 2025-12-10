@@ -114,24 +114,45 @@ function lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k)
         end
     end
     ylabel(tl,'NE_{S1} PC2', 'FontSize', 16)
-    xlabel(tl, 'NE_{S1} PC1', 'FontSize', 16)    
-
-    % figure()
-    % for o = 1:4
-    %     axs(o) = nexttile;
-    %     y = [all_ne{1}{o}; all_ne{2}{o}; all_ne{3}{o}; all_ne{4}{o}];
-    %     inds = [zeros(size(all_ne{1}{o},1),1)+1; zeros(size(all_ne{2}{o},1),1)+2; zeros(size(all_ne{3}{o},1),1)+3; zeros(size(all_ne{4}{o},1),1)+4];
-    %     [~, score, ~, ~, explained] = pca(y);
-    %     hold on 
-    %     for i = 1:4
-    %         % scatter3(nanmean(score(inds==i,1)), nanmean(score(inds==i,2)), nanmean(score(inds==i,3)), 36, cols(i,:))
-    %         errorbar(nanmean(score(inds==i,1)), nanmean(score(inds==i,2)), ste(score(inds==i,2)), ste(score(inds==i,2)), ste(score(inds==i,1)), ste(score(inds==i,1)), 'o', 'Color', cols(i,:))
-    %     end
-    % end
-
-    % ylabel(tl,'NE_{mPFC} PC2', 'FontSize', 16)
-    % xlabel(tl, 'NE_{mPFC} PC1', 'FontSize', 16)    
-    % unifyYLimits(fig)
+    xlabel(tl, 'NE_{S1} PC1', 'FontSize', 16)   
+    
+    Outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    comps = [1,2; ...
+        1,3; ...
+        1,4; ...
+        2,3; ...
+        2,4; ...
+        3,4];
+    fprintf('NE S1 PC Comparisons\n')
+    for o = 1:4
+        scores = {};
+        for i = 1:4
+            scores{i} = all_score(inds==i & outcomes == o,:);
+        end
+        fprintf(sprintf('\n%s:\n', Outcomes{o}))
+        fprintf('First dimension:\n')
+        for c = 1:size(comps,1)
+            fprintf('State %i vs state %i:\n', comps(c,1)-1, comps(c,2)-1)
+            if KStest(scores{comps(c,1)}(:,1)) || KStest(scores{comps(c,2)}(:,1))
+                p = ranksum(scores{comps(c,1)}(:,1), scores{comps(c,2)}(:,1));
+                fprintf('Mann Whitney: p = %d\n', p)
+            else
+                [~, p] = ttest2(scores{comps(c,1)}(:,1), scores{comps(c,2)}(:,1));
+                fprintf('two-sample t-test: p = %d\n', p)
+            end
+        end
+        fprintf('Second dimension:\n')
+        for c = 1:size(comps,1)
+            fprintf('State %i vs state %i:\n', comps(c,1)-1, comps(c,2)-1)
+            if KStest(scores{comps(c,1)}(:,2)) || KStest(scores{comps(c,2)}(:,2))
+                p = ranksum(scores{comps(c,1)}(:,2), scores{comps(c,2)}(:,2));
+                fprintf('Mann Whitney: p = %d\n', p)
+            else
+                [~, p] = ttest2(scores{comps(c,1)}(:,2), scores{comps(c,2)}(:,2));
+                fprintf('two-sample t-test: p = %d\n', p)
+            end
+        end 
+    end
 
     saveas(fig_bar, 'Figures/fig7f_alt_bar.fig')
     saveas(fig_bar, 'Figures/fig7f_alt_bar.svg')

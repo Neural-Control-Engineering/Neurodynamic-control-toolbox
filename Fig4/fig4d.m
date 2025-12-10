@@ -81,11 +81,12 @@ function [dilations_animal, dilations_session] = fig4d(data, tbounds, alignTo, v
     saveas(fig_sesh, 'Figures/fig4d.fig')
     saveas(fig_sesh, 'Figures/fig4d.svg')
 
-    mat = [dilations_session{1}, dilations_session{2}, dilations_session{4}, dilations_session{4}];
-    p = anova1(mat);
+    mat = [dilations_session{1}, dilations_session{2}, dilations_session{3}, dilations_session{4}];
+    [p, ~, stats] = anova1(mat);
     fprintf('S1 NE stim induced increase:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
+    mc = multcompare(stats)
     % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{7}, dilations_session{8})))
 
 end

@@ -79,7 +79,7 @@ function [animal, session] = fig2f(data, tbounds, alignTo)
     xtickangle(45)
     ylabel({'Pearson''s correlation coefficient', '(pupil baseline vs. dilation)'})
 
-    mat = [session{1}, session{2}, session{4}, session{4}];
+    mat = [session{1}, session{2}, session{3}, session{4}];
     [p, ~, stats] = anova1(mat);
     fprintf('Pupil baseline vs dilation pearsons correlation coefficient:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))

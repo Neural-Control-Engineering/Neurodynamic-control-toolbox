@@ -69,12 +69,13 @@ function [baselines_animal, baselines_session] = fig2g(data, tbounds, alignTo)
     xtickangle(45)
     ylabel('Baseline Pupil Area (z-score)')
 
-    mat = [baselines_session{1}, baselines_session{2}, baselines_session{4}, baselines_session{4}];
-    p = anova1(mat);
+    mat = [baselines_session{1}, baselines_session{2}, baselines_session{3}, baselines_session{4}];
+    [p, ~, stats] = anova1(mat);
     fprintf('Pupil baseline:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
-
+    mc = multcompare(stats)
+    keyboard 
     saveas(fig_sesh, 'Figures/fig2g.fig')
     saveas(fig_sesh, 'Figures/fig2g.svg')
 

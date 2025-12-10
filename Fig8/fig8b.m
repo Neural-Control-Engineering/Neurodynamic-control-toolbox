@@ -1,9 +1,11 @@
 function fig8b(data, k, data_ver, ssd_version, psychver, animals, shuff)
     corrs = lumpByResponseProb(data_ver, ssd_version, psychver, animals, data, k, shuff);
     corrs = [corrs{1}, corrs{2}, corrs{3}, corrs{4}];
-    p = anova1(corrs);
+    [p, ~, stats] = anova1(corrs);
     fprintf('Xcorr by state:\n')
     fprintf(sprintf('one way anova: p = %d\n', p))
+    mc = multcompare(stats)
+    keyboard 
     % fprintf('Pupil baseline by outcome / state:\n')
 end
 

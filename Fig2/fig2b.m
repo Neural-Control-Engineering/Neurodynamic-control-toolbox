@@ -101,7 +101,8 @@ function fig2b(data, tbounds, alignTo)
         end
     end
 
-    p = anova1(mat')
+    [p, ~, stats] = anova1(mat')
+    multcompare(stats)
 
     saveas(session_fig, 'Figures/fig2b.fig')
     saveas(session_fig, 'Figures/fig2b.svg')

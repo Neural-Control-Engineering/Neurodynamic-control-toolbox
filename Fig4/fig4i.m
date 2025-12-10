@@ -75,10 +75,12 @@ function [baselines_animal, baselines_session] = fig4i(data, tbounds, alignTo, v
     ylabel('Baseline NE_{mPFC} (z-score)')
 
     mat = [baselines_session{1}, baselines_session{2}, baselines_session{4}, baselines_session{4}];
-    p = anova1(mat);
+    [p, ~, stats] = anova1(mat);
     fprintf('mPFC NE baseline:\n')
     fprintf(sprintf('Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
+    mc = multcompare(stats)
+    keyboard 
 
     saveas(fig_sesh, 'Figures/fig4i.fig')
     saveas(fig_sesh, 'Figures/fig4i.svg')

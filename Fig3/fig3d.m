@@ -122,10 +122,12 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
         ylabel('Peak Correlation at 0s Lag', 'FontSize', 16)
     end
     mat = [session_peaks{1}, session_peaks{2}, session_peaks{3}, session_peaks{4}];
-    p = anova1(mat);
+    [p, ~, stats] = anova1(mat);
     fprintf(sprintf('NE mPFC x S1 Outcome anova: p = %d\n', p))
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{5}, session_peaks{6})))
     fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{7}, session_peaks{8})))
+    mc = multcompare(stats)
+    keyboard 
     % fig_animal = figure();
     % errorbar([1:4, 6:7, 9:10], animal_avg, animal_err, 'k.')
     % hold on
