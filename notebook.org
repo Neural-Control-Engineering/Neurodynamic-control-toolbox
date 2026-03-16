@@ -746,3 +746,232 @@ but not baseline cortical GRABNE levels.
 We also employed a generalized linear model - hidden Markov model framework developed by Ashwood et al. (2022) to predict 
 performance and identify distinct behavioral states. 
 We found that baseline pupil area was a better predictor of behavior than task performance on previous trials.
+
+* [2026-2-27 Fri] - reviewer comments 
+** Reviewer 1 :
+This study examined pupil dynamics and NE activity in S1 and medial PFC in mice trained to perform a whisker-based 
+tactile signal detection task. The authors further use a GLM-HMM to identify latent states that reflected pupil 
+dynamics and task performance. This work is very interesting and has the potential to move the NE neuromodulatory 
+field forward. However, there were a substantial number of issues with the manuscript that dampened enthusiasm for 
+this work. These are outlined below.
+
+*** Major Concerns:
+**** The statistical analysis and its description throughout the manuscript did not appear consistent with the data 
+presented or the conclusions made by those analyses. It is highly recommended to engage a statistician to address 
+issues throughout the manuscript. A more detailed description of the statistics used in the methods section is 
+required. The following bullet points are a small sample of the issues found throughout the manuscript.
+
+***** Throughout the manuscript, it is indicated that ANOVA tests were used; however, there is no indication of the 
+degrees of freedom, F values, or factors used in those tests. In many cases these were not the correct statistical 
+test to be used, and a repeated measures or mixed model should be used.
+    Should be easy to fix. 
+
+***** Unconventional reporting of statistical results and p-values are difficult to interpret. For example, 
+ANOVA(Factor1 x Factor2), F(2, 27) = 4.545, p = 0.02) is a typical format. Additionally, why would the 
+authors report a P value < 8.7e-24 and not simply round (i.e. p<0.0001)?
+    As above. 
+
+***** For Figure 1 E-F, it is unclear how such statistical significance was obtained from an n=4 animals. This 
+needs to be explained in more detail.
+    Need to explain that statistics were performed across sessions unless otherwise noted.
+
+***** The statistics performed for Figure 2B,J-K should include time as an interaction term. If a select window 
+of time was used for the one-way ANOVA then that should be fully described in the text.
+    Have two-way stats for J-K, need to redo B 
+
+**** The main text of the manuscript is very descriptive, leaving out critical methodological and result details. For example:
+
+***** More detail is needed on the animals used for these experiments. Provide animal sex, age/weight, housing conditions, light cycle. etc.
+    *Don't know the sex, age/weight; might have to ask Cody.*  Should mention water restriction, maintain 80% baseline bodyweight, etc.
+
+***** Provide detail on the duration of the air puffs.
+    *I don't know the duration of the air puffs.*
+
+***** Provide more detail on whether the distractor puffs were delivered at random during the delay. This should be noted in Figure 1B. 
+Clarify whether the 2-second no-lick period was inclusive of 4-8 sec delay period.
+    Would be great to include distractor puff in the figure (was in a previous version).  Distractors were delivered at random during the 
+    delay. Looks like the 2-second no-lick period followed the delay, but not entirely sure.
+
+***** Report on what phase of the task where pupillometry measures taken. Was this during the 2 second no-lick. Before the stimulus was 
+presented or some other time point?
+    Pupil area was monitored continuously throughout the task.  We used the 2 seconds during the no-lick period prior to stimulus delivery
+    to compute baseline pupil area and baseline GRABNE signal.
+
+***** Across each trial, were the same number of vibrissa and movement identical for a given PSI. For all four animals, was the distance 
+between the air nozzle and rostral whisker the same?
+    Unfortunately, we did not monitor whisker movement as a result of stimulation during the task; however, it would be highly unlikely for 
+    the movement the vibrissa to be identical across trials at a given PSI as the mice were allowed to freely whisk during the behavior.
+    *I don't know about the distance between hte nozzle and the rostral whisker.*
+
+***** The authors note a head plate, but it is unclear from the methods whether the animal had free movement or whether the head was fixed 
+in place across the trials. If the head was fixed, provide information on how the animal was acclimated to the task to prevent restraint 
+from being a stressor.
+    Mice were head-fixed throughout each behavior session.  *I don't know what was done for acclimation.*    
+
+***** Provide greater detail for the behavioral task. Provide more detail around behavioral training leading up to testing in these sessions, 
+their overall performance levels in the test sessions, etc.
+    *I don't know these details.*
+
+***** The methods also indicated that there were 129 +/-5 trials in a session. In some plots, 4 data points are used yet in others plots substantially 
+more data is shown though less than 520 points (130 trials * 4 animals). This could be a result of multiple testing sessions, but it's unclear how 
+many testing sessions were recorded to generate these data.
+    In most figures (unless noted otherwise), we displayed session averages (generally across trials of a given type/outcome).  
+    *We should include the total number of sessions somewhere.* In figures with 4 daya points (Fig. 7D, G, H), those data represent each animal.
+
+**** The Figures and labels on the figures were difficult to read and needed to be expanded 300-350% to be legible. This unreadability substantially 
+limits the utility of this manuscript.
+    Need to increase fonts in figures.
+
+**** These data are based on 4 animals performing a behavioral task. Without a detailed description of the methods, animal training, and baseline 
+performance, it is unclear how animal performance was so similar. It is also unclear whether these studies were correctly powered with an n=4 and 
+whether these results reflect a sampling bias from a low sampling of the population.
+    Hopefully addressing the above comments helps assuage these concerns.  We do have pupil and behavior for more animals, though I don't readily know 
+
+
+*** Minor Concerns:
+**** Results:
+***** Provide a table or values within the text for the hit, miss, false alarm, and correct rejection rates for each stimulus level.
+
+***** The authors indicate that pupil size fluctuated during the task, similar to rats; however, Figure 2A only shows an image of DeepLabCut segmentation.
+    We can include an example trace or histogram of pupil area across a session.
+
+***** Report the range of pupil diameter sizes for low, medium, and high terciles used in Figure 2D.
+
+***** For pupil diameter and size, the authors report a series of numbers in the text. However, it is unclear what the metric of those numbers are. 
+For example, is this a Z-score or are these in millimeters? How does one obtain a negative baseline pupil size?
+    Recorded pupil sizes are Z-scores.  
+
+***** The authors indicate that NE signals in S1 and PFC were strongly synchronized. However, a correlation coefficient of .15 may not be considered a strong correlation.
+    These are shuffle corrected correlations, so it is the correlation at a given lag minus the average correlation at that lag for a 100(0) randomly shuffled signals.
+    *Maybe we should nonetheless drop strongly*
+
+***** The authors report a bimodal NE response to the stimulus presentation, given work by Aston-Jones et al., is there a response dependent peak in NE within S1 or PFC?
+    *I don't follow*
+
+**** In Figure 5E, it is interesting that at trial 25, the exemplar animal switches between oscillating between state 2 and 3 to state 0 and 1. 
+Is there an explanation or interpretation of this phenomenon?
+    Black and green are high response probability states (and thus more likely to switch from one to another if the animal is engaged in the task),
+    while red and blue are lower response probability states (and likewise more likely to switch from one to another when the animal is less engaged).
+    It is likely that around trial 25, the mouse moves from higher arousal state to a lower one.
+
+**** Figure 1:
+***** There seems to be a formatting issue with Figure 1B. It looks as if the air puff occurred within the response period instead of at the start 
+(as indicated in the methods).
+    True
+
+***** Include a more detailed description how reaction time in Figure 1 C was attained. Was this the average latency to the first lick?
+    Yes, latency to first lick.
+
+***** Report the bin size used for Figure 1D to quantify response probability? These values do not seem to match the PSTH plots in Figure 1D. 
+Possibly highlight the animal that those data were derived from in a different colored line throughout the Figure.
+    Any lick in the window of opportunity is considered a response.  1D is an example of a single session.  
+
+***** Calculations of d' (Figure 1F) suggest that there were false alarms, however these are not illustrated in Figure 1D.
+    Not all sessions include false alarm trials.
+
+Figure 2:
+- The authors plot pupil dynamics in Figure 2C, it is unclear whether this is an average of all stimulus intensities or for a specific example. Did pupil size Z scores differ across misses of differing intensity?
+
+- Describe in detail how baseline and dilation Z scores were calculated (Figure 2E). Was this the grand mean across all baseline measures and mean of all dilated pupil diameters? Or, was the pupil dilation Z score based on a trial by trial baseline mean?
+
+- For Figure 2E-H, do these reflect a representation of all stimulus intensities or a specific intensity or tercile?
+
+Figure 3:
+- For clarification, did GRAB-NE contain a fluorescent reporter? The legend indicates that immunohistochemistry was used. Also, this is a immunofluorescence photomicrograph.
+
+- Figure 3B-D, how many trials do these plots represent?
+
+Figure 5:
+- Strength is misspelled in Figure 5B inset and misspelled words exist in the legend.
+
+Figure 6:
+- Words are misspelled in the legend.
+
+- Again, are these trials from a particular stimulus intensity or is this an average of all intensities and therefore HMM State is a confound of stimulus intensity.
+
+- The bi-modal distribution of Miss and Correct Rejection in Figure 6B suggests that the states (1-3) are a mixture of states. Is there an explanation for this bimodal distribution?
+
+- It is unclear whether the variance in the date Figure 6B (False Alarm) supports the presented statistical p-value.
+
+Figure 7:
+- It is unclear what the difference is between Figure 7A and 7C, 7D and 7F. Indeed, 7A and 7D are time courses; however, from what data is C and F generated from?
+
+- Was there a comparison between the PFC and S1 for NE Baseline and task-evoked changed? This seems like a missed opportunity.
+
+Additional minor comments:
+The authors use the phrase "Behavioral States" and "Behavioral Outcome" to reference the response outcomes of the task (Hit, Miss, etc.). This usage is imprecise and it would be more parsimonious to simply state that these are task/response outcomes or trial result.
+
+There are inconsistencies across nomenclature in the manuscript. For example, PFC is used in the text and mPFC is used in Figures. Figure 3A suggests that the authors should use mPFC (medial PFC) throughout the manuscript.
+
+The discussion references the model as a HMM-GLM model versus a GLM-HMM model throughout the paper.
+
+There are a number of spelling and editorial errors throughout the manuscript that need to be addressed.
+
+
+** Reviewer 2:
+I read this manuscript with great interest. The concurrent measurement of pupil size and cortical noradrenergic activity is impressive and has resulted in a rich dataset. 
+By separating behavioral associations of global arousal from local noradrenergic dynamics, the study addresses important and timely questions about the unique and joint 
+associations of these measures. The exploration of relationships between behavior, pupil dynamics, and neuromodulatory activity is extensive and produces several 
+interesting observations.
+
+However, I have several concerns regarding unclear hypotheses, incomplete statistical reporting, and unconventional modeling choices that may limit interpretation of 
+the results. These issues need to be addressed before the manuscript is suitable for publication.
+
+*** Major comments:
+**** The manuscript lacks clearly defined predictions and hypotheses. Combined with the large number of reported effects, this makes the results difficult to interpret 
+and the overall narrative hard to follow. For example, it is unclear why pupil and NE dynamics are shown for specific trial types (hits, misses, etc.) within different 
+behavioral states, that were partially defined based on these trial types. Without clear hypotheses, it is difficult to evaluate the rationale or importance of these 
+comparisons. I suggest the authors to clearly define the research questions and justify all reported analyses in a clear and structured manner or focus on the most relevant 
+endpoints.
+    Should be easy to address, pretty simple hypotheses 
+
+**** The added value of the GLM-HMM analysis is currently unclear, and several modelling decisions appear somewhat unconventional and insufficiently justified. 
+For instance, no rationale is provided for including baseline pupil size as a predictor, but not baseline NE activity or evoked signals. Moreover, it is unclear 
+why a model similar to that used in Hulsey et al. (2024) was not considered, in which state dynamics were linked to baseline pupil-linked arousal. Their model 
+includes an intercept to capture overall decision bias and a stimulus predictor to capture sensitivity, producing interpretable behavioral states, including 
+engaged and biased states. This setup might also account for the asymmetry in target absent and target present trials in the current study, that likely drives 
+decision bias. If this alternative model provides a better fit of the data, investigating baseline pupil dynamics and anti-correlated task-evoked pupil responses 
+would also be more interpretable and less circular than in the current analysis.
+
+**** The underlying GLM weights for the detected states are not reported and not semantically labelled. Without this information, it is unclear what the states 
+represent. Reporting these weights and labelling the states would help clarify this.
+
+**** The statistical testing is underreported. It is unclear whether tests were performed at the level of single trials, how many trials were included, and how 
+many sessions were performed. If sufficient sessions were recorded per animal, using session as a random effect would further help avoid inflated type 1 errors. 
+Furthermore, figure captions should clarify what error bars represent and whether individual datapoints correspond to trials, sessions, animals, or something else.
+    Hopefully addressing Reviewer 1 comments addresses this concern 
+
+**** The different evoked pupil responses across trial types (hits, misses, false alarms, correct rejections) may be confounded by differences in baseline pupil 
+size. Indeed, the authors show robust anti-correlations between baseline pupil size and evoked pupil responses, in line with previous reports. I recommend regressing 
+baseline pupil size out of evoked responses and repeating the statistical analyses.
+
+**** Dividing trials into three bins based on baseline pupil size may be too coarse to capture known nonmonotonic, inverted-U relationships between pupil-linked 
+arousal and behavioral performance (e.g., Beerendonk et al., 2024, PNAS; de Gee et al., 2024, Current Biology; McGinley et al., 2015, Neuron). These relationships 
+are often asymmetric, with their peak shifted to the left, and recording just three bins may obscure this pattern. Analyses using continuous linear and quadratic 
+pupil size predictors would provide a more detailed insight in the relation between baseline pupil size and behavior. This applies to the GRABne signals too.
+
+Minor comments:
+- The second peak in NE signaling in S1 and PFC is intriguing. Could it reflect post-response licking, since it is only observed for response trials? Including a control analysis examining licking in this late time-window could be informative.
+
+- In the Introduction, the statement that the relationship between behavioral strategies and arousal remains unclear overlooks relevant literature including Akella et al. (2025; Nature Communications). Hulsey et al. (2024; Neuron), Johnson et al. (bioRxiv), Yin et al. (2025; Neuron).
+
+- In the Results, the opening sentence of the behavioral state segment mentions that task-evoked pupil dilations are examined as baseline pupil size was used as a predictor in the GLM, yet baseline pupil size effects are then reported. This sentence could be rephrased for clarity.
+
+- There is a period missing in the final paragraph of the Analyses, before "All analyses were performed [....]".
+
+- In the Results the sentence "Consistent with previous work, the perceptual behavior [...] was dependent on baseline pupil size" is somewhat redundant given the previous paragraph.
+
+- A brief explanation of what GRABne measures (single-cell versus population-level activity) could be included for clarification.
+
+Used literature:
+- Akella, S., et al. (2024). Deciphering neuronal variability across states reveals dynamic sensory encoding. Nature Communications, 16(1), 1768.
+
+- Beerendonk, L., et al. (2024). A disinhibitory circuit mechanism explains a general principle of peak performance during mid-level arousal. Proceedings of the National Academy of Sciences, 121, e2312898121.
+
+- de Gee, J. W., et al. (2024). Strategic stabilization of arousal boosts sustained attention. Current Biology. https://doi.org/10.1016/j.cub.2024.07.070
+
+- Hulsey, D., et al. (2024). Decision-making dynamics are predicted by arousal and uninstructed movements. Cell Reports, 43.
+
+- Johnson, P. A., et al. (2025). A dynamical systems model of arousal-driven behavioural state transitions. bioRxiv Preprint. https://doi.org/10.1101/2025.10.31.685593
+
+- Yin, C., et al. (2024). Spontaneous movements and their relationship to neural activity fluctuate with latent engagement states. Neuron, 113.
