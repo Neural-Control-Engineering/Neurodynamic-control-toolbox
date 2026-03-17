@@ -975,3 +975,12 @@ Used literature:
 - Johnson, P. A., et al. (2025). A dynamical systems model of arousal-driven behavioural state transitions. bioRxiv Preprint. https://doi.org/10.1101/2025.10.31.685593
 
 - Yin, C., et al. (2024). Spontaneous movements and their relationship to neural activity fluctuate with latent engagement states. Neuron, 113.
+
+* [2026-3-17 Tue] - addressing comments 
+** TODOS 
+*** TODO: fix stats 
+**** TODO: rerun fig8b.m for F statistic 
+*** TODO: rerun GLM-HMM accuracy plot to include baseline NE as regressor 
+*** TODO: clarify rational for different regressors 
+*** TODO: explicitly state hypotheses 
+*** TODO: compare NE dynamics between regions 
