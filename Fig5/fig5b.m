@@ -28,7 +28,13 @@ function fig = combineAnimals(animals, data_versions, kstates, lapse_ver)
         for animal = animals
             results_dir = sprintf('NT-GLM-HMM/data/lapse/%s/Lapse_Model/%i/', ... 
                 data_versions{i}, animal);
-            results = load(strcat(results_dir, 'results.mat'));
+            try
+                results = load(strcat(results_dir, 'results.mat'));
+            catch
+                results_dir = sprintf('NT-GLM-HMM/data/lapse/v3/%s/Lapse_Model/%i/', ... 
+                    data_versions{i}, animal);
+                results = load(strcat(results_dir, 'results.mat'));
+            end
             switch lapse_ver 
                 case 'best'
                     accs = [accs; max(results.accuracy)];
