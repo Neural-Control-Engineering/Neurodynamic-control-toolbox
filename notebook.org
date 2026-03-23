@@ -981,7 +981,17 @@ Used literature:
 *** DONE: fix stats 
 **** DONE: rerun fig8b.m for F statistic 
 *** DONE: rerun GLM-HMM accuracy plot to include baseline NE as regressor 
-*** TODO: clarify rational for different regressors 
+*** DONE: clarify rational for different regressors 
 *** TODO: explicitly state hypotheses 
 *** TODO: compare NE dynamics between regions 
 *** TODO: plot pupil area for a single session 
+*** DONE: regress baseline out of evoked pupil response and redo statistics 
+**** [[Figures/suppFig2.svg][dilation by outcome corrected for baseline vs. dilation trend]]
+**** anova:
+by outcome 
+    {'Source'}    {'SS'     }    {'df' }    {'MS'      }    {'F'       }    {'Prob>F'    }
+    {'Groups'}    {[ 5.9340]}    {[  3]}    {[  1.9780]}    {[ 32.6860]}    {[1.1778e-16]}
+    {'Error' }    {[10.0456]}    {[166]}    {[  0.0605]}    {0×0 double}    {0×0 double  }
+    {'Total' }    {[15.9796]}    {[169]}    {0×0 double}    {0×0 double}    {0×0 double  }
+**** Responded vs. Withheld, Wilcoxon signed-rank: p = 5.147353e-08
+*** TODO: plot weights per state 

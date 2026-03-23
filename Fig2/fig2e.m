@@ -28,6 +28,7 @@ function fig2e(data, tbounds, alignTo)
     xlabel('Baseline Pupil Area (z-score)', 'FontSize', 16)
     ylabel('Pupil Dilation (z-score)', 'FontSize', 16)
     xlim([-2.5,5.1])
+    keyboard 
     saveas(fig, 'Figures/fig2e.fig')
     saveas(fig, 'Figures/fig2e.svg')
 end

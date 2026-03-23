@@ -1,4 +1,8 @@
-data = filterTrials(Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% data = filterTrials(Datastore.Datastore.NE_dstore, 'recording_location', 'mPFC-S1');
+% animals = fetchAnimals(data);
+% data(cellfun(@isempty, data.photometry_ch1),:) = [];
+Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
+data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
 ssd_version = 'v2';
