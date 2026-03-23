@@ -843,7 +843,7 @@ For example, is this a Z-score or are these in millimeters? How does one obtain 
 
 ***** The authors indicate that NE signals in S1 and PFC were strongly synchronized. However, a correlation coefficient of .15 may not be considered a strong correlation.
     These are shuffle corrected correlations, so it is the correlation at a given lag minus the average correlation at that lag for a 100(0) randomly shuffled signals.
-    *Maybe we should nonetheless drop strongly*
+    *Maybe we should nonetheless drop strongly* - dropped
 
 ***** The authors report a bimodal NE response to the stimulus presentation, given work by Aston-Jones et al., is there a response dependent peak in NE within S1 or PFC?
     *I don't follow*
@@ -860,14 +860,14 @@ Is there an explanation or interpretation of this phenomenon?
     True
 
 ***** Include a more detailed description how reaction time in Figure 1 C was attained. Was this the average latency to the first lick?
-    Yes, latency to first lick.
+    Yes, latency to first lick. Added to text
 
 ***** Report the bin size used for Figure 1D to quantify response probability? These values do not seem to match the PSTH plots in Figure 1D. 
 Possibly highlight the animal that those data were derived from in a different colored line throughout the Figure.
     Any lick in the window of opportunity is considered a response.  1D is an example of a single session.  
 
 ***** Calculations of d' (Figure 1F) suggest that there were false alarms, however these are not illustrated in Figure 1D.
-    Not all sessions include false alarm trials.
+    There are 0 PSI trials with licks in the during the response window (false alarms) in figure 1 D (top left).
 
 Figure 2:
 - The authors plot pupil dynamics in Figure 2C, it is unclear whether this is an average of all stimulus intensities or for a specific example. Did pupil size Z scores differ across misses of differing intensity?
@@ -980,7 +980,8 @@ Used literature:
 ** TODOS 
 *** DONE: fix stats 
 **** DONE: rerun fig8b.m for F statistic 
-*** TODO: rerun GLM-HMM accuracy plot to include baseline NE as regressor 
+*** DONE: rerun GLM-HMM accuracy plot to include baseline NE as regressor 
 *** TODO: clarify rational for different regressors 
 *** TODO: explicitly state hypotheses 
 *** TODO: compare NE dynamics between regions 
+*** TODO: plot pupil area for a single session 
