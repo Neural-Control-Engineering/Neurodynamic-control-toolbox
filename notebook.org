@@ -982,6 +982,21 @@ Used literature:
 **** DONE: rerun fig8b.m for F statistic 
 *** DONE: rerun GLM-HMM accuracy plot to include baseline NE as regressor 
 *** DONE: clarify rational for different regressors 
+*** DONE: 2j,k with higher resolution:
+**** 2j
+                         SumSq      DF      MeanSq       F         pValue       pValueGG      pValueHF      pValueLB 
+                        _______    ____    ________    ______    ___________    _________    __________    __________
+
+    (Intercept):Time     49.783       6      8.2971    144.97    2.9735e-136    3.321e-93    1.9106e-95    4.0447e-25
+    tercile:Time        0.96396       6     0.16066    2.8071       0.010257     0.024152      0.023086      0.095512
+    Error(Time)           64.56    1128    0.057234 
+**** 2k
+                        SumSq      DF     MeanSq       F         pValue        pValueGG      pValueHF      pValueLB 
+                        ______    ____    _______    ______    ___________    __________    __________    __________
+
+    (Intercept):Time    206.75       5      41.35    119.04    3.3416e-102    5.8455e-78    2.5519e-79    9.7213e-23
+    tercile:Time        3.7649       5    0.75298    2.1677       0.055429      0.074707      0.073458       0.14226
+    Error(Time)         413.36    1190    0.34736       
 *** TODO: explicitly state hypotheses 
 *** DONE: compare NE dynamics between regions 
 animal_ne = {};
