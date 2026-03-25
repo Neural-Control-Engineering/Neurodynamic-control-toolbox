@@ -953,13 +953,17 @@ pupil size predictors would provide a more detailed insight in the relation betw
 Minor comments:
 - The second peak in NE signaling in S1 and PFC is intriguing. Could it reflect post-response licking, since it is only observed for response trials? Including a control analysis examining licking in this late time-window could be informative.
 
-- In the Introduction, the statement that the relationship between behavioral strategies and arousal remains unclear overlooks relevant literature including Akella et al. (2025; Nature Communications). Hulsey et al. (2024; Neuron), Johnson et al. (bioRxiv), Yin et al. (2025; Neuron).
+- In the Introduction, the statement that the relationship between behavioral strategies and arousal remains unclear overlooks relevant literature
+ including Akella et al. (2025; Nature Communications). Hulsey et al. (2024; Neuron), Johnson et al. (bioRxiv), Yin et al. (2025; Neuron).
 
-- In the Results, the opening sentence of the behavioral state segment mentions that task-evoked pupil dilations are examined as baseline pupil size was used as a predictor in the GLM, yet baseline pupil size effects are then reported. This sentence could be rephrased for clarity.
+- In the Results, the opening sentence of the behavioral state segment mentions that task-evoked pupil dilations are examined as baseline pupil size was used as a p
+predictor in the GLM, yet baseline pupil size effects are then reported. This sentence could be rephrased for clarity.
 
 - There is a period missing in the final paragraph of the Analyses, before "All analyses were performed [....]".
+fixed
 
 - In the Results the sentence "Consistent with previous work, the perceptual behavior [...] was dependent on baseline pupil size" is somewhat redundant given the previous paragraph.
+deleted
 
 - A brief explanation of what GRABne measures (single-cell versus population-level activity) could be included for clarification.
 
