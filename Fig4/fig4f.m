@@ -4,12 +4,15 @@ function out = fig4f(data, ver)
     baselines = nanmean(s1,2);
 
     % ptiles = 25:25:100;
-    ptiles = [33, 66, 100];
+    % ptiles = [33, 66, 100];
+    % ptiles = [20,40,60,80,100];
+    ptiles = [10,20,30,40,50,60,70,80,90,100];
     low = prctile(baselines, 0);
     stim_strengths = unique(data.stimulus_strength);
-    cols = distinguishable_colors(5);
+    cols = distinguishable_colors(length(ptiles));
     fig = figure();
     out = {};
+
     for i = 1:length(ptiles)
         ptile = ptiles(i);
         high = prctile(baselines, ptile);
@@ -70,6 +73,21 @@ function out = fig4f(data, ver)
     ylabel('Response Probability', 'FontSize', 14)
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline NE_{S1}';
+
+    rppa_session = out;
+    % terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2; zeros(49,1)+3; zeros(49,1)+4];
+    terciles = [];
+    mat = [];
+    for i = 1:length(rppa_session)
+        terciles = [terciles; zeros(size(rppa_session{i},1),1)+i-1];
+        mat = [mat; rppa_session{i}];
+    end
+    stim_strengths = stim_strengths .* 10;
+    % mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}; rppa_session{4}; rppa_session{5}];
+    tbl = table(terciles, mat(:,1), mat(:,2), mat(:,3), mat(:,4), mat(:,5), mat(:,6), mat(:,7), 'VariableNames', {'tercile', 't0', 't1', 't2', 't3', 't4', 't5', 't6'});
+    rm = fitrm(tbl, 't0-t6 ~ tercile', 'WithinDesign', stim_strengths);
+    ranova(rm)
+    
     saveas(fig, 'Figures/fig4f.fig')
     saveas(fig, 'Figures/fig4f.svg')
 end

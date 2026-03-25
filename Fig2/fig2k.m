@@ -1,6 +1,7 @@
 function fig2k(data)
     % ptiles = 25:25:100;
-    ptiles = [33, 66, 100];
+    % ptiles = [33, 66, 100];
+    ptiles = [20,40,60,80,100];
     low = prctile(data.pupil_base_before_stimulus, 0);
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(5);
@@ -51,22 +52,25 @@ function fig2k(data)
         %         mat(trial, ind) = 0;
         %     end
         % end
-        switch i 
-            case 1  
-                l = sprintf('Low', i);
-            case 2
-                l = sprintf('Medium', i);
-            case 3
-                l = sprintf('High', i);
-            otherwise
-                l = sprintf('%ith quartile', i);
-        end
+        % switch i 
+        %     case 1  
+        %         l = sprintf('Low', i);
+        %     case 2
+        %         l = sprintf('Medium', i);
+        %     case 3
+        %         l = sprintf('High', i);
+        %     otherwise
+        %         l = sprintf('%ith quartile', i);
+        % end
+        l = sprintf('%ith quintile', i);
         n = size(mat,1);
         semshade(mat, 0.3, cols(i,:), cols(i,:), stim_strengths(2:end) .* 10, 1, sprintf('%s (n=%i)', l, n));
         hold on
     end
     xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
     ylabel('d''', 'FontSize', 14)
+    lims = ylim;
+    ylim([-0.25,lims(2)])
     
     leg = legend('location', 'southeast');
     leg.Title.String = 'Baseline Pupil Area';
@@ -74,9 +78,9 @@ function fig2k(data)
     saveas(fig, 'Figures/fig2k.fig')
     saveas(fig, 'Figures/fig2k.svg')
 
-    terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2];
+    terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2; zeros(49,1)+3; zeros(49,1)+4];
+    mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}; rppa_session{4}; rppa_session{5}];
     stim_strengths = stim_strengths(2:end) .* 10;
-    mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}];
     tbl = table(terciles, mat(:,1), mat(:,2), mat(:,3), mat(:,4), mat(:,5), mat(:,6), 'VariableNames', {'tercile', 't0', 't1', 't2', 't3', 't4', 't5'});
     rm = fitrm(tbl, 't0-t5 ~ tercile', 'WithinDesign', stim_strengths);
     ranova(rm)

@@ -70,6 +70,7 @@ function fig4a(data, tbounds, alignTo, ver)
     ylim([-0.22, 0.82])
     leg = legend();
     leg.Title.String = 'Stimulus Strength';
+
     saveas(session_fig, 'Figures/fig4a.fig')
     saveas(session_fig, 'Figures/fig4a.svg')
 end

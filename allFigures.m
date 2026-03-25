@@ -126,6 +126,12 @@ fprintf('Figure 5e:\n')
 fig5g(data, k, data_version, ssd_version, psychver, animals)
 fprintf('Figure 5f:\n')
 fig5h(data, k, data_version, ssd_version, psychver, animals)
+fprintf('Figure 5g:\n')
+fig5d(data, k, data_version, ssd_version, psychver, animals)
+fprintf('Figure 5h:\n')
+fig5g(data, k, data_version, ssd_version, psychver, animals)
+fprintf('Figure 5i:\n')
+fig5h(data, k, data_version, ssd_version, psychver, animals)
 close all
 
 % figure 6 

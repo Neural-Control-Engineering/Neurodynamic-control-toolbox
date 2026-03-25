@@ -983,8 +983,126 @@ Used literature:
 *** DONE: rerun GLM-HMM accuracy plot to include baseline NE as regressor 
 *** DONE: clarify rational for different regressors 
 *** TODO: explicitly state hypotheses 
-*** TODO: compare NE dynamics between regions 
-*** TODO: plot pupil area for a single session 
+*** DONE: compare NE dynamics between regions 
+animal_ne = {};
+session_ne = {};
+for i = 1:length(unique(data.stimulus_strength))
+    animal_ne{i} = [];
+    session_ne{i} = [];
+end
+
+animals = fetchAnimals(data);
+sessions = unique(data.session_id);
+for a = 1:length(animals)
+    atmp = filterTrials(data, 'animal', num2str(animals(a)));
+    stim_strengths = unique(atmp.stimulus_strength);
+    for i = 1:length(stim_strengths)
+        stim = stim_strengths(i);
+        otmp = filterTrials(atmp, 'stim_strength', stim);
+        if ~isempty(otmp)
+            [~, s1, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
+            if length(stim_strengths) == 2 && i == 2
+                animal_ne{end} = [animal_ne{end}; nanmean(s1)];
+            else
+                animal_ne{i} = [animal_ne{i}; nanmean(s1)];
+            end
+        end
+    end
+end
+for a = 1:length(sessions)
+    atmp = filterTrials(data, 'session_id', num2str(sessions(a)));
+    stim_strengths = unique(atmp.stimulus_strength);
+    for i = 1:length(stim_strengths)
+        stim = stim_strengths(i);
+        otmp = filterTrials(atmp, 'stim_strength', stim);
+        if ~isempty(otmp)
+            [~, s1, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
+            if length(stim_strengths) == 2 && i == 2
+                if size(s1,1) > 1
+                    session_ne{end} = [session_ne{end}; nanmean(s1)];
+                else
+                    session_ne{end} = [session_ne{end}; s1];
+                end
+            else
+                if size(s1,1) > 1
+                    session_ne{i} = [session_ne{i}; nanmean(s1)];
+                else
+                    session_ne{i} = [session_ne{i}; s1];
+                end
+            end
+        end
+    end
+end
+s1 = session_ne{end};
+animal_ne = {};
+session_ne = {};
+for i = 1:length(unique(data.stimulus_strength))
+    animal_ne{i} = [];
+    session_ne{i} = [];
+end
+
+animals = fetchAnimals(data);
+sessions = unique(data.session_id);
+for a = 1:length(animals)
+    atmp = filterTrials(data, 'animal', num2str(animals(a)));
+    stim_strengths = unique(atmp.stimulus_strength);
+    for i = 1:length(stim_strengths)
+        stim = stim_strengths(i);
+        otmp = filterTrials(atmp, 'stim_strength', stim);
+        if ~isempty(otmp)
+            [mPFC, ~, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
+            if length(stim_strengths) == 2 && i == 2
+                animal_ne{end} = [animal_ne{end}; nanmean(mPFC)];
+            else
+                animal_ne{i} = [animal_ne{i}; nanmean(mPFC)];
+            end
+        end
+    end
+end
+for a = 1:length(sessions)
+    atmp = filterTrials(data, 'session_id', num2str(sessions(a)));
+    stim_strengths = unique(atmp.stimulus_strength);
+    for i = 1:length(stim_strengths)
+        stim = stim_strengths(i);
+        otmp = filterTrials(atmp, 'stim_strength', stim);
+        if ~isempty(otmp)
+            [mPFC, ~, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
+            if length(stim_strengths) == 2 && i == 2
+                if size(mPFC,1) > 1
+                    session_ne{end} = [session_ne{end}; nanmean(mPFC)];
+                else
+                    session_ne{end} = [session_ne{end}; mPFC];
+                end
+            else
+                if size(mPFC,1) > 1
+                    session_ne{i} = [session_ne{i}; nanmean(mPFC)];
+                else
+                    session_ne{i} = [session_ne{i}; mPFC];
+                end
+            end
+        end
+    end
+end
+mpfc = session_ne{end};
+
+region = [zeros(size(s1,1),1); ones(size(mpfc,1),1)];
+mat = [s1; mpfc];
+mat = mat(:, t>=0 & t<=5);
+t = t(t>=0 & t<=5);
+tbl = table(region, mat(:,1), 'VariableNames', {'region', 't0'});
+for c = 2:size(mat,2)
+    tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+end
+rm = fitrm(tbl, 't0-t600 ~ region', 'WithinDesign', t);
+ranova(rm)
+                        SumSq      DF       MeanSq       F       pValue     pValueGG     pValueHF     pValueLB 
+                        ______    _____    ________    ______    ______    __________    _________    _________
+
+    (Intercept):Time    692.85      600      1.1547    12.494       0      8.1747e-16    4.677e-17    0.0006302
+    region:Time         419.82      600      0.6997    7.5703       0      3.5458e-09    7.875e-10    0.0070939
+    Error(Time)         5323.8    57600    0.092426      
+
+*** DONE: plot pupil area for a single session 
 *** DONE: regress baseline out of evoked pupil response and redo statistics 
 **** [[Figures/suppFig2.svg][dilation by outcome corrected for baseline vs. dilation trend]]
 **** anova:
@@ -994,4 +1112,33 @@ by outcome
     {'Error' }    {[10.0456]}    {[166]}    {[  0.0605]}    {0×0 double}    {0×0 double  }
     {'Total' }    {[15.9796]}    {[169]}    {0×0 double}    {0×0 double}    {0×0 double  }
 **** Responded vs. Withheld, Wilcoxon signed-rank: p = 5.147353e-08
-*** TODO: plot weights per state 
+*** DONE: plot weights per state 
+Stimulus Weights:
+tbl =
+
+  4×6 cell array
+
+    {'Source' }    {'SS'     }    {'df'}    {'MS'      }    {'F'       }    {'Prob>F'  }
+    {'Columns'}    {[24.7976]}    {[ 3]}    {[  8.2659]}    {[  6.3532]}    {[  0.0080]}
+    {'Error'  }    {[15.6125]}    {[12]}    {[  1.3010]}    {0×0 double}    {0×0 double}
+    {'Total'  }    {[40.4101]}    {[15]}    {0×0 double}    {0×0 double}    {0×0 double}
+
+Pupil area weights:
+tbl =
+
+  4×6 cell array
+
+    {'Source' }    {'SS'        }    {'df'}    {'MS'      }    {'F'       }    {'Prob>F'  }
+    {'Columns'}    {[1.2752e+03]}    {[ 3]}    {[425.0685]}    {[  1.7952]}    {[  0.2016]}
+    {'Error'  }    {[2.8414e+03]}    {[12]}    {[236.7797]}    {0×0 double}    {0×0 double}
+    {'Total'  }    {[4.1166e+03]}    {[15]}    {0×0 double}    {0×0 double}    {0×0 double}
+
+* [2026-3-25 Wed] - figure captions 
+Figure 1. Experimental setup and detection behavior. A) Experimental setup. B) Diagram of the tactile detection task. C)  Response time for each stimulus. Gray lines indicate individual animals. Dark line indicate the average across all session in this figure. D) Top: raster plot of the animal’s response around the presentation of tactile stimuli in an example session. Bottom: histgram of licking response within the window of opportunity. E) Response probablity for each tactile stimulus. F) Perceptual sensitivity associated with tactile stimuli with different intensities.
+Figure 2. Pupil size fluctuations during the tactile detection task. A) Example pupil contour segmented using DeepLabCut. B) Pupil responses to tactile stimuli of different intensities. C) Pupil dilations associated with the four behavioral outcomes. D) Pupil dilations associated with the four behavioral outcomes under low, medium, and high pupil baseline conditions. E) Scatter plot showing the relationship between pupil baseline and pupil dilation. F) Pearson’s correlation coefficients between pupil baseline and dilation for the four behavioral outcomes (left), and for Response and Withheld trials (right). G) Pupil baseline size for the four behavioral outcomes (left), and for Response and Withheld trials (right). H) Pupil dilation for the four behavioral outcomes (left), and for Response and Withheld trials (right). I) Reaction times for trials with low, medium, and high pupil baselines. J) Response probability to tactile stimuli of different intensities under low, medium, and high pupil baseline conditions. K) Perceptual sensitivity to tactile stimuli of different intensities under low, medium, and high pupil baseline conditions.
+Figure 3. NE dynamics in S1 and mPFC during the tactile detection task. A) IHC confirmation of successful expression of GRAB_NE in the Barrel cortex (left) and prefrontal cortex (right). B) Cross-correlation between NE dynamics in S1 and PFC. C) Cross-correlation between pre-stimulus NE dynamics in S1 and PFC in hit, miss, correct rejection, and false alarm trials. D) Correlation coefficient at 0 s lag for different behavioral outcomes.
+Figure 4. NE dynamics in S1 and mPFC during the tactile detection task. A) NE dynamics in S1 evoked by the presentation of different tactile stimuli. B) Task evokded NE dynamics in S1 in hit, miss, correct rejection and miss trials. C) Baseline NE level in S1 in hit, miss, correct rejection and miss trials. D) Mean increase in NE level in S1 in hit, miss, correct rejection and miss trials. E) Reaction times during the high, medium, and low terciles of baseline NE levels in S1. F) Pychometric curves during the high, medium, and low terciles of baseline NE levels in S1. G) NE dynamics in mPFC evoked by the presentation of different tactile stimuli. H) Task evokded NE dynamics in mPFC in hit, miss, correct rejection and miss trials. I) Baseline NE level in mPFC in hit, miss, correct rejection and miss trials. J) Mean increase in NE level in mPFC in hit, miss, correct rejection and miss trials. K) Reaction times during the high, medium, and low terciles of baseline NE levels in mPFC. L) Pychometric curves during the high, medium, and low terciles of baseline NE levels in mPFC.
+Figure 5. GLM-HMM modeling of behavior. A) Diagram of the GLM-HMM model. B) Elbow plot of prediction accuracy vs number of states. C) Psychometric curve during the four states. D) Farction of toal trials during each state. E) Posterior state probabilities during an example portion of a session. F) Inferred transition matrix for the four-state GLM-HMM model. G) Reaction time during the four states. H) Decision criterion during the four states.
+Figure 6. Behavioral state-dependent pupil dynamics. A) Task-evoked pupil dynamics in hit, miss, correct rejection and miss trials during the four states. B) Baseline pupil size in hit, miss, correct rejection and miss trials during the four states. C) Mean pupil dilation in hit, miss, correct rejection and miss trials during the four states.
+Figure 7. Behavioral state-dependent NE dynamics in S1 and mPFC. A) Task-evoked NE dynamics in S1 in hit, miss, correct rejection and miss trials during the four states. B) Baseline NE level in S1 in hit, miss, correct rejection and miss trials during the four states. C) Mean increase in NE level in S1 in hit, miss, correct rejection and miss trials during the four states. D) Task-evoked NE dynamics in mPFC in hit, miss, correct rejection and miss trials during the four states. E) Baseline NE level in mPFC in hit, miss, correct rejection and miss trials during the four states. F) Mean increase in NE level in mPFC in hit, miss, correct rejection and miss trials during the four states.
+Figure 8. State dependent cross-correlation between NE signals in S1 and mPFC. A) Cross-correlation between NE signals in S1 and mPFC during the four states. B) Correlation coefficient between NE signals in S1 and mPFC during the four states.

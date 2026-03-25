@@ -5,7 +5,7 @@ Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
-ssd_version = 'v2';
+ssd_version = 'v3';
 kstates = [2, 3, 4, 5, 6];
 % data_versions = {'last_trial_behavior_no_bias', ... 
 %     'spontaneous_mpfc_s1_pupil_normalized', ... 
@@ -19,10 +19,7 @@ kstates = [2, 3, 4, 5, 6];
 %     'behavior_s1_combo', ...
 %     'behavior_pupil_combo', ...
 %     'dynamic_state'};
-data_versions = {'last_trial_behavior_no_bias', ... 
-    'spontaneous_mpfc_stim', ...
-    'spontaneous_s1_stim', ...
-    'spontaneous_pupil_stim'};
+data_versions = {'spontaneous_pupil_stim_v2'};
 animals_v1 = [3316, 3258, 3133, 200, 199, 198, 197, 196, 180, 167, 152];
 animals_v2 = [240, 241, 242, 243];
 
@@ -44,7 +41,8 @@ animals_v2 = [240, 241, 242, 243];
 %             'dCh2/dt', ... 
 %             'd2Ch2/dt2', ... 
 %             'stimulus strength'};
-features = {{'Prev. Reward', 'Prev. Response', 'Stim.'}, {'mPFC NE', 'Stim. Strength'}, {'S1 NE', 'Stim.'}, {'Pupil Area', 'Stim.'}};
+% features = {{'Prev. Reward', 'Prev. Response', 'Stim.'}, {'mPFC NE', 'Stim. Strength'}, {'S1 NE', 'Stim.'}, {'Pupil Area', 'Stim.'}};
+features = {{'Pupil Area', 'Stim.'}};
 
 % p = gcp('nocreate');
 % if isempty(p)
@@ -53,7 +51,7 @@ features = {{'Prev. Reward', 'Prev. Response', 'Stim.'}, {'mPFC NE', 'Stim. Stre
 
 % animal = animals_v2(1);
 animal = 241;
-k = 5;
+k = 4;
 fig = figure('Visible', 'on');
 
 % for dv = 1:length(data_versions)
