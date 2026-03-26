@@ -1176,3 +1176,23 @@ Figure 8. State dependent cross-correlation between NE signals in S1 and mPFC. A
 *** TODO: Provide a table or values within the text for the hit, miss, false alarm, and correct rejection rates for each stimulus level.
 *** TODO: plot by outcome and stim intensity 
 *** TODO: compare licking activity to NE signals on response trials 
+** surface plot for looking at response probability by baseline pupil area across finer resolution 
+figure(); hold on
+x = [];
+z = [];
+for i = 1:length(rppa_session)
+    % plot3(stim_strengths, repmat(ptiles(i),length(stim_strengths),1), nanmean(rppa_session{i}), 'k*-')
+    x = [x; stim_strengths'];
+    z = [z; nanmean(rppa_session{i})];
+end
+
+y = [];
+for c = 1:size(z,2)
+    z(:,c) = smooth(z(:,c), 5);
+    y = [y, [2:2:100]'];
+end
+
+y = [];
+for r = 1:size(x,1)
+    y = [y; 2:2:100];
+end

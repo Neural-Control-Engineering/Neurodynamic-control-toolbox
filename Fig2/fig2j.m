@@ -84,7 +84,7 @@ function [x, ss, tcile] = fig2j(data)
         for i = 1:size(rppa_animal{k},1)
             for j = 1:size(rppa_animal{k},2)
                 if ~isnan(rppa_animal{k}(i,j))
-                    x = [x, rppa_animal{k}(i,k)];
+                    x = [x, rppa_animal{k}(i,j)];
                     ss{all_count} = num2str(stim_strengths(j));
                     tcile{all_count} = num2str(k);
                     all_count = all_count + 1;
@@ -109,11 +109,26 @@ function [x, ss, tcile] = fig2j(data)
     saveas(session_fig, 'Figures/fig2j.fig')
     saveas(session_fig, 'Figures/fig2j.svg')
 
-    terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2; zeros(49,1)+3; zeros(49,1)+4];
+    % terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2; zeros(49,1)+3; zeros(49,1)+4];
+    % stim_strengths = stim_strengths .* 10;
+    % mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}; rppa_session{4}; rppa_session{5}];
+    % tbl = table(terciles, mat(:,1), mat(:,2), mat(:,3), mat(:,4), mat(:,5), mat(:,6), mat(:,7), 'VariableNames', {'tercile', 't0', 't1', 't2', 't3', 't4', 't5', 't6'});
+    % rm = fitrm(tbl, 't0-t6 ~ tercile', 'WithinDesign', stim_strengths);
+    % ranova(rm)
+
+    percentile = [];
+    mat = [];
     stim_strengths = stim_strengths .* 10;
-    mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}; rppa_session{4}; rppa_session{5}];
-    tbl = table(terciles, mat(:,1), mat(:,2), mat(:,3), mat(:,4), mat(:,5), mat(:,6), mat(:,7), 'VariableNames', {'tercile', 't0', 't1', 't2', 't3', 't4', 't5', 't6'});
-    rm = fitrm(tbl, 't0-t6 ~ tercile', 'WithinDesign', stim_strengths);
+    for i = 1:length(rppa_session)
+        percentile = [percentile; zeros(size(rppa_session{i},1),1)+i-1];
+        mat = [mat; rppa_session{i}];
+    end
+
+    tbl = table(percentile, mat(:,1), 'VariableNames', {'percentile', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ percentile',c-1), 'WithinDesign', stim_strengths);
     ranova(rm)
 
     keyboard 
