@@ -2,14 +2,19 @@ function fig2i(data)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
-    animal = {[],[],[]};
-    session = {[],[],[]};
 
     if ~exist('alignTo', 'var')
         alignTo = 'stimulus';
     end
 
-    ptiles = [33, 66, 100];
+    % ptiles = [33, 66, 100];
+    animal = {};
+    session = {};
+    ptiles = [20,40,60,80,100];
+    for i = 1:length(ptiles)
+        animal{i} = [];
+        session{i} = [];
+    end
     low = prctile(data.pupil_base_before_stimulus, 0);
     for i = 1:length(ptiles)
         ptile = ptiles(i);
@@ -35,8 +40,11 @@ function fig2i(data)
         sesh_err(i) = nanstd(session{i}) / sqrt(length(session{i}));
     end
 
-    x = 1:3;
-    l = {'Low', 'Medium', 'High'};
+    x = 1:length(ptiles);
+    % l = {'Low', 'Medium', 'High'};
+    for i = 1:length(x)
+        l{i} = num2str(x);
+    end
 
     fig_sesh = figure();
     hold on 
@@ -44,7 +52,7 @@ function fig2i(data)
         plot(zeros(1,length(session{i}))+x(i)+(rand([1,length(session{i})])-0.5)*-0.3, ...
             session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
     end
-    errorbar(x, cellfun(@mean, session), cellfun(@ste, session), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    errorbar(x, cellfun(@nanmean, session), cellfun(@ste, session), 'k.', 'CapSize', 15, 'LineWidth', 2)
     lims = ylim;
     ylim([0,lims(2)])
     yticks([0, lims(2)])
@@ -53,7 +61,7 @@ function fig2i(data)
     xtickangle(45)
     ylabel('Reaction Time (s)', 'FontSize', 16)
     xlabel('Baseline Pupil Area', 'FontSize', 16)
-    p = anova1(cell2mat(session));
+    [p,tbl,stats] = anova1(cell2mat(session))
     fprintf('Pupil area vs reaction time:\n')
     fprintf(sprintf('One way anova: p = %d\n', p))
 
