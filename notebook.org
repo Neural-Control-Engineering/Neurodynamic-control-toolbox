@@ -827,7 +827,6 @@ performance, it is unclear how animal performance was so similar. It is also unc
 whether these results reflect a sampling bias from a low sampling of the population.
     Hopefully addressing the above comments helps assuage these concerns.  We do have pupil and behavior for more animals, though I don't readily know 
 
-
 *** Minor Concerns:
 **** Results:
 ***** Provide a table or values within the text for the hit, miss, false alarm, and correct rejection rates for each stimulus level.
@@ -869,43 +868,50 @@ Possibly highlight the animal that those data were derived from in a different c
 ***** Calculations of d' (Figure 1F) suggest that there were false alarms, however these are not illustrated in Figure 1D.
     There are 0 PSI trials with licks in the during the response window (false alarms) in figure 1 D (top left).
 
-Figure 2:
-- The authors plot pupil dynamics in Figure 2C, it is unclear whether this is an average of all stimulus intensities or for a specific example. Did pupil size Z scores differ across misses of differing intensity?
+**** Figure 2:
+***** The authors plot pupil dynamics in Figure 2C, it is unclear whether this is an average of all stimulus intensities or for a specific example. Did pupil size Z scores differ across misses of differing intensity?
 
-- Describe in detail how baseline and dilation Z scores were calculated (Figure 2E). Was this the grand mean across all baseline measures and mean of all dilated pupil diameters? Or, was the pupil dilation Z score based on a trial by trial baseline mean?
+***** Describe in detail how baseline and dilation Z scores were calculated (Figure 2E). Was this the grand mean across all baseline measures and mean of all dilated pupil diameters? Or, was the pupil dilation Z score based on a trial by trial baseline mean?
 
-- For Figure 2E-H, do these reflect a representation of all stimulus intensities or a specific intensity or tercile?
+***** For Figure 2E-H, do these reflect a representation of all stimulus intensities or a specific intensity or tercile?
 
-Figure 3:
-- For clarification, did GRAB-NE contain a fluorescent reporter? The legend indicates that immunohistochemistry was used. Also, this is a immunofluorescence photomicrograph.
+**** Figure 3:
+***** For clarification, did GRAB-NE contain a fluorescent reporter? The legend indicates that immunohistochemistry was used. Also, this is a immunofluorescence photomicrograph.
 
-- Figure 3B-D, how many trials do these plots represent?
+***** Figure 3B-D, how many trials do these plots represent?
 
-Figure 5:
-- Strength is misspelled in Figure 5B inset and misspelled words exist in the legend.
+**** Figure 5:
+***** Strength is misspelled in Figure 5B inset and misspelled words exist in the legend.
 
-Figure 6:
-- Words are misspelled in the legend.
+**** Figure 6:
+***** Words are misspelled in the legend.
 
-- Again, are these trials from a particular stimulus intensity or is this an average of all intensities and therefore HMM State is a confound of stimulus intensity.
+***** Again, are these trials from a particular stimulus intensity or is this an average of all intensities and therefore HMM State is a confound of stimulus intensity.
 
-- The bi-modal distribution of Miss and Correct Rejection in Figure 6B suggests that the states (1-3) are a mixture of states. Is there an explanation for this bimodal distribution?
+***** The bi-modal distribution of Miss and Correct Rejection in Figure 6B suggests that the states (1-3) are a mixture of states. Is there an explanation for this bimodal distribution?
 
-- It is unclear whether the variance in the date Figure 6B (False Alarm) supports the presented statistical p-value.
+***** It is unclear whether the variance in the date Figure 6B (False Alarm) supports the presented statistical p-value.
 
-Figure 7:
-- It is unclear what the difference is between Figure 7A and 7C, 7D and 7F. Indeed, 7A and 7D are time courses; however, from what data is C and F generated from?
+**** Figure 7:
+***** - It is unclear what the difference is between Figure 7A and 7C, 7D and 7F. Indeed, 7A and 7D are time courses; however, from what data is C and F generated from?
 
-- Was there a comparison between the PFC and S1 for NE Baseline and task-evoked changed? This seems like a missed opportunity.
+***** Was there a comparison between the PFC and S1 for NE Baseline and task-evoked changed? This seems like a missed opportunity.
 
-Additional minor comments:
-The authors use the phrase "Behavioral States" and "Behavioral Outcome" to reference the response outcomes of the task (Hit, Miss, etc.). This usage is imprecise and it would be more parsimonious to simply state that these are task/response outcomes or trial result.
+*** Additional minor comments:
+**** The authors use the phrase "Behavioral States" and "Behavioral Outcome" to reference the response outcomes of the task (Hit, Miss, etc.). 
+This usage is imprecise and it would be more parsimonious to simply state that these are task/response outcomes or trial result.
+    We had actuallty meant to use "behavioral state" to refer to the states identified by the GLM-HMM and "behavioral outcome" interchangably with "trial outcome".
+    To avoid confusion, we continue to use "behavioral state" to reference the discrete states used by the GLM-HMM to predict trial outcomes and "trial outcome" instead 
+    of "behavioral outcome". 
 
-There are inconsistencies across nomenclature in the manuscript. For example, PFC is used in the text and mPFC is used in Figures. Figure 3A suggests that the authors should use mPFC (medial PFC) throughout the manuscript.
+**** There are inconsistencies across nomenclature in the manuscript. For example, PFC is used in the text and mPFC is used in Figures. 
+Figure 3A suggests that the authors should use mPFC (medial PFC) throughout the manuscript.
+    Thank you for pointing this out. We have tried to remedy any nomenclature inconsistencies, this one in particular.
 
-The discussion references the model as a HMM-GLM model versus a GLM-HMM model throughout the paper.
+**** The discussion references the model as a HMM-GLM model versus a GLM-HMM model throughout the paper.
+    Thank you for pointing this out.  We have corrected this in the text.
 
-There are a number of spelling and editorial errors throughout the manuscript that need to be addressed.
+**** There are a number of spelling and editorial errors throughout the manuscript that need to be addressed.
 
 
 ** Reviewer 2:
@@ -944,28 +950,31 @@ Furthermore, figure captions should clarify what error bars represent and whethe
 **** The different evoked pupil responses across trial types (hits, misses, false alarms, correct rejections) may be confounded by differences in baseline pupil 
 size. Indeed, the authors show robust anti-correlations between baseline pupil size and evoked pupil responses, in line with previous reports. I recommend regressing 
 baseline pupil size out of evoked responses and repeating the statistical analyses.
+    Thank you for this suggestion.  We have included this analysis as a supplemental figure.
 
 **** Dividing trials into three bins based on baseline pupil size may be too coarse to capture known nonmonotonic, inverted-U relationships between pupil-linked 
 arousal and behavioral performance (e.g., Beerendonk et al., 2024, PNAS; de Gee et al., 2024, Current Biology; McGinley et al., 2015, Neuron). These relationships 
 are often asymmetric, with their peak shifted to the left, and recording just three bins may obscure this pattern. Analyses using continuous linear and quadratic 
 pupil size predictors would provide a more detailed insight in the relation between baseline pupil size and behavior. This applies to the GRABne signals too.
 
-Minor comments:
-- The second peak in NE signaling in S1 and PFC is intriguing. Could it reflect post-response licking, since it is only observed for response trials? Including a control analysis examining licking in this late time-window could be informative.
+*** Minor comments:
+**** The second peak in NE signaling in S1 and PFC is intriguing. Could it reflect post-response licking, since it is only observed for response trials? 
+Including a control analysis examining licking in this late time-window could be informative.
 
-- In the Introduction, the statement that the relationship between behavioral strategies and arousal remains unclear overlooks relevant literature
+**** In the Introduction, the statement that the relationship between behavioral strategies and arousal remains unclear overlooks relevant literature
  including Akella et al. (2025; Nature Communications). Hulsey et al. (2024; Neuron), Johnson et al. (bioRxiv), Yin et al. (2025; Neuron).
 
-- In the Results, the opening sentence of the behavioral state segment mentions that task-evoked pupil dilations are examined as baseline pupil size was used as a p
+**** In the Results, the opening sentence of the behavioral state segment mentions that task-evoked pupil dilations are examined as baseline pupil size was used as a p
 predictor in the GLM, yet baseline pupil size effects are then reported. This sentence could be rephrased for clarity.
 
-- There is a period missing in the final paragraph of the Analyses, before "All analyses were performed [....]".
+**** There is a period missing in the final paragraph of the Analyses, before "All analyses were performed [....]".
 fixed
 
-- In the Results the sentence "Consistent with previous work, the perceptual behavior [...] was dependent on baseline pupil size" is somewhat redundant given the previous paragraph.
+**** In the Results the sentence "Consistent with previous work, the perceptual behavior [...] was dependent on baseline pupil size" is somewhat redundant given the previous paragraph.
 deleted
+    That's true.  We've removed that sentence.
 
-- A brief explanation of what GRABne measures (single-cell versus population-level activity) could be included for clarification.
+**** A brief explanation of what GRABne measures (single-cell versus population-level activity) could be included for clarification.
 
 Used literature:
 - Akella, S., et al. (2024). Deciphering neuronal variability across states reveals dynamic sensory encoding. Nature Communications, 16(1), 1768.
@@ -1161,3 +1170,9 @@ Figure 5. GLM-HMM modeling of behavior. A) Diagram of the GLM-HMM model. B) Elbo
 Figure 6. Behavioral state-dependent pupil dynamics. A) Task-evoked pupil dynamics in hit, miss, correct rejection and miss trials during the four states. B) Baseline pupil size in hit, miss, correct rejection and miss trials during the four states. C) Mean pupil dilation in hit, miss, correct rejection and miss trials during the four states.
 Figure 7. Behavioral state-dependent NE dynamics in S1 and mPFC. A) Task-evoked NE dynamics in S1 in hit, miss, correct rejection and miss trials during the four states. B) Baseline NE level in S1 in hit, miss, correct rejection and miss trials during the four states. C) Mean increase in NE level in S1 in hit, miss, correct rejection and miss trials during the four states. D) Task-evoked NE dynamics in mPFC in hit, miss, correct rejection and miss trials during the four states. E) Baseline NE level in mPFC in hit, miss, correct rejection and miss trials during the four states. F) Mean increase in NE level in mPFC in hit, miss, correct rejection and miss trials during the four states.
 Figure 8. State dependent cross-correlation between NE signals in S1 and mPFC. A) Cross-correlation between NE signals in S1 and mPFC during the four states. B) Correlation coefficient between NE signals in S1 and mPFC during the four states.
+
+* [2026-3-26 Thu] - 
+** TODOS
+*** TODO: Provide a table or values within the text for the hit, miss, false alarm, and correct rejection rates for each stimulus level.
+*** TODO: plot by outcome and stim intensity 
+*** TODO: compare licking activity to NE signals on response trials 
