@@ -204,7 +204,7 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             baseline_pupil = metrics(:,1);  % pupil_base_before_stimulus
             
             % z-score pupil within session for stable transition fitting
-            baseline_pupil = (baseline_pupil - nanmean(baseline_pupil)) / nanstd(baseline_pupil);
+            baseline_pupil = (baseline_pupil - mean(baseline_pupil, 'omitnan')) / std(baseline_pupil, 'omitnan');
             
             stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
             
@@ -238,9 +238,9 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             baseline_s1 = metrics(:,5);     % photo_base_before_stim_ch2
             
             % z-score within session
-            baseline_pupil = (baseline_pupil - nanmean(baseline_pupil)) / nanstd(baseline_pupil);
-            baseline_mpfc = (baseline_mpfc - nanmean(baseline_mpfc)) / nanstd(baseline_mpfc);
-            baseline_s1 = (baseline_s1 - nanmean(baseline_s1)) / nanstd(baseline_s1);
+            baseline_pupil = (baseline_pupil - mean(baseline_pupil, 'omitnan')) / std(baseline_pupil, 'omitnan');
+            baseline_mpfc = (baseline_mpfc - mean(baseline_mpfc, 'omitnan')) / std(baseline_mpfc, 'omitnan');
+            baseline_s1 = (baseline_s1 - mean(baseline_s1, 'omitnan')) / std(baseline_s1, 'omitnan');
             
             stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
             
