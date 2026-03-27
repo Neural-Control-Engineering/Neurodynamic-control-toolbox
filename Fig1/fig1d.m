@@ -1,4 +1,4 @@
-function lickRasterByStimStrength(data, session)
+function fig1d(data, session)
     data = filterTrials(data, 'session_id', session);
     stim_strengths = unique(data.stimulus_strength);
     for o = 1:length(stim_strengths)
