@@ -75,7 +75,7 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
             end
         end
         l = sprintf('%ith quintile', i);
-        tl = tiledlayout(2,4)
+        tl = tiledlayout(2,4);
         ax(1) = nexttile; hold on;
         semshade(s1_rppa_hit{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
         title('Hit')
@@ -140,14 +140,14 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     s1_hit = s1_hit(:, t>0 & t<6);
     mpfc_hit = mpfc_hit(:, t>0 & t<6);
     time = t(t>0 & t<6);
-    tbl = table(s1_quintile, s1_hit(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(s1_quintile_hit, s1_hit(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(s1_hit,2)
         tbl = [tbl, table(s1_hit(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
     fprintf('S1 Hit:\n')
     ranova(rm)
-    tbl = table(mpfc_quintile, mpfc_hit(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(mpfc_quintile_hit, mpfc_hit(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(mpfc_hit,2)
         tbl = [tbl, table(mpfc_hit(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
@@ -158,14 +158,14 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     s1_miss = s1_miss(:, t>0 & t<6);
     mpfc_miss = mpfc_miss(:, t>0 & t<6);
     time = t(t>0 & t<6);
-    tbl = table(s1_quintile, s1_miss(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(s1_quintile_miss, s1_miss(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(s1_miss,2)
         tbl = [tbl, table(s1_miss(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
     fprintf('S1 Miss:\n')
     ranova(rm)
-    tbl = table(mpfc_quintile, mpfc_miss(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(mpfc_quintile_miss, mpfc_miss(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(mpfc_miss,2)
         tbl = [tbl, table(mpfc_miss(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
@@ -176,14 +176,14 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     s1_cr = s1_cr(:, t>0 & t<6);
     mpfc_cr = mpfc_cr(:, t>0 & t<6);
     time = t(t>0 & t<6);
-    tbl = table(s1_quintile, s1_cr(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(s1_quintile_cr, s1_cr(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(s1_cr,2)
         tbl = [tbl, table(s1_cr(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
     fprintf('S1 CR:\n')
     ranova(rm)
-    tbl = table(mpfc_quintile, mpfc_cr(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(mpfc_quintile_cr, mpfc_cr(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(mpfc_cr,2)
         tbl = [tbl, table(mpfc_cr(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
@@ -194,14 +194,14 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     s1_fa = s1_fa(:, t>0 & t<6);
     mpfc_fa = mpfc_fa(:, t>0 & t<6);
     time = t(t>0 & t<6);
-    tbl = table(s1_quintile, s1_fa(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(s1_quintile_fa, s1_fa(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(s1_fa,2)
         tbl = [tbl, table(s1_fa(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
     fprintf('S1 FA:\n')
     ranova(rm)
-    tbl = table(mpfc_quintile, mpfc_fa(:,1), 'VariableNames', {'quintile', 't0'});
+    tbl = table(mpfc_quintile_fa, mpfc_fa(:,1), 'VariableNames', {'quintile', 't0'});
     for c = 2:size(mpfc_fa,2)
         tbl = [tbl, table(mpfc_fa(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
@@ -213,13 +213,13 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     subplot(1,2,1)
     hold on;
     for i = 1:length(s1_baseline)
-        plot(zeros(size(s1_baseline{i},1),1)+i*10+(rand(size(s1_baseline{i},1),1)-0.5)*1, s1_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
+        plot(zeros(size(s1_baseline{i},1),1)+ptiles(i)+(rand(size(s1_baseline{i},1),1)-0.5)*1, s1_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
     end
     errorbar(ptiles, cellfun(@nanmean,s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
     subplot(1,2,2)
     hold on;
     for i = 1:length(mpfc_baseline)
-        plot(zeros(size(mpfc_baseline{i},1),1)+i*10+(rand(size(mpfc_baseline{i},1),1)-0.5)*1, mpfc_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
+        plot(zeros(size(mpfc_baseline{i},1),1)+ptiles(i)+(rand(size(mpfc_baseline{i},1),1)-0.5)*1, mpfc_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
     end
     errorbar(ptiles, cellfun(@nanmean,mpfc_baseline), cellfun(@ste, mpfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
     mat = [];
@@ -232,6 +232,6 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     for i = 1:length(mpfc_baseline)
         mat = [mat, mpfc_baseline{i}];
     end
-    [p,tbl,stats] = anova1(mat)
     fprintf('Basline mPFC NE by baseline pupil area\n')
+    [p,tbl,stats] = anova1(mat)
 end
