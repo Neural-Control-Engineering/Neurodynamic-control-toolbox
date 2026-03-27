@@ -200,8 +200,13 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
         %
         for i = 1:length(sessions)
             tmp = filterTrials(data, 'session_id', sessions{i});
-            metrics = getSpontaneousMetrics(tmp, false);
-            baseline_pupil = metrics(:,1);  % pupil_base_before_stimulus
+            % Extract baseline pupil directly (avoid getSpontaneousMetrics
+            % which requires all photometry fields)
+            if iscell(tmp.pupil_base_before_stimulus)
+                baseline_pupil = cell2mat(tmp.pupil_base_before_stimulus);
+            else
+                baseline_pupil = tmp.pupil_base_before_stimulus;
+            end
             
             % z-score pupil within session for stable transition fitting
             baseline_pupil = (baseline_pupil - mean(baseline_pupil, 'omitnan')) / std(baseline_pupil, 'omitnan');
