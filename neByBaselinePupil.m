@@ -152,7 +152,7 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         tbl = [tbl, table(mpfc_hit(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
-    fprintf('S1 Hit:\n')
+    fprintf('mPFC Hit:\n')
     ranova(rm)
 
     s1_miss = s1_miss(:, t>0 & t<6);
@@ -170,7 +170,7 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         tbl = [tbl, table(mpfc_miss(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
-    fprintf('S1 Miss:\n')
+    fprintf('mPFC Miss:\n')
     ranova(rm)
 
     s1_cr = s1_cr(:, t>0 & t<6);
@@ -188,7 +188,7 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         tbl = [tbl, table(mpfc_cr(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
-    fprintf('S1 CR:\n')
+    fprintf('mPFC CR:\n')
     ranova(rm)
 
     s1_fa = s1_fa(:, t>0 & t<6);
@@ -206,22 +206,29 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         tbl = [tbl, table(mpfc_fa(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
-    fprintf('S1 FA:\n')
+    fprintf('mPFC FA:\n')
     ranova(rm)
 
-    figure();
-    subplot(1,2,1)
+    bfig = figure();
+    tl = tiledlayout(1,2);
+    bax(1) = nexttile;
     hold on;
     for i = 1:length(s1_baseline)
-        plot(zeros(size(s1_baseline{i},1),1)+ptiles(i)+(rand(size(s1_baseline{i},1),1)-0.5)*1, s1_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
+        plot(zeros(size(s1_baseline{i},1),1)+i+(rand(size(s1_baseline{i},1),1)-0.5)*0.1, s1_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
     end
-    errorbar(ptiles, cellfun(@nanmean,s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    subplot(1,2,2)
+    errorbar(1:length(ptiles), cellfun(@nanmean,s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    ylabel('Basline NE in S1 (z-score)')
+    xticks(1:lenght(ptiles))
+    bax(2) = nexttile;
     hold on;
     for i = 1:length(mpfc_baseline)
-        plot(zeros(size(mpfc_baseline{i},1),1)+ptiles(i)+(rand(size(mpfc_baseline{i},1),1)-0.5)*1, mpfc_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
+        plot(zeros(size(mpfc_baseline{i},1),1)+i+(rand(size(mpfc_baseline{i},1),1)-0.5)*0.1, mpfc_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
     end
-    errorbar(ptiles, cellfun(@nanmean,mpfc_baseline), cellfun(@ste, mpfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    errorbar(1:length(ptiles), cellfun(@nanmean,mpfc_baseline), cellfun(@ste, mpfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    ylabel('Basline NE in mPFC (z-score)')
+    xticks(1:lenght(ptiles))
+    xlabel('Baseline Pupil Area Quintile')
+    
     mat = [];
     for i = 1:length(s1_baseline)
         mat = [mat, s1_baseline{i}];
