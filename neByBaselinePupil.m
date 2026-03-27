@@ -15,6 +15,10 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     s1_baseline = {};
     mpfc_baseline = {};
     fig = figure();
+    tl = tiledlayout(2,4);
+    for i = 1:8
+        ax(i) = nexttile; hold on;
+    end
     for i = 1:length(ptiles)
         ptile = ptiles(i);
         high = prctile(data.pupil_base_before_stimulus, ptile);
@@ -75,27 +79,27 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
             end
         end
         l = sprintf('%ith quintile', i);
-        tl = tiledlayout(2,4);
-        ax(1) = nexttile; hold on;
+        axes(ax(1)); hold on;
         semshade(s1_rppa_hit{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
         title('Hit')
         ylabel('NE in S1 (z-score)')
-        ax(2) = nexttile; hold on;
+        axes(ax(2)); hold on;
         semshade(s1_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
         title('Miss')
-        ax(3) = nexttile; hold on;
+        axes(ax(3)); hold on;
         semshade(s1_rppa_cr{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
         title('Correct Rejection')
-        ax(4) = nexttile; hold on;
+        axes(ax(4)); hold on;
         semshade(s1_rppa_fa{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        ax(5) = nexttile; hold on;
+        title('False Alarm')
+        axes(ax(5)); hold on;
         semshade(mpfc_rppa_hit{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
         ylabel('NE in mPFC (z-score)')
-        ax(6) = nexttile; hold on;
+        axes(ax(6)); hold on;
         semshade(mpfc_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        ax(7) = nexttile; hold on;
+        axes(ax(7)); hold on;
         semshade(mpfc_rppa_cr{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        ax(8) = nexttile; hold on;
+        axes(ax(8)); hold on;
         semshade(mpfc_rppa_fa{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
     end
     for i = 1:8
@@ -218,7 +222,7 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     end
     errorbar(1:length(ptiles), cellfun(@nanmean,s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
     ylabel('Basline NE in S1 (z-score)')
-    xticks(1:lenght(ptiles))
+    xticks(1:length(ptiles))
     bax(2) = nexttile;
     hold on;
     for i = 1:length(mpfc_baseline)
@@ -226,8 +230,9 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     end
     errorbar(1:length(ptiles), cellfun(@nanmean,mpfc_baseline), cellfun(@ste, mpfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
     ylabel('Basline NE in mPFC (z-score)')
-    xticks(1:lenght(ptiles))
-    xlabel('Baseline Pupil Area Quintile')
+    xticks(1:length(ptiles))
+    xlabel(tl, 'Baseline Pupil Area Quintile')
+    unifyYLimits(bfig)
     
     mat = [];
     for i = 1:length(s1_baseline)
