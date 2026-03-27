@@ -185,6 +185,78 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
             preprocessed_label{i,1} = num2cell(tmp.go_nogo);
             preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
         end
+    elseif strcmp(version, 'pupil_driven_transitions')
+        % Pupil drives state transitions, stimulus drives choice observations
+        % Addresses eNeuro reviewer comment re: Hulsey et al. (2024)
+        %
+        % Output columns:
+        %   Col 1: baseline pupil (z-scored within session) -> transitions
+        %   Col 2: stimulus strength (normalized)           -> observations
+        %   Col 3: ones (bias term)                         -> observations
+        %
+        % The Python GLM-HMM code (glm_hmm_utils_v2.py) expects:
+        %   - Column 0 (pupil): used by InputDrivenTransitions (M_transition=1)
+        %   - Columns 1-2 (stimulus + bias): used by observations
+        %
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            metrics = getSpontaneousMetrics(tmp, false);
+            baseline_pupil = metrics(:,1);  % pupil_base_before_stimulus
+            
+            % z-score pupil within session for stable transition fitting
+            baseline_pupil = (baseline_pupil - nanmean(baseline_pupil)) / nanstd(baseline_pupil);
+            
+            stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            
+            if shuffle
+                pupil_shuffled = baseline_pupil(randperm(length(baseline_pupil)));
+                stim_shuffled = stim_strengths(randperm(length(stim_strengths)));
+                preprocessed_input{i,1} = [pupil_shuffled, stim_shuffled, ones(size(stim_shuffled))];
+            else
+                preprocessed_input{i,1} = [baseline_pupil, stim_strengths, ones(size(stim_strengths))];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo);
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+        end
+    elseif strcmp(version, 'pupil_ne_driven_transitions')
+        % Pupil + NE baselines drive state transitions, stimulus drives choice
+        % Extended version including mPFC and S1 NE baselines for transitions
+        %
+        % Output columns:
+        %   Col 1: baseline pupil (z-scored)           -> transitions
+        %   Col 2: baseline mPFC NE (z-scored)         -> transitions
+        %   Col 3: baseline S1 NE (z-scored)           -> transitions
+        %   Col 4: stimulus strength (normalized)      -> observations
+        %   Col 5: ones (bias term)                    -> observations
+        %
+        for i = 1:length(sessions)
+            tmp = filterTrials(data, 'session_id', sessions{i});
+            metrics = getSpontaneousMetrics(tmp, false);
+            baseline_pupil = metrics(:,1);  % pupil_base_before_stimulus
+            baseline_mpfc = metrics(:,3);   % photo_base_before_stim_ch1
+            baseline_s1 = metrics(:,5);     % photo_base_before_stim_ch2
+            
+            % z-score within session
+            baseline_pupil = (baseline_pupil - nanmean(baseline_pupil)) / nanstd(baseline_pupil);
+            baseline_mpfc = (baseline_mpfc - nanmean(baseline_mpfc)) / nanstd(baseline_mpfc);
+            baseline_s1 = (baseline_s1 - nanmean(baseline_s1)) / nanstd(baseline_s1);
+            
+            stim_strengths = tmp.stimulus_strength ./ max(tmp.stimulus_strength);
+            
+            if shuffle
+                preprocessed_input{i,1} = [baseline_pupil(randperm(end)), ...
+                    baseline_mpfc(randperm(end)), ...
+                    baseline_s1(randperm(end)), ...
+                    stim_strengths(randperm(end)), ones(size(stim_strengths))];
+            else
+                preprocessed_input{i,1} = [baseline_pupil, baseline_mpfc, baseline_s1, ...
+                    stim_strengths, ones(size(stim_strengths))];
+            end
+            preprocessed_session{i,1} = sessions{i};
+            preprocessed_label{i,1} = num2cell(tmp.go_nogo);
+            preprocessed_trial_number{i,1} = tmp.sequential_trial_number;
+        end
     elseif strcmp(version, 'spontaneous_pupil_stim_drop_outliers')
         for i = 1:length(sessions)
             tmp = filterTrials(data, 'session_id', sessions{i});
