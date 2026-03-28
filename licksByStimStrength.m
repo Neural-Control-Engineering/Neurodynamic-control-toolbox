@@ -108,6 +108,21 @@ function licksByStimStrength(data)
     unifyYLimits(session_fig)
     leg = legend();
     leg.Title.String = 'Stimulus Strength';
+
+    intensity = [];
+    mat = [];
+    for i = 2:length(licks_hit)
+        intensity = [intensity; zeros(size(licks_hit{i},1),1)+i-stim_strengths(i)];
+        mat = [mat; licks_hit{i}];
+    end
+
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', t);
+    ranova(rm)
+
     keyboard 
     % saveas(session_fig, 'Figures/fig4a.fig')
     % saveas(session_fig, 'Figures/fig4a.svg')
