@@ -89,7 +89,7 @@ function licksByStimStrength(data)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(licks_hit{i} ./ (bins(2)-bins(1)), 0.3, cols(i,:), cols(i,:), ...
-                t, 1, l);
+                t, 5, l);
     end
     xlim([bins(1),bins(end)])
     ylabel('Lick Frequency (Hz)', 'FontSize', 16)
@@ -100,7 +100,7 @@ function licksByStimStrength(data)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(licks_miss{i} ./ (bins(2)-bins(1)), 0.3, cols(i,:), cols(i,:), ...
-                t, 1, l);
+                t, 5, l);
     end
     xlim([bins(1),bins(end)])
     title('Miss', 'FontSize', 16)
@@ -115,12 +115,36 @@ function licksByStimStrength(data)
         intensity = [intensity; zeros(size(licks_hit{i},1),1)+i-stim_strengths(i)];
         mat = [mat; licks_hit{i}];
     end
-
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
+    % end
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
     tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
     for c = 2:size(mat,2)
         tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', t);
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('hit licks by stimulus strength:\n')
+    ranova(rm)
+
+    intensity = [];
+    mat = [];
+    for i = 2:length(licks_miss)
+        intensity = [intensity; zeros(size(licks_miss{i},1),1)+i-stim_strengths(i)];
+        mat = [mat; licks_miss{i}];
+    end
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
+    % end
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('miss licks by stimulus strength:\n')
     ranova(rm)
 
     keyboard 

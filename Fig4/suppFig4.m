@@ -87,7 +87,7 @@ function suppFig4(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(s1_ne_hit{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 1, l);
+                t, 5, l);
     end
     xlim(tbounds)
     ylabel('NE in S1 (z-score')
@@ -98,7 +98,7 @@ function suppFig4(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(s1_ne_miss{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 1, l);
+                t, 5, l);
     end
     xlim(tbounds)
     title('Miss')
@@ -108,7 +108,7 @@ function suppFig4(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(mpfc_ne_hit{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 1, l);
+                t, 5, l);
     end
     xlim(tbounds)
     ylabel('NE in mPFC (z-score')
@@ -118,13 +118,90 @@ function suppFig4(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(mpfc_ne_miss{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 1, l);
+                t, 5, l);
     end
     xlim(tbounds)
     xlabel(tl, 'Time (s)', 'FontSize', 16)
     unifyYLimits(session_fig)
     leg = legend();
     leg.Title.String = 'Stimulus Strength';
+
+    intensity = [];
+    mat = [];
+    for i = 2:length(s1_ne_hit)
+        intensity = [intensity; zeros(size(s1_ne_hit{i},1),1)+i-stim_strengths(i)];
+        mat = [mat; s1_ne_hit{i}];
+    end
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
+    % end
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('hit s1_ne_ by stimulus strength:\n')
+    ranova(rm)
+
+    intensity = [];
+    mat = [];
+    for i = 2:length(s1_ne_miss)
+        intensity = [intensity; zeros(size(s1_ne_miss{i},1),1)+i-stim_strengths(i)];
+        mat = [mat; s1_ne_miss{i}];
+    end
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
+    % end
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('miss s1_ne_ by stimulus strength:\n')
+    ranova(rm)
+
+    intensity = [];
+    mat = [];
+    for i = 2:length(mpfc_ne_hit)
+        intensity = [intensity; zeros(size(mpfc_ne_hit{i},1),1)+i-stim_strengths(i)];
+        mat = [mat; mpfc_ne_hit{i}];
+    end
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
+    % end
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('hit mpfc_ne_ by stimulus strength:\n')
+    ranova(rm)
+
+    intensity = [];
+    mat = [];
+    for i = 2:length(mpfc_ne_miss)
+        intensity = [intensity; zeros(size(mpfc_ne_miss{i},1),1)+i-stim_strengths(i)];
+        mat = [mat; mpfc_ne_miss{i}];
+    end
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
+    % end
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('miss mpfc_ne_ by stimulus strength:\n')
+    ranova(rm)
+
     keyboard 
     % saveas(session_fig, 'Figures/fig4a.fig')
     % saveas(session_fig, 'Figures/fig4a.svg')
