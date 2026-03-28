@@ -2,14 +2,15 @@ function [animal, session, t] = fig2d(data, tbounds, alignTo)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
-    animal = {{[],[],[]}, {[],[],[]}, {[],[],[]}, {[],[],[]}};
-    session = {{[],[],[]}, {[],[],[]}, {[],[],[]}, {[],[],[]}};
+    animal = {{[],[],[],[],[]}, {[],[],[],[],[]}, {[],[],[],[],[]}, {[],[],[],[],[]}};
+    session = {{[],[],[],[],[]}, {[],[],[],[],[]}, {[],[],[],[],[]}, {[],[],[],[],[]}};
 
     if ~exist('alignTo', 'var')
         alignTo = 'stimulus';
     end
 
-    ptiles = [33, 66, 100];
+    % ptiles = [33, 66, 100];
+    ptiles = [20,40,60,80,100];
     low = prctile(data.pupil_base_before_stimulus, 0);
     for i = 1:length(ptiles)
         ptile = ptiles(i);
@@ -54,14 +55,14 @@ function [animal, session, t] = fig2d(data, tbounds, alignTo)
     end
     % t = t(2:end-1);
             
-    cols = distinguishable_colors(4);
+    cols = distinguishable_colors(length(ptiles));
     fig_sesh = figure('Visible', 'on', 'WindowState', 'maximized');
     tl_sesh = tiledlayout(2,2);
 
-    l = {'low', 'medium', 'high'};
+    l = {'1st quintile', '2nd quintile', '3rd quintile', '4th quintile', '5th quintile'};
     for o = 1:length(outcomes)
         axs_sesh(o) = nexttile;
-        for i = 1:3    
+        for i = 1:length(ptiles)
             axis square
             hold on
             n = size(pupil,1);
