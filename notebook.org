@@ -1010,7 +1010,7 @@ Used literature:
     (Intercept):Time    206.75       5      41.35    119.04    3.3416e-102    5.8455e-78    2.5519e-79    9.7213e-23
     tercile:Time        3.7649       5    0.75298    2.1677       0.055429      0.074707      0.073458       0.14226
     Error(Time)         413.36    1190    0.34736       
-*** TODO: explicitly state hypotheses 
+*** DONE: explicitly state hypotheses 
 *** DONE: compare NE dynamics between regions 
 animal_ne = {};
 session_ne = {};

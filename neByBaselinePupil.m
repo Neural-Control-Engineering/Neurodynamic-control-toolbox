@@ -81,20 +81,20 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         l = sprintf('%ith quintile', i);
         axes(ax(1)); hold on;
         semshade(s1_rppa_hit{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('Hit')
-        ylabel('NE in S1 (z-score)')
+        title('Hit', 'FontSize', 16)
+        ylabel('NE in S1 (z-score)', 'FontSize', 16)
         axes(ax(2)); hold on;
         semshade(s1_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('Miss')
+        title('Miss', 'FontSize', 16)
         axes(ax(3)); hold on;
         semshade(s1_rppa_cr{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('Correct Rejection')
+        title('Correct Rejection', 'FontSize', 16)
         axes(ax(4)); hold on;
         semshade(s1_rppa_fa{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('False Alarm')
+        title('False Alarm', 'FontSize', 16)
         axes(ax(5)); hold on;
         semshade(mpfc_rppa_hit{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        ylabel('NE in mPFC (z-score)')
+        ylabel('NE in mPFC (z-score)', 'FontSize', 16)
         axes(ax(6)); hold on;
         semshade(mpfc_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
         axes(ax(7)); hold on;
@@ -106,7 +106,7 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         axes(ax(i)); xlim([-0.5,6])
     end
     unifyYLimits(fig)
-    xlabel(tl, 'Time (s)')
+    xlabel(tl, 'Time (s)', 'FontSize', 16)
     mpfc_hit = [];
     mpfc_miss = [];
     mpfc_fa = [];
@@ -221,7 +221,7 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         plot(zeros(size(s1_baseline{i},1),1)+i+(rand(size(s1_baseline{i},1),1)-0.5)*0.1, s1_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
     end
     errorbar(1:length(ptiles), cellfun(@nanmean,s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    ylabel('Basline NE in S1 (z-score)')
+    title('S1', 'FontSize', 16)
     xticks(1:length(ptiles))
     bax(2) = nexttile;
     hold on;
@@ -229,10 +229,11 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
         plot(zeros(size(mpfc_baseline{i},1),1)+i+(rand(size(mpfc_baseline{i},1),1)-0.5)*0.1, mpfc_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
     end
     errorbar(1:length(ptiles), cellfun(@nanmean,mpfc_baseline), cellfun(@ste, mpfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    ylabel('Basline NE in mPFC (z-score)')
+    title('mPFC', 'FontSize', 16)
     xticks(1:length(ptiles))
-    xlabel(tl, 'Baseline Pupil Area Quintile')
+    xlabel(tl, 'Baseline Pupil Area Quintile', 'FontSize', 16)
     unifyYLimits(bfig)
+    ylabel(tl, 'Baseline NE (z-score)', 'FontSize', 16)
     
     mat = [];
     for i = 1:length(s1_baseline)
@@ -246,4 +247,10 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     end
     fprintf('Basline mPFC NE by baseline pupil area\n')
     [p,tbl,stats] = anova1(mat)
+
+    saveas(bfig, 'Figures/baselineNEbyBaselinePupil.fig')
+    saveas(bfig, 'Figures/baselineNEbyBaselinePupil.fig')
+    saveas(fig, 'Figures/nEbyBaselinePupil.fig')
+    saveas(fig, 'Figures/nEbyBaselinePupil.fig')
+    
 end
