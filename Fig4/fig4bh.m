@@ -1,4 +1,4 @@
-function suppFig4(data, tbounds, alignTo, ver)
+function fig4bh(data, tbounds, alignTo, ver)
 
     s1_ne_hit = {};
     s1_ne_miss = {};
@@ -74,13 +74,35 @@ function suppFig4(data, tbounds, alignTo, ver)
                 end
             end
         end
+        otmp = filterTrials(sidtmp, 'categorical_outcome', 'CR');
+        if ~isempty(otmp)
+            [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
+            if size(s1,1) > 1
+                s1_ne_cr{1} = [s1_ne_cr{1}; nanmean(s1)];
+                mpfc_ne_cr{1} = [mpfc_ne_cr{1}; nanmean(mpfc)];
+            else
+                s1_ne_cr{1} = [s1_ne_cr{1}; s1];
+                mpfc_ne_cr{1} = [mpfc_ne_cr{1}; mpfc];
+            end
+        end
+        otmp = filterTrials(sidtmp, 'categorical_outcome', 'FA');
+        if ~isempty(otmp)
+            [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, alignTo, ver);
+            if size(s1,1) > 1
+                s1_ne_fa{1} = [s1_ne_fa{1}; nanmean(s1)];
+                mpfc_ne_fa{1} = [mpfc_ne_fa{1}; nanmean(mpfc)];
+            else
+                s1_ne_fa{1} = [s1_ne_fa{1}; s1];
+                mpfc_ne_fa{1} = [mpfc_ne_fa{1}; mpfc];
+            end
+        end
     end
 
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(length(stim_strengths)+1);
     
-    session_fig = figure();
-    tl = tiledlayout(2,2);
+    s1_fig = figure();
+    tl = tiledlayout(1,4);
     axs(1) = nexttile;
     hold on
     for i = 2:length(stim_strengths)
@@ -90,8 +112,8 @@ function suppFig4(data, tbounds, alignTo, ver)
                 t, 5, l);
     end
     xlim(tbounds)
-    ylabel('NE in S1 (z-score')
-    title('Hit')
+    title('Hit', 'FontSize', 16)
+    legend()
     axs(2) = nexttile;
     hold on
     for i = 2:length(stim_strengths)
@@ -101,8 +123,32 @@ function suppFig4(data, tbounds, alignTo, ver)
                 t, 5, l);
     end
     xlim(tbounds)
-    title('Miss')
+    title('Miss', 'FontSize', 16)
     axs(3) = nexttile;
+    hold on
+    stim = stim_strengths(1);
+    l = sprintf('%.1f PSI', stim*10);
+    out = semshade(s1_ne_cr{1}, 0.3, cols(1,:), cols(1,:), ...
+            t, 5, l);
+    title('Correct Rejection', 'FontSize', 16)
+    xlim(tbounds)
+    axs(4) = nexttile;
+    hold on
+    stim = stim_strengths(1);
+    l = sprintf('%.1f PSI', stim*10);
+    out = semshade(s1_ne_fa{1}, 0.3, cols(1,:), cols(1,:), ...
+            t, 5, l);
+    xlim(tbounds)
+    title('False Alarm', 'FontSize', 16)
+    xlabel(tl, 'Time (s)', 'FontSize', 16)
+    ylabel(tl, 'NE in S1 (z-score)', 'FontSize', 16)
+    unifyYLimits(s1_fig)
+    leg = legend();
+    leg.Title.String = 'Stimulus Strength';
+
+    mpfc_fig = figure();
+    tl = tiledlayout(1,4);
+    axs(1) = nexttile;
     hold on
     for i = 2:length(stim_strengths)
         stim = stim_strengths(i);
@@ -111,8 +157,9 @@ function suppFig4(data, tbounds, alignTo, ver)
                 t, 5, l);
     end
     xlim(tbounds)
-    ylabel('NE in mPFC (z-score')
-    axs(4) = nexttile;
+    title('Hit', 'FontSize', 16)
+    legend()
+    axs(2) = nexttile;
     hold on
     for i = 2:length(stim_strengths)
         stim = stim_strengths(i);
@@ -121,8 +168,26 @@ function suppFig4(data, tbounds, alignTo, ver)
                 t, 5, l);
     end
     xlim(tbounds)
+    title('Miss', 'FontSize', 16)
+    axs(3) = nexttile;
+    hold on
+    stim = stim_strengths(1);
+    l = sprintf('%.1f PSI', stim*10);
+    out = semshade(mpfc_ne_cr{1}, 0.3, cols(1,:), cols(1,:), ...
+            t, 5, l);
+    title('Correct Rejection', 'FontSize', 16)
+    xlim(tbounds)
+    axs(4) = nexttile;
+    hold on
+    stim = stim_strengths(1);
+    l = sprintf('%.1f PSI', stim*10);
+    out = semshade(mpfc_ne_fa{1}, 0.3, cols(1,:), cols(1,:), ...
+            t, 5, l);
+    xlim(tbounds)
+    title('False Alarm', 'FontSize', 16)
     xlabel(tl, 'Time (s)', 'FontSize', 16)
-    unifyYLimits(session_fig)
+    ylabel(tl, 'NE in mPFC (z-score)', 'FontSize', 16)
+    unifyYLimits(mpfc_fig)
     leg = legend();
     leg.Title.String = 'Stimulus Strength';
 
@@ -203,6 +268,8 @@ function suppFig4(data, tbounds, alignTo, ver)
     ranova(rm)
 
     keyboard 
-    % saveas(session_fig, 'Figures/fig4a.fig')
-    % saveas(session_fig, 'Figures/fig4a.svg')
+    saveas(s1_fig, 'Figures/figb.fig')
+    saveas(s1_fig, 'Figures/figb.svg')
+    saveas(mpfc_fig, 'Figures/figh.fig')
+    saveas(mpfc_fig, 'Figures/figh.svg')
 end
