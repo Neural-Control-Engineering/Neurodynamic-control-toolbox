@@ -11,7 +11,7 @@ metrics = {'accuracy', 'roc_auc', 'pr_auc', 'bits_per_trial'};
 titles = {'Accuracy', 'ROC-AUC', 'PR-AUC', 'Log-likelihood (bits/trial)'};
 ylabels = {'Accuracy', 'AUC', 'AUC', 'bits/trial'};
 
-colors = struct('Sticky', [0.2 0.4 0.8], 'InputDriven', [0.9 0.3 0.2]);
+colors = struct('Original', [0.2 0.4 0.8], 'New', [0.9 0.3 0.2]);
 
 %% Generate one .fig per metric
 for m = 1:length(metrics)
@@ -37,7 +37,7 @@ for m = 1:length(metrics)
         errorbar(k_vals, means, sems, '-o', ...
             'Color', c, 'MarkerFaceColor', c, 'MarkerSize', 7, ...
             'LineWidth', 1.5, 'CapSize', 8, ...
-            'DisplayName', strrep(model, 'InputDriven', 'Input-Driven'));
+            'DisplayName', model);
     end
     
     xlabel('Number of states (K)');
