@@ -187,4 +187,6 @@ function licksByBaselinePupil(data)
     fprintf('Licks False Alarm:\n')
     ranova(rm)
 
+    keyboard 
+
 end

@@ -188,6 +188,14 @@ rm = fitrm(tbl, sprintf('t0-t%i ~ state',c-1), 'WithinDesign', time);
 fprintf('mPFC Miss:\n')
 ranova(rm)
 
+tbl = table(state_cr_mat, pupil_cr_mat(:,1), 'VariableNames', {'state', 't0'});
+for c = 2:size(pupil_cr_mat,2)
+    tbl = [tbl, table(pupil_cr_mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+end
+rm = fitrm(tbl, sprintf('t0-t%i ~ state',c-1), 'WithinDesign', pt);
+fprintf('Pupil CR:\n')
+ranova(rm)
+
 s1_cr_mat = s1_cr_mat(:,t > 0 & t <= 5); 
 time = t(t > 0 & t <= 5);
 tbl = table(state_cr_mat, s1_cr_mat(:,1), 'VariableNames', {'state', 't0'});

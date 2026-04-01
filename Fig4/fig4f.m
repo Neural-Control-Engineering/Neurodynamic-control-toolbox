@@ -5,8 +5,8 @@ function out = fig4f(data, ver)
 
     % ptiles = 25:25:100;
     % ptiles = [33, 66, 100];
-    % ptiles = [20,40,60,80,100];
-    ptiles = [10,20,30,40,50,60,70,80,90,100];
+    ptiles = [20,40,60,80,100];
+    % ptiles = [10,20,30,40,50,60,70,80,90,100];
     low = prctile(baselines, 0);
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(length(ptiles));

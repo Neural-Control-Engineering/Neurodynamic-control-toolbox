@@ -1,85 +1,170 @@
-function [animal, session, t] = fig2c(data, tbounds, alignTo)
-    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
-    animals = fetchAnimals(data);
+function fig2c(data, tbounds, alignTo)
+
+    pupil_ne_hit = {};
+    pupil_ne_miss = {};
+    pupil_ne_cr = {};
+    pupil_ne_fa = {};
+    for i = 1:length(unique(data.stimulus_strength))
+        pupil_ne_hit{i} = [];
+        pupil_ne_miss{i} = [];
+        pupil_ne_cr{i} = [];
+        pupil_ne_fa{i} = [];
+    end
+    
     sessions = unique(data.session_id);
-    animal = {[], [], [], []};
-    session = {[], [], [], []};
 
-    if ~exist('alignTo', 'var')
-        alignTo = 'stimulus';
-    end
-
-    for a = 1:length(animals)
-        atmp = filterTrials(data, 'animal', num2str(animals(a)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(atmp, 'categorical_outcome', outcome);
+    for a = 1:length(sessions)
+        sidtmp = filterTrials(data, 'session_id', num2str(sessions(a)));
+        stim_strengths = unique(sidtmp.stimulus_strength);
+        atmp = filterTrials(sidtmp, 'categorical_outcome', 'Hit');
+        for i = 1:length(stim_strengths)
+            stim = stim_strengths(i);
+            otmp = filterTrials(atmp, 'stim_strength', stim);
             if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    animal{o} = [animal{o}; nanmean(pupil(:,2:end-1))];
+                [s1, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
+                if length(stim_strengths) == 2 && i == 2
+                    if size(s1,1) > 1
+                        pupil_ne_hit{end} = [pupil_ne_hit{end}; nanmean(s1)];
+                    else
+                        pupil_ne_hit{end} = [pupil_ne_hit{end}; s1];
+                    end
                 else
-                    animal{o} = [animal{o}; pupil(2:end-1)];
+                    if size(s1,1) > 1
+                        pupil_ne_hit{i} = [pupil_ne_hit{i}; nanmean(s1)];
+                    else
+                        pupil_ne_hit{i} = [pupil_ne_hit{i}; s1];
+                    end
                 end
+            end
+        end
+        atmp = filterTrials(sidtmp, 'categorical_outcome', 'Miss');
+        for i = 1:length(stim_strengths)
+            stim = stim_strengths(i);
+            otmp = filterTrials(atmp, 'stim_strength', stim);
+            if ~isempty(otmp)
+                [s1, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
+                if length(stim_strengths) == 2 && i == 2
+                    if size(s1,1) > 1
+                        pupil_ne_miss{end} = [pupil_ne_miss{end}; nanmean(s1)];
+                    else
+                        pupil_ne_miss{end} = [pupil_ne_miss{end}; s1];
+                    end
+                else
+                    if size(s1,1) > 1
+                        pupil_ne_miss{i} = [pupil_ne_miss{i}; nanmean(s1)];
+                    else
+                        pupil_ne_miss{i} = [pupil_ne_miss{i}; s1];
+                    end
+                end
+            end
+        end
+        otmp = filterTrials(sidtmp, 'categorical_outcome', 'CR');
+        if ~isempty(otmp)
+            [s1, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
+            if size(s1,1) > 1
+                pupil_ne_cr{1} = [pupil_ne_cr{1}; nanmean(s1)];
+            else
+                pupil_ne_cr{1} = [pupil_ne_cr{1}; s1];
+            end
+        end
+        otmp = filterTrials(sidtmp, 'categorical_outcome', 'FA');
+        if ~isempty(otmp)
+            [s1, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
+            if size(s1,1) > 1
+                pupil_ne_fa{1} = [pupil_ne_fa{1}; nanmean(s1)];
+            else
+                pupil_ne_fa{1} = [pupil_ne_fa{1}; s1];
             end
         end
     end
 
-    for s = 1:length(sessions)
-        stmp = filterTrials(data, 'session_id', num2str(sessions(s)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(stmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    session{o} = [session{o}; nanmean(pupil(:,2:end-1))];
-                else
-                    session{o} = [session{o}; pupil(2:end-1)];
-                end
-            end
-        end
-    end
-            
-    fig_sesh = figure('Visible', 'on', 'WindowState', 'maximized');
-    axs_sesh = 1:length(outcomes);
-    tl_sesh = tiledlayout(1,length(outcomes));
+    stim_strengths = unique(data.stimulus_strength);
+    cols = distinguishable_colors(length(stim_strengths)+1);
     
-    for o = 1:length(outcomes)
-        axs_sesh(o) = nexttile;
-        axis square
-        hold on
-        n = size(pupil,1);
-        semshade(session{o}, 0.3, 'k', 'k', ...
-                t(2:end-1), 1, sprintf('%s (n=%i)', outcome, n));
-        title(outcomes{o}, 'FontSize', 16)
-        ylim([-0.7,1.0])
-        xlim(tbounds)
-        plot([0,0], [-0.7, 1.55], 'k:', 'HandleVisibility', 'off')
+    pupil_fig = figure();
+    tl = tiledlayout(1,4);
+    axs(1) = nexttile;
+    hold on
+    for i = 2:length(stim_strengths)
+        stim = stim_strengths(i);
+        l = sprintf('%.1f PSI', stim*10);
+        out = semshade(pupil_ne_hit{i}, 0.3, cols(i,:), cols(i,:), ...
+                t, 5, l);
     end
-    ylabel(tl_sesh, 'Pupil Area (z-score)', 'FontSize', 14)
-    xlabel(tl_sesh, 'Time (s)', 'FontSize', 14)
-    saveas(fig_sesh, 'Figures/fig2c.fig')
-    saveas(fig_sesh, 'Figures/fig2c.svg')
+    xlim(tbounds)
+    title('Hit', 'FontSize', 16)
+    legend()
+    axs(2) = nexttile;
+    hold on
+    for i = 2:length(stim_strengths)
+        stim = stim_strengths(i);
+        l = sprintf('%.1f PSI', stim*10);
+        out = semshade(pupil_ne_miss{i}, 0.3, cols(i,:), cols(i,:), ...
+                t, 5, l);
+    end
+    xlim(tbounds)
+    title('Miss', 'FontSize', 16)
+    axs(3) = nexttile;
+    hold on
+    stim = stim_strengths(1);
+    l = sprintf('%.1f PSI', stim*10);
+    out = semshade(pupil_ne_cr{1}, 0.3, cols(1,:), cols(1,:), ...
+            t, 5, l);
+    title('Correct Rejection', 'FontSize', 16)
+    xlim(tbounds)
+    axs(4) = nexttile;
+    hold on
+    stim = stim_strengths(1);
+    l = sprintf('%.1f PSI', stim*10);
+    out = semshade(pupil_ne_fa{1}, 0.3, cols(1,:), cols(1,:), ...
+            t, 5, l);
+    xlim(tbounds)
+    title('False Alarm', 'FontSize', 16)
+    xlabel(tl, 'Time (s)', 'FontSize', 16)
+    ylabel(tl, 'Pupil Area (z-score)', 'FontSize', 16)
+    unifyYLimits(pupil_fig)
+    leg = legend();
+    leg.Title.String = 'Stimulus Strength';
 
-    % fig_animal = figure('Visible', 'on', 'WindowState', 'maximized');
-    % axs_animal = 1:length(outcomes);
-    % tl_animal = tiledlayout(1,length(outcomes));
-    
-    % t = t(2:end-1);
-    % for o = 1:length(outcomes)
-    %     axs_animal(o) = nexttile;
-    %     axis square
-    %     hold on
-    %     n = size(pupil,1);
-    %     semshade(animal{o}, 0.3, 'k', 'k', ...
-    %             t, 1, sprintf('%s (n=%i)', outcome, n));
-    %     title(outcomes{o}, 'FontSize', 16)
-    %     ylim([-0.7,1.0])
-    %     xlim(tbounds)
-    %     plot([0,0], [-0.7, 1.55], 'k:', 'HandleVisibility', 'off')
+    intensity = [];
+    mat = [];
+    for i = 2:length(pupil_ne_hit)
+        intensity = [intensity; zeros(size(pupil_ne_hit{i},1),1)+stim_strengths(i)];
+        mat = [mat; pupil_ne_hit{i}];
+    end
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
     % end
-    % ylabel(tl_animal, 'Pupil Area (z-score)', 'FontSize', 14)
-    % xlabel(tl_animal, 'Time (s)', 'FontSize', 14)
-    % saveas(fig_sesh, 'Analysis/paper_figures/figure2/pupilByOutcome.fig')
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('hit pupil_ne_ by stimulus strength:\n')
+    ranova(rm)
+
+    intensity = [];
+    mat = [];
+    for i = 2:length(pupil_ne_miss)
+        intensity = [intensity; zeros(size(pupil_ne_miss{i},1),1)+stim_strengths(i)];
+        mat = [mat; pupil_ne_miss{i}];
+    end
+    % for r = 1:size(mat,1)
+    %     mat(r,:) = smooth(mat(r,:),5);
+    % end
+    mat = mat(:, t>0 & t<=5);
+    time =t(:, t>0 & t<=5);
+    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    fprintf('miss pupil_ne_ by stimulus strength:\n')
+    ranova(rm)
+
+    keyboard 
+    saveas(pupil_fig, 'Figures/figb.fig')
+    saveas(pupil_fig, 'Figures/figb.svg')
 end

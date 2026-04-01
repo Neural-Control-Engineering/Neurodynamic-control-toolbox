@@ -869,11 +869,16 @@ Possibly highlight the animal that those data were derived from in a different c
     There are 0 PSI trials with licks in the during the response window (false alarms) in figure 1 D (top left).
 
 **** Figure 2:
-***** The authors plot pupil dynamics in Figure 2C, it is unclear whether this is an average of all stimulus intensities or for a specific example. Did pupil size Z scores differ across misses of differing intensity?
+***** The authors plot pupil dynamics in Figure 2C, it is unclear whether this is an average of all stimulus intensities or for a specific example. D
+id pupil size Z scores differ across misses of differing intensity?
+    replacing with individual plots by intensity
 
-***** Describe in detail how baseline and dilation Z scores were calculated (Figure 2E). Was this the grand mean across all baseline measures and mean of all dilated pupil diameters? Or, was the pupil dilation Z score based on a trial by trial baseline mean?
+***** Describe in detail how baseline and dilation Z scores were calculated (Figure 2E). Was this the grand mean across all baseline measures and mean of all 
+dilated pupil diameters? Or, was the pupil dilation Z score based on a trial by trial baseline mean?
+    computed for each trial (I believe)
 
 ***** For Figure 2E-H, do these reflect a representation of all stimulus intensities or a specific intensity or tercile?
+    All stimulus intensities 
 
 **** Figure 3:
 ***** For clarification, did GRAB-NE contain a fluorescent reporter? The legend indicates that immunohistochemistry was used. Also, this is a immunofluorescence photomicrograph.
@@ -882,9 +887,11 @@ Possibly highlight the animal that those data were derived from in a different c
 
 **** Figure 5:
 ***** Strength is misspelled in Figure 5B inset and misspelled words exist in the legend.
+    Fixed 
 
 **** Figure 6:
 ***** Words are misspelled in the legend.
+    Fixed 
 
 ***** Again, are these trials from a particular stimulus intensity or is this an average of all intensities and therefore HMM State is a confound of stimulus intensity.
 
@@ -962,7 +969,11 @@ pupil size predictors would provide a more detailed insight in the relation betw
 Including a control analysis examining licking in this late time-window could be informative.
 
 **** In the Introduction, the statement that the relationship between behavioral strategies and arousal remains unclear overlooks relevant literature
- including Akella et al. (2025; Nature Communications). Hulsey et al. (2024; Neuron), Johnson et al. (bioRxiv), Yin et al. (2025; Neuron).
+ including 
+***** Akella et al. (2025; Nature Communications). 
+***** Hulsey et al. (2024; Neuron), 
+***** Johnson et al. (bioRxiv), A dynamical systems model of arousal-driven behavioural state transitions. bioRxiv Preprint. https://doi.org/10.1101/2025.10.31.685593
+***** Yin et al. (2025; Neuron).
 
 **** In the Results, the opening sentence of the behavioral state segment mentions that task-evoked pupil dilations are examined as baseline pupil size was used as a p
 predictor in the GLM, yet baseline pupil size effects are then reported. This sentence could be rephrased for clarity.
@@ -1370,7 +1381,14 @@ xlabel('State', 'FontSize', 16)
 ylabel('Decision Criterion (s)', 'FontSize', 16)
 mat = [fracs{1}, fracs{2}, fracs{3}];
 [p,tbl,stats] = anova1(mat)
-** cross correlations by state 
+** cross correlations by state - corrByState.m 
+
+                        SumSq     DF      MeanSq       F         pValue       pValueGG      pValueHF      pValueLB
+                        ______    _____    _________    ______    ______    __________    __________    __________
+
+    (Intercept):Time    82.709      956     0.086515    40.269       0      3.9487e-16    1.4114e-16    1.5873e-08
+    state:Time          18.854      956     0.019721    9.1793       0      8.7789e-05    7.0948e-05     0.0033702
+    Error(Time)         151.99    70744    0.0021485
 
 * [2026-3-31 Tue] - wrapping up glm hmm
 T = readtable('glmhmm_cv_results.csv');

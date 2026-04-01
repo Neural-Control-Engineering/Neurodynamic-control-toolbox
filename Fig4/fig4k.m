@@ -2,8 +2,8 @@ function [animal, session] = fig4k(data)
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     animals = fetchAnimals(data);
     sessions = unique(data.session_id);
-    animal = {[],[],[]};
-    session = {[],[],[]};
+    animal = {[],[],[],[],[]};
+    session = {[],[],[],[],[]};
     ver = 'filtered';
 
     if ~exist('alignTo', 'var')
@@ -12,8 +12,7 @@ function [animal, session] = fig4k(data)
 
     [mpfc, ~, ~] = avg_photo_traces(data, [-0.5, 0], 'stimulus', ver);
     baselines = nanmean(mpfc,2);
-
-    ptiles = [33, 66, 100];
+    ptiles = [20,40,60,80,100];
     low = prctile(baselines, 0);
     for i = 1:length(ptiles)
         ptile = ptiles(i);
@@ -39,8 +38,8 @@ function [animal, session] = fig4k(data)
         sesh_err(i) = nanstd(session{i}) / sqrt(length(session{i}));
     end
 
-    x = 1:3;
-    l = {'Low', 'Medium', 'High'};
+    x = 1:length(ptiles);
+    l = {'1', '2', '3', '4', '5'};
 
     fig_sesh = figure();
     hold on 
