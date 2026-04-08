@@ -109,7 +109,7 @@ function fig4bh(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(s1_ne_hit{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 5, l);
+                t, 10, l);
     end
     xlim(tbounds)
     title('Hit', 'FontSize', 16)
@@ -120,7 +120,7 @@ function fig4bh(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(s1_ne_miss{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 5, l);
+                t, 10, l);
     end
     xlim(tbounds)
     title('Miss', 'FontSize', 16)
@@ -129,7 +129,7 @@ function fig4bh(data, tbounds, alignTo, ver)
     stim = stim_strengths(1);
     l = sprintf('%.1f PSI', stim*10);
     out = semshade(s1_ne_cr{1}, 0.3, cols(1,:), cols(1,:), ...
-            t, 5, l);
+            t, 10, l);
     title('Correct Rejection', 'FontSize', 16)
     xlim(tbounds)
     axs(4) = nexttile;
@@ -137,7 +137,7 @@ function fig4bh(data, tbounds, alignTo, ver)
     stim = stim_strengths(1);
     l = sprintf('%.1f PSI', stim*10);
     out = semshade(s1_ne_fa{1}, 0.3, cols(1,:), cols(1,:), ...
-            t, 5, l);
+            t, 10, l);
     xlim(tbounds)
     title('False Alarm', 'FontSize', 16)
     xlabel(tl, 'Time (s)', 'FontSize', 16)
@@ -154,7 +154,7 @@ function fig4bh(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(mpfc_ne_hit{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 5, l);
+                t, 10, l);
     end
     xlim(tbounds)
     title('Hit', 'FontSize', 16)
@@ -165,7 +165,7 @@ function fig4bh(data, tbounds, alignTo, ver)
         stim = stim_strengths(i);
         l = sprintf('%.1f PSI', stim*10);
         out = semshade(mpfc_ne_miss{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 5, l);
+                t, 10, l);
     end
     xlim(tbounds)
     title('Miss', 'FontSize', 16)
@@ -174,7 +174,7 @@ function fig4bh(data, tbounds, alignTo, ver)
     stim = stim_strengths(1);
     l = sprintf('%.1f PSI', stim*10);
     out = semshade(mpfc_ne_cr{1}, 0.3, cols(1,:), cols(1,:), ...
-            t, 5, l);
+            t, 10, l);
     title('Correct Rejection', 'FontSize', 16)
     xlim(tbounds)
     axs(4) = nexttile;
@@ -182,7 +182,7 @@ function fig4bh(data, tbounds, alignTo, ver)
     stim = stim_strengths(1);
     l = sprintf('%.1f PSI', stim*10);
     out = semshade(mpfc_ne_fa{1}, 0.3, cols(1,:), cols(1,:), ...
-            t, 5, l);
+            t, 10, l);
     xlim(tbounds)
     title('False Alarm', 'FontSize', 16)
     xlabel(tl, 'Time (s)', 'FontSize', 16)
@@ -267,7 +267,6 @@ function fig4bh(data, tbounds, alignTo, ver)
     fprintf('miss mpfc_ne_ by stimulus strength:\n')
     ranova(rm)
 
-    keyboard 
     saveas(s1_fig, 'Figures/figb.fig')
     saveas(s1_fig, 'Figures/figb.svg')
     saveas(mpfc_fig, 'Figures/figh.fig')

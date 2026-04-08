@@ -202,45 +202,7 @@ function licksByStimStrength(data)
     fprintf('miss licks by stimulus strength:\n')
     ranova(rm)
 
-    % intensity = [];
-    % mat = [];
-    % for i = 2:length(licks_cr)
-    %     intensity = [intensity; zeros(size(licks_cr{i},1),1)+i-stim_strengths(i)];
-    %     mat = [mat; licks_cr{i}];
-    % end
-    % % for r = 1:size(mat,1)
-    % %     mat(r,:) = smooth(mat(r,:),5);
-    % % end
-    % mat = mat(:, t>0 & t<=5);
-    % time =t(:, t>0 & t<=5);
-    % tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
-    % for c = 2:size(mat,2)
-    %     tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
-    % end
-    % rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
-    % fprintf('cr licks by stimulus strength:\n')
-    % ranova(rm)
+    saveas(session_fig, 'Figures/fig1d_addition.fig')
+    saveas(session_fig, 'Figures/fig1d_addition.svg')
 
-    % intensity = [];
-    % mat = [];
-    % for i = 2:length(licks_fa)
-    %     intensity = [intensity; zeros(size(licks_fa{i},1),1)+i-stim_strengths(i)];
-    %     mat = [mat; licks_fa{i}];
-    % end
-    % % for r = 1:size(mat,1)
-    % %     mat(r,:) = smooth(mat(r,:),5);
-    % % end
-    % mat = mat(:, t>0 & t<=5);
-    % time =t(:, t>0 & t<=5);
-    % tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
-    % for c = 2:size(mat,2)
-    %     tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
-    % end
-    % rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
-    % fprintf('fa licks by stimulus strength:\n')
-    % ranova(rm)
-
-    keyboard 
-    % saveas(session_fig, 'Figures/fig4a.fig')
-    % saveas(session_fig, 'Figures/fig4a.svg')
 end

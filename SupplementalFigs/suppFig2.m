@@ -1,4 +1,4 @@
-function licksByBaselinePupil(data)
+function suppFig2(data)
     ptiles = [20,40,60,80,100];
     bins = -0.5:0.1:6.0;
     low = prctile(data.pupil_base_before_stimulus, 0);
@@ -126,8 +126,8 @@ function licksByBaselinePupil(data)
     end
     xlabel(tl, 'Time (s)', 'FontSize', 16)
     ylabel(tl, 'Lick Frequency (Hz)', 'FontSize', 16)
-    saveas(fig, 'Figures/licksByBaseline.fig')
-    saveas(fig, 'Figures/licksByBaseline.svg')
+    saveas(fig, 'Figures/suppFig2.fig')
+    saveas(fig, 'Figures/suppFig2.svg')
 
     lk_hit = [];
     lk_miss = [];
@@ -186,7 +186,5 @@ function licksByBaselinePupil(data)
     rm = fitrm(tbl, sprintf('t0-t%i ~ quintile',c-1), 'WithinDesign', time);
     fprintf('Licks False Alarm:\n')
     ranova(rm)
-
-    keyboard 
 
 end

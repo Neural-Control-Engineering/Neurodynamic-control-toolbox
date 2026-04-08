@@ -39,7 +39,7 @@ function [animal, session] = fig4k(data)
     end
 
     x = 1:length(ptiles);
-    l = {'1', '2', '3', '4', '5'};
+    % l = {'1', '2', '3', '4', '5'};
 
     fig_sesh = figure();
     hold on 
@@ -52,10 +52,10 @@ function [animal, session] = fig4k(data)
     ylim([0,lims(2)])
     yticks([0, lims(2)])
     xticks(x)
-    xticklabels(l)
-    xtickangle(45)
+    % xticklabels(l)
+    % xtickangle(45)
     ylabel('Reaction Time (s)', 'FontSize', 16)
-    xlabel('Baseline NE_{mPFC}', 'FontSize', 16)
+    xlabel('Baseline NE_{mPFC} Quintile', 'FontSize', 16)
     p = anova1(cell2mat(session));
     fprintf('Reaction Time by Baseline NE mPFC:\n')
     fprintf(sprintf('One way anova: p = %d\n', p))
