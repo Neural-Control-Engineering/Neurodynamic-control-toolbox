@@ -92,17 +92,32 @@ function fig2b(data, tbounds, alignTo)
     % saveas(fig, 'Analysis/paper_figures/figure2/pupilByStimStrength.fig')
     % leg.Title.FontSize = 12;
 
-    mat = zeros(length(pupil_session), 49);
+    % mat = zeros(length(pupil_session), 49);
+    % for i = 1:length(pupil_session)
+    %     for j = 1:size(pupil_session{i},1)
+    %         dilate = max(pupil_session{i}(j,6:end));
+    %         baseline = mean(pupil_session{i}(j,1:5));
+    %         mat(i,j) = dilate - baseline;
+    %     end
+    % end
+    keyboard 
+    mat = [];
+    ss = [];
     for i = 1:length(pupil_session)
-        for j = 1:size(pupil_session{i},1)
-            dilate = max(pupil_session{i}(j,6:end));
-            baseline = mean(pupil_session{i}(j,1:5));
-            mat(i,j) = dilate - baseline;
-        end
+        mat = [mat; pupil_session{i}];
+        ss = [ss; repmat(stim_strengths(i),size(pupil_session{i},1),1)];
     end
+    mat = mat(:,t>0);
+    time = t(t>0);
+    tbl = table(ss, mat(:,1), 'VariableNames', {'stim_strength', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i', c-1)})];
+    end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ stim_strength', 'WithinDesign', stim_strengths);
+    ranova(rm)
 
-    [p, ~, stats] = anova1(mat')
-    multcompare(stats)
+    % [p, ~, stats] = anova1(mat')
+    % multcompare(stats)
 
     saveas(session_fig, 'Figures/fig2b.fig')
     saveas(session_fig, 'Figures/fig2b.svg')

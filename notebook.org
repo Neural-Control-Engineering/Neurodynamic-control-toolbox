@@ -1263,4 +1263,4 @@ end
 **** DONE: Supplemental figures 
 **** DONE: package for qi  
 *** TODO: put response letter together 
-*** TODO: list update p-values for qi 
+*** DONE: list update p-values for qi 

@@ -88,6 +88,7 @@ function fig6()
     [p,tbl,stats] = anova1(mat)
     saveas(ffig, 'Figures/fig6e.fig')
     saveas(ffig, 'Figures/fig6e.svg')
+    keyboard
 
     transitions = zeros(3,3);
     totals = zeros(3,1);
