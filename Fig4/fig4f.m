@@ -5,8 +5,8 @@ function out = fig4f(data, ver)
 
     % ptiles = 25:25:100;
     % ptiles = [33, 66, 100];
-    % ptiles = [20,40,60,80,100];
-    ptiles = [10,20,30,40,50,60,70,80,90,100];
+    ptiles = [20,40,60,80,100];
+    % ptiles = [10,20,30,40,50,60,70,80,90,100];
     low = prctile(baselines, 0);
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(length(ptiles));
@@ -56,13 +56,13 @@ function out = fig4f(data, ver)
         % end
         switch i 
             case 1  
-                l = sprintf('Low', i);
+                l = sprintf('1st quintile', i);
             case 2
-                l = sprintf('Medium', i);
+                l = sprintf('2nd quintile', i);
             case 3
-                l = sprintf('High', i);
+                l = sprintf('3rd quintile', i);
             otherwise
-                l = sprintf('%ith quartile', i);
+                l = sprintf('%ith quintile', i);
         end
         n = size(mat,1);
         semshade(mat, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, sprintf('%s (n=%i)', l, n));

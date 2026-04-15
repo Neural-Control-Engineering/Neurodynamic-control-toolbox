@@ -54,17 +54,18 @@ function [x, ss, tcile] = fig2j(data)
                 end
             end
         end
-        % switch i 
-        %     case 1  
-        %         l = sprintf('Low', i);
-        %     case 2
-        %         l = sprintf('Medium', i);
-        %     case 3
-        %         l = sprintf('High', i);
-        %     otherwise
-        %         l = sprintf('%ith quartile', i);
-        % end
-        l = sprintf('%ith quintile', i);
+        switch i 
+            case 1  
+                l = sprintf('1st quintile', i);
+            case 2
+                l = sprintf('2nd quintile', i);
+            case 3
+                l = sprintf('3rd quintile', i);
+            otherwise
+                l = sprintf('%ith quintile', i);
+        end
+        % l = {'1st quintile', '2nd quintile', '3rd quintile', '4th quintile', '5th quintile'};
+        
         figure(session_fig)
         n = size(session_mat,1);
         semshade(session_mat, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, sprintf('%s (n=%i)', l, n));
@@ -131,5 +132,4 @@ function [x, ss, tcile] = fig2j(data)
     rm = fitrm(tbl, sprintf('t0-t%i ~ percentile',c-1), 'WithinDesign', stim_strengths);
     ranova(rm)
 
-    keyboard 
 end

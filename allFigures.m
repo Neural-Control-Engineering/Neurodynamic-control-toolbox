@@ -116,60 +116,55 @@ close all
 
 % figure 5
 fprintf('Figure 5:\n')
-fprintf('Figure 5b:\n')
-fig5b(animals, data_versions, kstates)
-fprintf('Figure 5c:\n')
-fig5c(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 5d:\n')
-fig5d(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 5e:\n')
-fig5g(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 5f:\n')
-fig5h(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 5g:\n')
-fig5d(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 5h:\n')
-fig5g(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 5i:\n')
-fig5h(data, k, data_version, ssd_version, psychver, animals)
+fprintf('Figure 5a and 5b:\n')
+fig5ab(data, tbounds, alignTo, 'z-score');
 close all
 
 % figure 6 
-fprintf('Figure 6:\n')
-fprintf('Figure 6a:\n')
-fig6a(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 6b:\n')
-fig6b(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 6c:\n')
-fig6c(data, k, data_version, ssd_version, psychver, animals)
+fig6()
+% fprintf('Figure 6:\n')
+% fprintf('Figure 6a:\n')
+% fig6a(data, k, data_version, ssd_version, psychver, animals)
+% fprintf('Figure 6b:\n')
+% fig6b(data, k, data_version, ssd_version, psychver, animals)
+% fprintf('Figure 6c:\n')
+% fig6c(data, k, data_version, ssd_version, psychver, animals)
 close all
 
-% figure 7
-%% s1
-fprintf('Figure 7:\n')
-fprintf('Figure 7a:\n')
-fig7a(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 7b:\n')
-fig7b(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 7c:\n')
-fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
-%% s2 
-fprintf('Figure 7d:\n')
-fig7d(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 7e:\n')
-fig7e(data, k, data_version, ssd_version, psychver, animals)
-fprintf('Figure 7f:\n')
-fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
-close all
+% % figure 7
+% %% s1
+% fprintf('Figure 7:\n')
+% fprintf('Figure 7a:\n')
+% fig7a(data, k, data_version, ssd_version, psychver, animals)
+% fprintf('Figure 7b:\n')
+% fig7b(data, k, data_version, ssd_version, psychver, animals)
+% fprintf('Figure 7c:\n')
+% fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
+% %% s2 
+% fprintf('Figure 7d:\n')
+% fig7d(data, k, data_version, ssd_version, psychver, animals)
+% fprintf('Figure 7e:\n')
+% fig7e(data, k, data_version, ssd_version, psychver, animals)
+% fprintf('Figure 7f:\n')
+% fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
+% close all
 
-figure 8 
-fprintf('Figure 8:\n')
-fprintf('Figure 8a:\n')
-fig8a(data, k, data_version, ssd_version, psychver, animals, shuff_xcor)
-fprintf('Figure 8b:\n')
-fig8b(data, k, data_version, ssd_version, psychver, animals, shuff_xcor)
-fig8c(data, k, data_version, ssd_version, psychver, animals, shuff_ppfc)
-fig8e(data, k, data_version, ssd_version, psychver, animals, shuff_ps1)
-close all
+% % figure 8 
+% fprintf('Figure 8:\n')
+% fprintf('Figure 8a:\n')
+% fig8a(data, k, data_version, ssd_version, psychver, animals, shuff_xcor)
+% fprintf('Figure 8b:\n')
+% fig8b(data, k, data_version, ssd_version, psychver, animals, shuff_xcor)
+% fig8c(data, k, data_version, ssd_version, psychver, animals, shuff_ppfc)
+% fig8e(data, k, data_version, ssd_version, psychver, animals, shuff_ps1)
+% close all
+
+% Figures 7 and 8 
+dynamicsByState();
+corrByState(shuff_xcor);
+
+% Supplemental Figures 
+suppFig1(data, tbounds, alignTo);
+suppFig2(data);
 
 diary off 

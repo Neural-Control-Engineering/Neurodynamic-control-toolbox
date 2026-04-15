@@ -1,4 +1,4 @@
-function neByBaselinePupil(data, tbounds, alignTo, ver)
+function fig5ab(data, tbounds, alignTo, ver)
     ptiles = [20,40,60,80,100];
     low = prctile(data.pupil_base_before_stimulus, 0);
     stim_strengths = unique(data.stimulus_strength);
@@ -248,9 +248,9 @@ function neByBaselinePupil(data, tbounds, alignTo, ver)
     fprintf('Basline mPFC NE by baseline pupil area\n')
     [p,tbl,stats] = anova1(mat)
 
-    saveas(bfig, 'Figures/baselineNEbyBaselinePupil.fig')
-    saveas(bfig, 'Figures/baselineNEbyBaselinePupil.fig')
-    saveas(fig, 'Figures/nEbyBaselinePupil.fig')
-    saveas(fig, 'Figures/nEbyBaselinePupil.fig')
+    saveas(bfig, 'Figures/fig5b.svg')
+    saveas(bfig, 'Figures/fig5b.fig')
+    saveas(fig, 'Figures/fig5a.fig')
+    saveas(fig, 'Figures/fig5a.svg')
     
 end

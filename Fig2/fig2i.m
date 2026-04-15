@@ -41,10 +41,10 @@ function fig2i(data)
     end
 
     x = 1:length(ptiles);
-    % l = {'Low', 'Medium', 'High'};
-    for i = 1:length(x)
-        l{i} = num2str(x);
-    end
+    % % l = {'Low', 'Medium', 'High'};
+    % for i = 1:length(x)
+    %     l{i} = num2str(x);
+    % end
 
     fig_sesh = figure();
     hold on 
@@ -57,10 +57,10 @@ function fig2i(data)
     ylim([0,lims(2)])
     yticks([0, lims(2)])
     xticks(x)
-    xticklabels(l)
-    xtickangle(45)
+    % xticklabels(l)
+    % xtickangle(45)
     ylabel('Reaction Time (s)', 'FontSize', 16)
-    xlabel('Baseline Pupil Area', 'FontSize', 16)
+    xlabel('Baseline Pupil Area Quintile', 'FontSize', 16)
     [p,tbl,stats] = anova1(cell2mat(session))
     fprintf('Pupil area vs reaction time:\n')
     fprintf(sprintf('One way anova: p = %d\n', p))

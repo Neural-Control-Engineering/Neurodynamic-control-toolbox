@@ -1,4 +1,4 @@
-function suppFig2(data, tbounds, alignTo)
+function suppFig1(data, tbounds, alignTo)
     stim_strengths = unique(data.stimulus_strength);
     cols = distinguishable_colors(length(stim_strengths)+1);
     tmp = filterTrials(data, 'categorical_outcome', 'Hit');
@@ -95,7 +95,7 @@ function suppFig2(data, tbounds, alignTo)
     xticks(x)
     xticklabels(labels)
     xtickangle(45)
-    ylabel('Mean Pupil Dilation (z-score)')
+    ylabel('Baseline-Corrected Pupil Dilation')
 
     mat = [dilations_session{1}, dilations_session{2}, dilations_session{3}, dilations_session{4}];
     [p, tbl, stats] = anova1(mat)
@@ -104,6 +104,6 @@ function suppFig2(data, tbounds, alignTo)
     fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
     mc = multcompare(stats)
 
-    saveas(fig_sesh, 'Figures/suppFig2.fig')
-    saveas(fig_sesh, 'Figures/suppFig2.svg')
+    saveas(fig_sesh, 'Figures/suppFig1.fig')
+    saveas(fig_sesh, 'Figures/suppFig1.svg')
 end
