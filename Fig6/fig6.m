@@ -88,7 +88,6 @@ function fig6()
     [p,tbl,stats] = anova1(mat)
     saveas(ffig, 'Figures/fig6e.fig')
     saveas(ffig, 'Figures/fig6e.svg')
-    keyboard
 
     transitions = zeros(3,3);
     totals = zeros(3,1);
@@ -208,23 +207,37 @@ function fig6()
     saveas(roc_auc_fig, 'Figures/fig6c.fig')
     saveas(roc_auc_fig, 'Figures/fig6c.svg')
 
-    jsonFileName = 'glmhmm_K3_params.json';
+    jsonFileName = 'glmhmm_K3_per_animal_params.json'; %'glmhmm_K3_params.json';
     jsonStr = fileread(jsonFileName);
     jsonData = jsondecode(jsonStr);
+    pupil = {[],[],[]};
+    bias = {[],[],[]};
+    stim = {[],[],[]};
+    for s = 1:3
+        animals = fieldnames(jsonData.animals);
+        for a = 1:length(animals)
+            pupil{s} = [pupil{s}; jsonData.animals.(animals{a}).observation_weights.(sprintf('state_%i',s-1)).pupil];
+            bias{s} = [bias{s}; jsonData.animals.(animals{a}).observation_weights.(sprintf('state_%i',s-1)).bias];
+            stim{s} = [stim{s}; jsonData.animals.(animals{a}).observation_weights.(sprintf('state_%i',s-1)).stim];
+        end 
+    end
     wfig = figure(); 
     hold on;
-    bar(1:3, [jsonData.New.observation_weights.state_0.pupil, ...
-        jsonData.New.observation_weights.state_0.stim, ...
-        jsonData.New.observation_weights.state_0.bias], 'FaceColor', 'b')
-    bar(5:7, [jsonData.New.observation_weights.state_1.pupil, ...
-        jsonData.New.observation_weights.state_1.stim, ...
-        jsonData.New.observation_weights.state_1.bias], 'FaceColor', 'r')
-    bar(9:11, [jsonData.New.observation_weights.state_2.pupil, ...
-        jsonData.New.observation_weights.state_2.stim, ...
-        jsonData.New.observation_weights.state_2.bias], 'FaceColor', 'g')
+    plot(repmat(1,4,1)+(rand(4,1)-0.5)*0.2, pupil{1}, 'o', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    plot(repmat(2,4,1)+(rand(4,1)-0.5)*0.2, stim{1}, 'o', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    plot(repmat(3,4,1)+(rand(4,1)-0.5)*0.2, bias{1}, 'o', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    errorbar(1:3, mean([pupil{1}, stim{1}, bias{1}]), ste([pupil{1}, stim{1}, bias{1}]), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    plot(repmat(5,4,1)+(rand(4,1)-0.5)*0.2, pupil{2}, 'o', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    plot(repmat(6,4,1)+(rand(4,1)-0.5)*0.2, stim{2}, 'o', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    plot(repmat(7,4,1)+(rand(4,1)-0.5)*0.2, bias{2}, 'o', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    errorbar(5:7, mean([pupil{2}, stim{2}, bias{2}]), ste([pupil{2}, stim{2}, bias{2}]), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    plot(repmat(9,4,1)+(rand(4,1)-0.5)*0.2, pupil{3}, 'o', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    plot(repmat(10,4,1)+(rand(4,1)-0.5)*0.2, stim{3}, 'o', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    plot(repmat(11,4,1)+(rand(4,1)-0.5)*0.2, bias{3}, 'o', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    errorbar(9:11, mean([pupil{3}, stim{3}, bias{3}]), ste([pupil{3}, stim{3}, bias{3}]), 'k.', 'LineWidth', 2, 'CapSize', 15)
     xticks([1:3, 5:7, 9:11])
     xticklabels({'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias'})
-    ylabel('Weight', 'FontSize', 16)
+    ylabel('Observation Weight', 'FontSize', 16)
     saveas(wfig, 'Figures/fig6j.fig')
     saveas(wfig, 'Figures/fig6j.svg')
 

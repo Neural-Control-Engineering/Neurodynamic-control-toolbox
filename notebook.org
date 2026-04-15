@@ -1264,3 +1264,11 @@ end
 **** DONE: package for qi  
 *** TODO: put response letter together 
 *** DONE: list update p-values for qi 
+
+* [2026-4-14 Tue] - 
+** range of sessions 
+animals = fetchAnimals(data);
+for a = 1:length(animals)
+    tmp = data(startsWith(data.session_id, num2str(animals(a))),:);
+    disp(length(unique(tmp.session_id)));
+end
