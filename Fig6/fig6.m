@@ -238,6 +238,7 @@ function fig6()
     xticks([1:3, 5:7, 9:11])
     xticklabels({'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias'})
     ylabel('Observation Weight', 'FontSize', 16)
+    keyboard
     saveas(wfig, 'Figures/fig6j.fig')
     saveas(wfig, 'Figures/fig6j.svg')
 

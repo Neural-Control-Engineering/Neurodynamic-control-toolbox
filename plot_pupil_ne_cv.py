@@ -4,8 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-CSV = '/Users/sleeper/Projects/Neurodynamic-control-toolbox/glmhmm_pupil_ne_cv_results.csv'
-OUT = '/Users/sleeper/Projects/Neurodynamic-control-toolbox/glmhmm_pupil_ne_cv_figure.png'
+CSV = 'glmhmm_pupil_ne_cv_results.csv'
+OUT = 'glmhmm_pupil_ne_cv_figure.svg'
 
 df = pd.read_csv(CSV)
 
@@ -70,7 +70,7 @@ for ax, (metric, label, _) in zip(axes.flat, metrics):
 # Legend in top-left only
 axes[0, 0].legend(frameon=False, loc='lower right', fontsize=9)
 
-fig.suptitle('Pupil vs. pupil+NE as state-transition drivers (49-session matched subset, 5-fold CV)',
+fig.suptitle('Pupil vs. pupil+NE as state-transition drivers',
              fontsize=11, color='#222222', y=0.985)
 
 plt.savefig(OUT, dpi=300, facecolor=BG, bbox_inches='tight')

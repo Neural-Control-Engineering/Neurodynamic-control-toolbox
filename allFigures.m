@@ -1,3 +1,4 @@
+% load and preprocess data 
 diary ssd_stats.txt
 addpath(genpath('./'))
 Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
@@ -32,7 +33,15 @@ end
 fprintf(sprintf('Trials per session: %d +/- %d\n', mean(trials), ste(trials)))
 fprintf(sprintf('Session duration (min): %d +/- %d\n', mean(durations ./ 60), ste(durations ./ 60)))
 
-% figure 1
+% Figure 1. Experimental setup and behavioral task. 
+% A) Experimental set up. The illustration was created with biorender.com.
+% B) Diagram of the tactile detection task.
+% C) Response time for each stimulus. Gray lines indicate individual animals. 
+% Dark line indicate the average across all session in this figure.
+% D) Top: raster plot of the animal’s response around the presentation of tactile stimuli in an example session. 
+% Bottom: histgram of licking response within the window of opportunity.
+% E) Response probablity for each tactile stimulus.
+% F) Perceptual sensitivity associated with tactile stimuli with different intensities.
 fprintf('Figure 1:\n')
 fprintf('Figure 1c:\n')
 fig1c(data);
@@ -43,6 +52,16 @@ fig1f(data);
 close all
 
 % figure 2
+% Figure 2. Pupil size dependent behavior. 
+% A) Example segmentation of mouse pupil contour by DLC (top) and the histogram of pupil fluctuations (bottom).
+% B) Pupil dilation evoked by the presentation of different tactile stimuli.
+% C) Pupil dynamics around stimulus presentation for four different behavioral outcomes.
+% D) Pupil dilation with different baseline pupil size.
+% E) Scatter plot showing negative correlation between baseline pupil size and pupil dilation for an example session.
+% F) Pearson’s correlation coefficients between baseline pupil size and pupil dilation for different behavioral outcomes.
+% G-H) Quantification of baseline pupil size and dilation for different behavioral outcomes.
+% I) Response time during low, medium, and high pupil-linked arousal levels.
+% J-K) Response probablity and perceptual sensitivity during low, medium, and high pupil-linked arousal levels
 fprintf('Figure 2:\n')
 fprintf('Figure 2a:\n')
 fig2a(data)
@@ -68,7 +87,13 @@ fprintf('Figure 2k:\n')
 fig2k(data);
 close all
 
-% figure 3
+% Figure 3. NE dynamics in S1 and mPFC during the tactile detection task. 
+% A) IHC confirmation of successful expression of GRAB_NE in the Barrel cortex (S1) and
+% medial prefrontal cortex (mPFC).
+% B) Cross-correlation between NE dynamics in S1 and PFC.
+% C) Cross-correlation between pre-stimulus NE dynamics in S1 and PFC in 
+% hit, miss, correct rejection, and false alarm trials.
+% D) Correlation coefficient at 0 s lag for different behavioral outcomes.
 fprintf('Figure 3:\n')
 fprintf('Figure 3b:\n')
 shuff_xcor = fig3b(data, 'z-score');
@@ -76,15 +101,21 @@ fprintf('Figure 3c:\n')
 fig3c(data, 'z-score', shuff_xcor);
 fprintf('Figure 3d:\n')
 fig3d(data, 'z-score', 'atzero', shuff_xcor);
-% shuff_ppfc = fig3e(data, 'z-score');
-% fig3f(data, 'z-score', shuff_ppfc);
-% fig3g(data, 'z-score', 'peak', shuff_ppfc);
-% shuff_ps1 = fig3h(data, 'z-score');
-% fig3i(data, 'z-score', shuff_ps1);
-% fig3j(data, 'z-score', 'peak', shuff_ps1);
 close all
 
-% figure 4
+% Figure 4. NE dynamics in S1 and mPFC during the tactile detection task. 
+% A) NE dynamics in S1 evoked by the presentation of different tactile stimuli.
+% B) Task evokded NE dynamics in S1 in hit, miss, correct rejection and miss trials.
+% C) Baseline NE level in S1 in hit, miss, correct rejection and miss trials.
+% D) Mean increase in NE level in S1 in hit, miss, correct rejection and miss trials.
+% E) Reaction times during the high, medium, and low terciles of baseline NE levels in S1.
+% F) Pychometric curves during the high, medium, and low terciles of baseline NE levels in S1.
+% G) NE dynamics in mPFC evoked by the presentation of different tactile stimuli.
+% H) Task evokded NE dynamics in mPFC in hit, miss, correct rejection and miss trials.
+% I) Baseline NE level in mPFC in hit, miss, correct rejection and miss trials.
+% J) Mean increase in NE level in mPFC in hit, miss, correct rejection and miss trials.
+% K) Reaction times during the high, medium, and low terciles of baseline NE levels in mPFC.
+% L) Pychometric curves during the high, medium, and low terciles of baseline NE levels in mPFC
 %% s1
 fprintf('Figure 4:\n')
 fprintf('Figure 4a:\n')
@@ -114,50 +145,15 @@ fprintf('Figure 4l:\n')
 fig4l(data, 'z-score');
 close all
 
-% figure 5
+% figure 5 - grab NE signals for different baseline pupil area levels
 fprintf('Figure 5:\n')
 fprintf('Figure 5a and 5b:\n')
 fig5ab(data, tbounds, alignTo, 'z-score');
 close all
 
-% figure 6 
+% figure 6 - summary of GLM-HMM modeling
 fig6()
-% fprintf('Figure 6:\n')
-% fprintf('Figure 6a:\n')
-% fig6a(data, k, data_version, ssd_version, psychver, animals)
-% fprintf('Figure 6b:\n')
-% fig6b(data, k, data_version, ssd_version, psychver, animals)
-% fprintf('Figure 6c:\n')
-% fig6c(data, k, data_version, ssd_version, psychver, animals)
 close all
-
-% % figure 7
-% %% s1
-% fprintf('Figure 7:\n')
-% fprintf('Figure 7a:\n')
-% fig7a(data, k, data_version, ssd_version, psychver, animals)
-% fprintf('Figure 7b:\n')
-% fig7b(data, k, data_version, ssd_version, psychver, animals)
-% fprintf('Figure 7c:\n')
-% fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
-% %% s2 
-% fprintf('Figure 7d:\n')
-% fig7d(data, k, data_version, ssd_version, psychver, animals)
-% fprintf('Figure 7e:\n')
-% fig7e(data, k, data_version, ssd_version, psychver, animals)
-% fprintf('Figure 7f:\n')
-% fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
-% close all
-
-% % figure 8 
-% fprintf('Figure 8:\n')
-% fprintf('Figure 8a:\n')
-% fig8a(data, k, data_version, ssd_version, psychver, animals, shuff_xcor)
-% fprintf('Figure 8b:\n')
-% fig8b(data, k, data_version, ssd_version, psychver, animals, shuff_xcor)
-% fig8c(data, k, data_version, ssd_version, psychver, animals, shuff_ppfc)
-% fig8e(data, k, data_version, ssd_version, psychver, animals, shuff_ps1)
-% close all
 
 % Figures 7 and 8 
 dynamicsByState();

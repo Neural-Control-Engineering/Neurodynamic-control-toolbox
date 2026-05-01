@@ -1219,7 +1219,7 @@ end
 sessions = unique(data.session_id);
 for s = 1:length(sessions)
     tmp_model = model(strcmp(model.session, sessions{s}),:);
-    if length(unique(tmp_model.state)) == 3
+    if length(unique(tmp_model.state)) == 1
         fprintf(sprintf('%i ', s))
     end
 end
@@ -1247,7 +1247,8 @@ end
 
 * [2026-4-6 Mon] - wrapping things up 
 ** TODOS 
-*** TODO: write figure caption for new figures (1 main, 2 supplemental)
+*** DONE: write figure caption for new figures (1 main, 2 supplemental)
+**** DONE: still need supplemental 
 *** DONE: rerun and rename figure panels
 **** DONE: Figure 1D - overall licks by stimulus intensity 
 **** DONE: Figure 2A - pupil trace for session (maybe histogram)
@@ -1262,7 +1263,7 @@ end
 **** DONE: Figure 5 on - all panels
 **** DONE: Supplemental figures 
 **** DONE: package for qi  
-*** TODO: put response letter together 
+*** DONE: put response letter together 
 *** DONE: list update p-values for qi 
 
 * [2026-4-14 Tue] - 
@@ -1272,3 +1273,4 @@ for a = 1:length(animals)
     tmp = data(startsWith(data.session_id, num2str(animals(a))),:);
     disp(length(unique(tmp.session_id)));
 end
+** pupil + ne - now in *plot_pupil_ne_cv.py*
