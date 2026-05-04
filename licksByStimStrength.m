@@ -170,9 +170,9 @@ function licksByStimStrength(data)
         intensity = [intensity; zeros(size(licks_hit{i},1),1)+i-stim_strengths(i)];
         mat = [mat; licks_hit{i}];
     end
-    % for r = 1:size(mat,1)
-    %     mat(r,:) = smooth(mat(r,:),5);
-    % end
+    for r = 1:size(mat,1)
+        mat(r,:) = smooth(mat(r,:),15);
+    end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
     tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
@@ -189,9 +189,9 @@ function licksByStimStrength(data)
         intensity = [intensity; zeros(size(licks_miss{i},1),1)+i-stim_strengths(i)];
         mat = [mat; licks_miss{i}];
     end
-    % for r = 1:size(mat,1)
-    %     mat(r,:) = smooth(mat(r,:),5);
-    % end
+    for r = 1:size(mat,1)
+        mat(r,:) = smooth(mat(r,:),15);
+    end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
     tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
