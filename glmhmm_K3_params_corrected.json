@@ -1,0 +1,47 @@
+{
+  "model": "corrected_routed (pupil->transitions only; stim+bias->observations)",
+  "K": 3,
+  "log_likelihood": -2384.7619441240004,
+  "states": {
+    "state_0": {
+      "label": "Liberal",
+      "obs_stim_weight": -6.434638182832436,
+      "obs_bias_weight": -0.7660761164634192,
+      "transition_pupil_weight": 0.36005344313002374
+    },
+    "state_1": {
+      "label": "Conservative",
+      "obs_stim_weight": -3.5460627830704365,
+      "obs_bias_weight": 3.6196399986930925,
+      "transition_pupil_weight": 0.895649745115656
+    },
+    "state_2": {
+      "label": "Engaged",
+      "obs_stim_weight": -23.680214313001873,
+      "obs_bias_weight": 2.4448757630730853,
+      "transition_pupil_weight": 0.07506883374428922
+    }
+  },
+  "baseline_transition_matrix": [
+    [
+      0.994432410168639,
+      0.0006290181950812102,
+      0.004938571636279743
+    ],
+    [
+      0.0005236258916608143,
+      0.9145275120161084,
+      0.08494886209223083
+    ],
+    [
+      0.00028051526870862827,
+      0.016456082986909766,
+      0.9832634017443816
+    ]
+  ],
+  "init_state_probs": [
+    0.29495642402991806,
+    0.046940207752242655,
+    0.6581033682178392
+  ]
+}
