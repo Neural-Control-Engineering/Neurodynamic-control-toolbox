@@ -3,8 +3,8 @@ function fig6()
     Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
     data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
     animals = fetchAnimals(data);
-    model = readtable('glmhmm_K3_state_assignments.csv');
-    model = model(strcmp(model.model, 'New'),:);
+    model = readtable('glmhmm_K3_state_assignments_corrected.csv');
+    model = model(strcmp(model.model, 'corrected'),:);
     model(cellfun(@isempty, data.photometry_ch1),:) = [];
     data(cellfun(@isempty, data.photometry_ch1),:) = [];
     sessions = unique(data.session_id);
