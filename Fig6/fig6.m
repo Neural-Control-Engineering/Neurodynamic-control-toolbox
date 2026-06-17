@@ -119,8 +119,9 @@ function fig6()
         tmp_model = model(strcmp(model.session, sessions{s}),:);
         tmp_data = data(strcmp(model.session, sessions{s}),:);
         for ss = 1:length(states)
-            if ~isempty(tmp_data)
-                fracs{states(ss)+1} = [fracs{states(ss)+1}; nanmean(tmp_data.response_time)];
+            stmp = tmp_data(tmp_model.state == states(ss),:);
+            if ~isempty(stmp)
+                fracs{states(ss)+1} = [fracs{states(ss)+1}; nanmean(stmp.response_time)];
             else
                 fracs{states(ss)+1} = [fracs{states(ss)+1}; nan];
             end
