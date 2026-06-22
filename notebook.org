@@ -1288,3 +1288,144 @@ for i = 1:length(ptiles)
     fprintf(sprintf('low: %.3f; high: %.3f\n', low, high))
     low = high;
 end
+
+* [2026-6-22 Mon] - second round of comments 
+In my previous review, I raised concerns about insufficient statistical detail, 
+weak formulation of central research questions and hypotheses, and an 
+unconventional implementation of the GLM-HMM model. While the authors have 
+addressed some of these concerns to a certain degree, they have not resolved them 
+to a satisfactory extent. The primary concerns remain largely unchanged and some of 
+their revisions have introduced new ambiguities. The manuscript still needs 
+substantial clarification and restructuring before the validity and robustness of 
+findings can be properly evaluated.
+
+** Major comments
+*** Although statistical reporting has improved, the manuscript still contains 
+ambiguities about model design, unsupported qualitative data descriptions, and 
+absent testing of interaction effects. Below, I list some examples, but the 
+authors need to ensure that such problems are addressed throughout.
+
+**** 1. The factorial design of several ANOVAs remains underspecified. For example, 
+the factor 'time', which enters several ANOVAs, is not undefined and the number 
+of factor levels is also frequently unclear. This prevents readers from 
+understanding these analyses properly.
+***** This seems to be more about the design of the experiments than about the 
+statistics, per se.  Aren't the factor levels the number of degrees of freedom 
+plus 1?
+
+**** 2. Several times, main effects are reported without testing the corresponding 
+interaction, which is a statistical fallacy that must be addressed in the 
+manuscript (Nieuwenhuis, Forstmann, Wagenmakers, 2011, Nature Neuroscience). 
+For example, on lines 251-254, pupil dilation is reported to scale with stimulus 
+intensity for miss trials but not for hit trials, however, whether the difference 
+between hits and misses is significant is not reported.
+
+**** 3. The authors report several ANOVAs and t-tests for effects on the dependent 
+variable, even when these factors can be analyzed within the same statistical 
+model. This approach is not only confusing, but also risks obscuring critical 
+interaction effects and conflating correlated independent variables. For example, 
+comparing withheld versus response trials inherently mixes effects of stimulus 
+intensity and reward outcome, because response rates increase with stimulus 
+intensity and only hit trials are rewarded. These dependencies can be handled 
+better by incorporating them in a single model, e.g., a 3-factor rmANOVA with 
+factors stimulus presence, stimulus intensity, and response.
+***** One suggestion would be to get rid of the response vs. withheld comparisons altogether.
+
+**** 4. Several qualitative statements lack statistical support, for example on 
+lines 280-282, 307-311, and 406-408,
+
+**** 5. Some qualitative statements are only statistically supported later in the text, 
+forcing readers to actively search through the manuscript for this information. 
+For example, the authors report different pupil dilations across the four trial 
+types (hits, misses, correct rejections, false alarms) on lines 248-250, but only 
+provide statistics on line 268.
+
+**** 6. ANOVA effects are sometimes mislabeled. For example, effects on 
+detection/response probability are repeatedly reported as an effect in interaction 
+with stimulus intensity (e.g., lines 278-279; 322-325), but this would rather 
+imply an effect on sensitivity and not overall response rates.
+
+*** The revised description of the GLM-HMM remains incomplete and unclear.
+
+**** 1. It is not specified how baseline pupil size was implemented to 'drive state 
+transitions'. To my knowledge, Hulsey et al. (2024) did not incorporate pupil into 
+their GLM-HMM, but rather used post-hoc correlations between state-related and 
+other variables. If the authors' approach diverges, please provide a justification 
+and clear technical description.
+***** need to talk to Tim 
+
+**** 2. The justification for subdividing trial types within behavioral states is still 
+lacking. Conceptually, I do not see so much added value over the state 
+classification itself, and methodologically, this subdivision of trials within 
+states could be problematic and lead to imprecise statistical inference. States 
+are defined based on the prevalence of different trial types (e.g., many hits 
+and false alarms in state 0), so estimates for non-frequent trial types (e.g., 
+misses and correct rejections) will be highly variable and tests on those estimates 
+are likely unreliable.
+***** I think maybe we should get rid of figures 7 and 8 based on these comments.  It's 
+probably sufficient to say that we could predict behavior by having pupil drive transitions 
+but there was no added benefit to including baseline NE in S1 and PFC as additional regeressors 
+
+*** Several results remain unsupported by a clearly stipulated research question or 
+follow-up discussion. For example, the purpose and interpretation of correlations 
+between S1 and mPFC GRAB-NE signals as a function of behavioral state, responses, 
+and outcome, are unclear and undiscussed. The same holds for the different 
+correlations between baseline and evoked pupil across trial types. At present, 
+these analyses only dilute the narrative of the manuscript.
+
+*** I the revised manuscript, the authors write: "Pupil dilations on hit trials were 
+similar in magnitude to predicted pupil dilations from baseline pupil area, with 
+smaller dilations than predicted on other trial outcomes (Extended Data Figure 2-1, 
+ANOVA(outcome), F(3)=32.7, p<0.0001)." (lines 270-272). As I understand this 
+analysis, evoked pupil dilations were predicted from baseline pupil size across 
+trial types, and the same ANOVA was then performed on these predicted evoked 
+responses. If so, this analysis does not address my initial concern that evoked 
+pupil responses may largely reflect baseline differences across trial types, given 
+their anticorrelation. If anything, the current results would appear consistent 
+with that notion. As noted in my previous review, a more direct way to assess whether 
+evoked responses differ across trial types would be to regress trial-wise baseline 
+pupil size out of trial-wise evoked responses and perform the ANOVA on the 
+residuals.
+**** We apologize for the confusion, but we did in fact regress trial-wise baseline 
+pupil size out of trial-wise evoked responses and performed ANOVA on the residuals.
+We performed a linear regression across trials for baseline pupil area and evoked 
+pupil dilation (Fig 2E).  Then, again for each trial, we subtracted the observed 
+pupil dilation from the predicted pupil dilation and performed ANOVA on those 
+residuals. 
+
+** Software comments
+The code could be downloaded. However, there seems to be an error in the 
+URL pointing to https://github.com/Neural-Control-595 instead of 
+https://github.com/Neural-Control-Engineering/Neurodynamic-control-toolbox It is 
+unclear whether the code can be run without the requisite data set: 
+Combined-Datastore_created_14-Jan-2024.mat
+*** I've added the data on FigShare.  Will need to update data availability statement
+accordingly.
+
+** Minor comments
+
+*** The authors often show time-series data, on which statistical testing was not 
+reported, but then omit figures showing the tested data. For example, Figure 5A 
+shows GRAB-NE time-series data across trial types, baseline pupil bins, and 
+cortical regions, but statistical tests only concern single metric per 
+subcondition (baseline-corrected signal in a 6s post-stimulus window). I would 
+suggest including a single time-series figure as example figure and then just 
+include point plots to show the tested effects (as in Figure 4I).
+**** We did in fact perform statistics on those time time series.  For that 
+example in particular, we wrote, "NE dynamics differed significantly across baseline
+pupil area quintiles on hit trials in S1 (ANOVA(baseline pupil quintile x time), 
+F(4,599)=18.9, p<0.0001; and in mPFC (ANOVA(baseline pupil quintile x time), 
+F(4,599)=15.2, p<0.0001; Figure 5A)."
+
+
+- The semantical labeling of behavioral states seems inappropriate. The 'high 
+sensitivity' state is actually not associated with most sensitive behavior 
+(strongest stimulus weighting), but with the most liberal bias. A better 
+classification would be states with engaged choice behavior (state 1), liberal 
+choice behavior (state 0), and conservative choice behavior (state 2)
+
+- False alarm pupil dilation seems to have an incorrect sign: -0.35{plus minus}0.07 (Lines 267-268)
+
+- The ordering of results is disorganized at times. For example, on lines 305-339 
+effects of evoked and baseline NE signals are reported in an intermixed manner,
+hindering the flow of the paragraph.
