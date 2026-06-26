@@ -113,7 +113,7 @@ function fig2b(data, tbounds, alignTo)
     for c = 2:size(mat,2)
         tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i', c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ stim_strength', 'WithinDesign', stim_strengths);
+    rm = fitrm(tbl, sprintf('t0-t%i ~ stim_strength', 'WithinDesign', stim_strengths));
     ranova(rm)
 
     % [p, ~, stats] = anova1(mat')

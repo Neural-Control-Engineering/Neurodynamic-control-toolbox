@@ -193,8 +193,8 @@ function fig4bh(data, tbounds, alignTo, ver)
 
     intensity = [];
     mat = [];
-    for i = 2:length(s1_ne_hit)
-        intensity = [intensity; zeros(size(s1_ne_hit{i},1),1)+i-stim_strengths(i)];
+    for i = 1:length(s1_ne_hit)
+        intensity = [intensity; zeros(size(s1_ne_hit{i},1),1)+stim_strengths(i)];
         mat = [mat; s1_ne_hit{i}];
     end
     % for r = 1:size(mat,1)
@@ -202,6 +202,9 @@ function fig4bh(data, tbounds, alignTo, ver)
     % end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
+    for i = 1:size(mat,1)
+        mat(i,:) = mat(i,:) - mean(mat(i,1));
+    end
     tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
     for c = 2:size(mat,2)
         tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
@@ -209,6 +212,7 @@ function fig4bh(data, tbounds, alignTo, ver)
     rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
     fprintf('hit s1_ne_ by stimulus strength:\n')
     ranova(rm)
+    keyboard 
 
     intensity = [];
     mat = [];
@@ -231,8 +235,8 @@ function fig4bh(data, tbounds, alignTo, ver)
 
     intensity = [];
     mat = [];
-    for i = 2:length(mpfc_ne_hit)
-        intensity = [intensity; zeros(size(mpfc_ne_hit{i},1),1)+i-stim_strengths(i)];
+    for i = 1:length(mpfc_ne_hit)
+        intensity = [intensity; zeros(size(mpfc_ne_hit{i},1),1)+stim_strengths(i)];
         mat = [mat; mpfc_ne_hit{i}];
     end
     % for r = 1:size(mat,1)
