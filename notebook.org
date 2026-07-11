@@ -1328,6 +1328,7 @@ between hits and misses is significant is not reported.
     intensity:Time             78.099       50       1.562    19.938    3.5657e-172     1.187e-10    1.0669e-10    1.0034e-05
     response:intensity:Time    43.523       50     0.87045    11.111     2.7174e-85    3.2527e-06    3.0848e-06    0.00092618
     Error(Time)                1837.1    23450    0.078342 
+***** also implemented for GRABNE signals (Fig 4B,H)
     
 **** 3. The authors report several ANOVAs and t-tests for effects on the dependent 
 variable, even when these factors can be analyzed within the same statistical 
@@ -1339,6 +1340,14 @@ intensity and only hit trials are rewarded. These dependencies can be handled
 better by incorporating them in a single model, e.g., a 3-factor rmANOVA with 
 factors stimulus presence, stimulus intensity, and response.
 ***** One suggestion would be to get rid of the response vs. withheld comparisons altogether.
+***** Thank you for this suggestion. We agree that comparing withheld versus response trials 
+mixes effect of stimulus intensity and response.  There are a couple issues with using 
+a 3-factor rmANOVA with factors stimulus presence, stimulus intensity, and response, particularly 
+because stimulus presence is captured by stimulus intensity, and not all sessions contain all 
+combinations of stimulus intensity and response (e.g. some sessions include no false alarms), so 
+we have removed such comparisons of withheld versus responded and adopted an approach using linear mixed-effects 
+models with factors stimulus intensity and response and random effects for subject and session in places where 
+the issues you've outlined arise.
 
 **** 4. Several qualitative statements lack statistical support, for example on 
 lines 280-282, 307-311, and 406-408,
@@ -1361,10 +1370,11 @@ were dependent on the intensity of tactile stimulus when not accounting for tria
 on stimulus intensity was a result of psychometric performance, not stimulus amplitude
 (Figure 4B, H).   
 ***** 406-408
+Currently:
 While there were no significant differences in baseline NE in
-407 either mPFC or S1 across states, we observed distinct task-evoked NE dynamics in S1 and
-408 mPFC. For instance, NE dynamics differed significantly across states in S1 (ANOVA(state
-409 x time), F(2,599)=1.30, p<0.0001) and mPFC (ANOVA(state x time), F(2,599)=1.82, p<0.0001
+either mPFC or S1 across states, we observed distinct task-evoked NE dynamics in S1 and
+mPFC. For instance, NE dynamics differed significantly across states in S1 (ANOVA(state
+x time), F(2,599)=1.30, p<0.0001) and mPFC (ANOVA(state x time), F(2,599)=1.82, p<0.0001
 
 in dynamicsByState()
 anova1([mpfc_ne_baseline{1}{1}, mpfc_ne_baseline{2}{1}, mpfc_ne_baseline{3}{1}; ...

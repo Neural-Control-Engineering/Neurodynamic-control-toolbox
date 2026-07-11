@@ -121,7 +121,7 @@ fprintf('Figure 4:\n')
 fprintf('Figure 4a:\n')
 fig4a(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4b:\n')
-fig4b(data, tbounds, alignTo, 'z-score');
+fig4bh(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4c:\n')
 fig4c(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4d:\n')
