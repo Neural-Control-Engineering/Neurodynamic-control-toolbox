@@ -1341,13 +1341,12 @@ better by incorporating them in a single model, e.g., a 3-factor rmANOVA with
 factors stimulus presence, stimulus intensity, and response.
 ***** One suggestion would be to get rid of the response vs. withheld comparisons altogether.
 ***** Thank you for this suggestion. We agree that comparing withheld versus response trials 
-mixes effect of stimulus intensity and response.  There are a couple issues with using 
-a 3-factor rmANOVA with factors stimulus presence, stimulus intensity, and response, particularly 
-because stimulus presence is captured by stimulus intensity, and not all sessions contain all 
+mixes effect of stimulus intensity and response.  However, there are a couple issues with using 
+a 3-factor rmANOVA with factors stimulus presence, stimulus intensity, and response, namely 
+that stimulus presence is captured by stimulus intensity, and not all sessions contain all 
 combinations of stimulus intensity and response (e.g. some sessions include no false alarms), so 
-we have removed such comparisons of withheld versus responded and adopted an approach using linear mixed-effects 
-models with factors stimulus intensity and response and random effects for subject and session in places where 
-the issues you've outlined arise.
+we adopted an approach using linear mixed-effects models with factors stimulus intensity and 
+response and random effects for subject and session.
 
 **** 4. Several qualitative statements lack statistical support, for example on 
 lines 280-282, 307-311, and 406-408,
@@ -1420,6 +1419,12 @@ between S1 and mPFC GRAB-NE signals as a function of behavioral state, responses
 and outcome, are unclear and undiscussed. The same holds for the different 
 correlations between baseline and evoked pupil across trial types. At present, 
 these analyses only dilute the narrative of the manuscript.
+**** For correlations between grabne signals:
+Recent studies have suggested that different subpopulations of LC neurons project 
+to distinct parts of the brain (Totah et al., 2018; Breton-Provencher et al.,
+445 2021; Kelberman et al., 2024; Liu et al. 2025, Su et al. 2026). 
+We therefore sought to quantify the correlation between GRABNE signals in S1 and PFC,
+hypothesizing that NE release in the two regions may vary independently.  
 
 *** I the revised manuscript, the authors write: "Pupil dilations on hit trials were 
 similar in magnitude to predicted pupil dilations from baseline pupil area, with 
