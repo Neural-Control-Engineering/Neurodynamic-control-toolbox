@@ -3,8 +3,8 @@ function fig6()
     Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
     data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
     animals = fetchAnimals(data);
-    model = readtable('glmhmm_K3_state_assignments.csv');
-    model = model(strcmp(model.model, 'New'),:);
+    model = readtable('glmhmm_K3_state_assignments_corrected.csv');
+    model = model(strcmp(model.model, 'corrected'),:);
     model(cellfun(@isempty, data.photometry_ch1),:) = [];
     data(cellfun(@isempty, data.photometry_ch1),:) = [];
     sessions = unique(data.session_id);
@@ -119,8 +119,9 @@ function fig6()
         tmp_model = model(strcmp(model.session, sessions{s}),:);
         tmp_data = data(strcmp(model.session, sessions{s}),:);
         for ss = 1:length(states)
-            if ~isempty(tmp_data)
-                fracs{states(ss)+1} = [fracs{states(ss)+1}; nanmean(tmp_data.response_time)];
+            stmp = tmp_data(tmp_model.state == states(ss),:);
+            if ~isempty(stmp)
+                fracs{states(ss)+1} = [fracs{states(ss)+1}; nanmean(stmp.response_time)];
             else
                 fracs{states(ss)+1} = [fracs{states(ss)+1}; nan];
             end
@@ -238,7 +239,6 @@ function fig6()
     xticks([1:3, 5:7, 9:11])
     xticklabels({'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias'})
     ylabel('Observation Weight', 'FontSize', 16)
-    keyboard
     saveas(wfig, 'Figures/fig6j.fig')
     saveas(wfig, 'Figures/fig6j.svg')
 
