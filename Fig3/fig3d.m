@@ -4,6 +4,7 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
     
     animal_xcor = {[], [], [], [], [], [], [], []};
     session_xcor = {[], [], [], [], [], [], [], []};
+    session_sesh = {{}, {}, {}, {}, {}, {}, {}, {}};
     tbounds = [-4,0];
 
     outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}, {'Hit', 'CR'}, {'Miss', 'FA'}};
@@ -70,6 +71,7 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
             else
                 session_xcor{o} = [session_xcor{o}; nan(1,size(session_xcor{o},2))];
             end
+            session_sesh{o} = vertcat(session_sesh{o}, sessions{s});
         end
     end
     session_lags = lag ./ Fs;
@@ -121,13 +123,12 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
     else
         ylabel('Peak Correlation at 0s Lag', 'FontSize', 16)
     end
-    mat = [session_peaks{1}, session_peaks{2}, session_peaks{3}, session_peaks{4}];
-    [p, ~, stats] = anova1(mat);
-    fprintf(sprintf('NE mPFC x S1 Outcome anova: p = %d\n', p))
-    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{5}, session_peaks{6})))
-    fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{7}, session_peaks{8})))
-    mc = multcompare(stats)
-    keyboard 
+    % mat = [session_peaks{1}, session_peaks{2}, session_peaks{3}, session_peaks{4}];
+    % [p, ~, stats] = anova1(mat);
+    % fprintf(sprintf('NE mPFC x S1 Outcome anova: p = %d\n', p))
+    % fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{5}, session_peaks{6})))
+    % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{7}, session_peaks{8})))
+    % mc = multcompare(stats)
     % fig_animal = figure();
     % errorbar([1:4, 6:7, 9:10], animal_avg, animal_err, 'k.')
     % hold on
@@ -136,6 +137,27 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
     % xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Responded', 'Withheld', 'Correct', 'Incorrect'})
     % xtickangle(45)
     % ylabel('Peak Cross Correlation')
+
+    sesh = vertcat(session_sesh{1}, session_sesh{2}, session_sesh{3}, session_sesh{4});
+    subj = {};
+    for i = 1:length(sesh)
+        subj{i} = sesh{i}(1:3);
+    end
+    tbl = table([session_peaks{1}; session_peaks{2}; session_peaks{3}; session_peaks{4}], ...
+        [ones(size(session_peaks{1})); zeros(size(session_peaks{2})); zeros(size(session_peaks{3})); ones(size(session_peaks{4}))], ...
+        [ones(size(session_peaks{1})); zeros(size(session_peaks{2})); ones(size(session_peaks{3})); zeros(size(session_peaks{4}))], ...
+        sesh, subj', 'VariableNames', {'xcorr', 'response', 'outcome', 'session', 'subject'});
+    tbl.response = categorical(tbl.response);
+    tbl.session = categorical(tbl.session);
+    tbl.subject = categorical(tbl.subject);
+    badRows = isnan(tbl.xcorr) | ...
+        isundefined(tbl.response) | ...
+        isundefined(tbl.subject) | ...
+        isundefined(tbl.session);
+    tbl(badRows,:) = [];
+    lme = fitlme(tbl, ...
+        'xcorr ~ response*outcome + (1|session) + (1|subject)');
+    anova(lme)
 
     saveas(fig_session, 'Figures/fig3d.fig')
     saveas(fig_session, 'Figures/fig3d.svg')

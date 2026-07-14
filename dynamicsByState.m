@@ -492,4 +492,6 @@ function dynamicsByState()
     fprintf('S1 by outcome state 3\n')
     [~,tbl,~] = anova1([s1_ne_baseline{3}{1}, s1_ne_baseline{3}{2}, s1_ne_baseline{3}{3}, s1_ne_baseline{3}{4}])
     close all
+
+    keyboard 
 end

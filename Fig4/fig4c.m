@@ -5,6 +5,7 @@ function [baselines_animal, baselines_session] = fig4c(data, tbounds, alignTo, v
     sessions = unique(data.session_id);
     animal = {[], [], [], [], [], []};
     session = {[], [], [], [], [], []};
+    session_sesh = session;
 
     if ~exist('alignTo', 'var')
         alignTo = 'stimulus';
@@ -41,6 +42,7 @@ function [baselines_animal, baselines_session] = fig4c(data, tbounds, alignTo, v
             else
                 session{o} = [session{o}; nan(1,size(session{o},2))];
             end
+            session_sesh{o} = [session_sesh{o}; sessions{s}];
         end
     end
 
@@ -74,13 +76,36 @@ function [baselines_animal, baselines_session] = fig4c(data, tbounds, alignTo, v
     xtickangle(45)
     ylabel('Baseline NE_{S1} (z-score)')
 
-    mat = [baselines_session{1}, baselines_session{2}, baselines_session{3}, baselines_session{4}];
-    [p, ~, stats] = anova1(mat);
-    fprintf('S1 NE baseline:\n')
-    fprintf(sprintf('Outcome anova: p = %d\n', p))
-    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
-    mc = multcompare(stats)
+    % mat = [baselines_session{1}, baselines_session{2}, baselines_session{3}, baselines_session{4}];
+    % [p, ~, stats] = anova1(mat);
+    % fprintf('S1 NE baseline:\n')
+    % fprintf(sprintf('Outcome anova: p = %d\n', p))
+    % fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
+    % mc = multcompare(stats)
 
+    sesh = cellstr(vertcat(session_sesh{1}, session_sesh{2}, session_sesh{3}, session_sesh{4}));
+    subj = {};
+    for i = 1:length(sesh)
+        subj{i} = sesh{i}(1:3);
+    end
+    tbl = table([baselines_session{1}; baselines_session{2}; baselines_session{3}; baselines_session{4}], ...
+        [ones(size(baselines_session{1})); zeros(size(baselines_session{2})); zeros(size(baselines_session{3})); ones(size(baselines_session{4}))], ...
+        [ones(size(baselines_session{1})); zeros(size(baselines_session{2})); ones(size(baselines_session{3})); zeros(size(baselines_session{4}))], ...
+        sesh, subj', 'VariableNames', {'baseline', 'response', 'outcome', 'session', 'subject'});
+    tbl.response = categorical(tbl.response);
+    tbl.session = categorical(tbl.session);
+    tbl.subject = categorical(tbl.subject);
+    badRows = isnan(tbl.baseline) | ...
+        isundefined(tbl.response) | ...
+        isundefined(tbl.subject) | ...
+        isundefined(tbl.session);
+    tbl(badRows,:) = [];
+    lme = fitlme(tbl, ...
+        'baseline ~ response*outcome + (1|session) + (1|subject)');
+    fprintf('LME Baseline S1 NE, Response, Outcome\n')
+    anova(lme)
+
+    keyboard 
     saveas(fig_sesh, 'Figures/fig4c.fig')
     saveas(fig_sesh, 'Figures/fig4c.svg')
     % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{7}, baselines_session{8})))

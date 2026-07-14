@@ -1,5 +1,6 @@
 # Neurotransmitter_Exploration
 
-This repository is a collection of functions used to process and analyze raw data at the NEC lab at Columbia University. Basic functionality is included for photometry and neuropixels data collection. 
-
-An abbreviated overview of the main functionality is forthcoming.
+This repository is a collection of code used to analyze pupillometry, fiber photometry recordings of GRABNE, and behavior 
+in mice performing a simple tactile signal detection task.  Required data is available on upon request.  To generate all 
+figures and analyses from our paper, simply unzip the data and run *allFigures.m*.  Code for running the GLM-HMM model 
+are found in *NT-GLM-HMM/* and subfolders.

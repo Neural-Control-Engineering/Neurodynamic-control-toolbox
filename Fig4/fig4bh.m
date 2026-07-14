@@ -8,6 +8,14 @@ function fig4bh(data, tbounds, alignTo, ver)
     mpfc_ne_miss = {};
     mpfc_ne_cr = {};
     mpfc_ne_fa = {};
+    s1_session_hit = {};
+    s1_session_miss = {};
+    s1_session_cr = {};
+    s1_session_fa = {};
+    mpfc_session_hit = {};
+    mpfc_session_miss = {};
+    mpfc_session_cr = {};
+    mpfc_session_fa = {};
     for i = 1:length(unique(data.stimulus_strength))
         s1_ne_hit{i} = [];
         s1_ne_miss{i} = [];
@@ -17,6 +25,14 @@ function fig4bh(data, tbounds, alignTo, ver)
         mpfc_ne_miss{i} = [];
         mpfc_ne_cr{i} = [];
         mpfc_ne_fa{i} = [];
+        s1_session_hit{i} = {};
+        s1_session_miss{i} = {};
+        s1_session_cr{i} = {};
+        s1_session_fa{i} = {};
+        mpfc_session_hit{i} = {};
+        mpfc_session_miss{i} = {};
+        mpfc_session_cr{i} = {};
+        mpfc_session_fa{i} = {};
     end
     
     sessions = unique(data.session_id);
@@ -38,6 +54,8 @@ function fig4bh(data, tbounds, alignTo, ver)
                         s1_ne_hit{end} = [s1_ne_hit{end}; s1];
                         mpfc_ne_hit{end} = [mpfc_ne_hit{end}; mpfc];
                     end
+                    s1_session_hit{end} = [s1_session_hit{end}; sessions{a}];
+                    mpfc_session_hit{end} = [mpfc_session_hit{end}; sessions{a}];
                 else
                     if size(s1,1) > 1
                         s1_ne_hit{i} = [s1_ne_hit{i}; nanmean(s1)];
@@ -46,6 +64,8 @@ function fig4bh(data, tbounds, alignTo, ver)
                         s1_ne_hit{i} = [s1_ne_hit{i}; s1];
                         mpfc_ne_hit{i} = [mpfc_ne_hit{i}; mpfc];
                     end
+                    s1_session_hit{i} = [s1_session_hit{i}; sessions{a}];
+                    mpfc_session_hit{i} = [mpfc_session_hit{i}; sessions{a}];
                 end
             end
         end
@@ -63,6 +83,8 @@ function fig4bh(data, tbounds, alignTo, ver)
                         s1_ne_miss{end} = [s1_ne_miss{end}; s1];
                         mpfc_ne_miss{end} = [mpfc_ne_miss{end}; mpfc];
                     end
+                    s1_session_miss{end} = [s1_session_miss{end}; sessions{a}];
+                    mpfc_session_miss{end} = [mpfc_session_miss{end}; sessions{a}];
                 else
                     if size(s1,1) > 1
                         s1_ne_miss{i} = [s1_ne_miss{i}; nanmean(s1)];
@@ -71,6 +93,8 @@ function fig4bh(data, tbounds, alignTo, ver)
                         s1_ne_miss{i} = [s1_ne_miss{i}; s1];
                         mpfc_ne_miss{i} = [mpfc_ne_miss{i}; mpfc];
                     end
+                    s1_session_miss{i} = [s1_session_miss{i}; sessions{a}];
+                    mpfc_session_miss{i} = [mpfc_session_miss{i}; sessions{a}];
                 end
             end
         end
@@ -84,6 +108,8 @@ function fig4bh(data, tbounds, alignTo, ver)
                 s1_ne_cr{1} = [s1_ne_cr{1}; s1];
                 mpfc_ne_cr{1} = [mpfc_ne_cr{1}; mpfc];
             end
+            s1_session_cr{1} = [s1_session_cr{1}; sessions{a}];
+            mpfc_session_cr{1} = [mpfc_session_cr{1}; sessions{a}];
         end
         otmp = filterTrials(sidtmp, 'categorical_outcome', 'FA');
         if ~isempty(otmp)
@@ -95,6 +121,8 @@ function fig4bh(data, tbounds, alignTo, ver)
                 s1_ne_fa{1} = [s1_ne_fa{1}; s1];
                 mpfc_ne_fa{1} = [mpfc_ne_fa{1}; mpfc];
             end
+            s1_session_fa{1} = [s1_session_fa{1}; sessions{a}];
+            mpfc_session_fa{1} = [mpfc_session_fa{1}; sessions{a}];
         end
     end
 
@@ -193,79 +221,96 @@ function fig4bh(data, tbounds, alignTo, ver)
 
     intensity = [];
     mat = [];
-    for i = 2:length(s1_ne_hit)
-        intensity = [intensity; zeros(size(s1_ne_hit{i},1),1)+i-stim_strengths(i)];
+    sessions = {};
+    for i = 1:length(s1_ne_hit)
+        intensity = [intensity; zeros(size(s1_ne_hit{i},1),1)+stim_strengths(i)];
         mat = [mat; s1_ne_hit{i}];
+        sessions = vertcat(sessions, s1_session_hit{i});
     end
-    % for r = 1:size(mat,1)
-    %     mat(r,:) = smooth(mat(r,:),5);
-    % end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
-    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    
+    s1_ne_hit_tbl = table(intensity, sessions, ones(size(intensity)), mat(:,1), 'VariableNames', {'intensity', 'session', 'response', 't0'});
     for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+        s1_ne_hit_tbl = [s1_ne_hit_tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
-    fprintf('hit s1_ne_ by stimulus strength:\n')
-    ranova(rm)
+    % rm = fitrm(s1_ne_hit_tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    % fprintf('hit s1_ne_ by stimulus strength:\n')
+    % ranova(rm)
 
     intensity = [];
     mat = [];
+    sessions = {};
     for i = 2:length(s1_ne_miss)
         intensity = [intensity; zeros(size(s1_ne_miss{i},1),1)+i-stim_strengths(i)];
         mat = [mat; s1_ne_miss{i}];
+        sessions = vertcat(sessions, s1_session_miss{i});
     end
     % for r = 1:size(mat,1)
     %     mat(r,:) = smooth(mat(r,:),5);
     % end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
-    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    s1_ne_miss_tbl = table(intensity, sessions, zeros(size(intensity)), mat(:,1), 'VariableNames', {'intensity', 'session', 'response', 't0'});
     for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+        s1_ne_miss_tbl = [s1_ne_miss_tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
-    fprintf('miss s1_ne_ by stimulus strength:\n')
-    ranova(rm)
+    % rm = fitrm(s1_ne_miss_tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    % fprintf('miss s1_ne_ by stimulus strength:\n')
+    % ranova(rm)
 
     intensity = [];
     mat = [];
-    for i = 2:length(mpfc_ne_hit)
-        intensity = [intensity; zeros(size(mpfc_ne_hit{i},1),1)+i-stim_strengths(i)];
+    sessions = {};
+    for i = 1:length(mpfc_ne_hit)
+        intensity = [intensity; zeros(size(mpfc_ne_hit{i},1),1)+stim_strengths(i)];
         mat = [mat; mpfc_ne_hit{i}];
+        sessions = vertcat(sessions, mpfc_session_hit{i});
     end
     % for r = 1:size(mat,1)
     %     mat(r,:) = smooth(mat(r,:),5);
     % end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
-    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    mpfc_ne_hit_tbl = table(intensity, sessions, ones(size(intensity)), mat(:,1), 'VariableNames', {'intensity', 'session', 'response', 't0'});
     for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+        mpfc_ne_hit_tbl = [mpfc_ne_hit_tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
-    fprintf('hit mpfc_ne_ by stimulus strength:\n')
-    ranova(rm)
+    % rm = fitrm(mpfc_ne_hit_tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    % fprintf('hit mpfc_ne_ by stimulus strength:\n')
+    % ranova(rm)
 
     intensity = [];
     mat = [];
+    sessions = {};
     for i = 2:length(mpfc_ne_miss)
         intensity = [intensity; zeros(size(mpfc_ne_miss{i},1),1)+i-stim_strengths(i)];
         mat = [mat; mpfc_ne_miss{i}];
+        sessions = vertcat(sessions, mpfc_session_miss{i});
     end
     % for r = 1:size(mat,1)
     %     mat(r,:) = smooth(mat(r,:),5);
     % end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
-    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    mpfc_ne_miss_tbl = table(intensity, sessions, zeros(size(intensity)), mat(:,1), 'VariableNames', {'intensity', 'session', 'response', 't0'});
     for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+        mpfc_ne_miss_tbl = [mpfc_ne_miss_tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
-    fprintf('miss mpfc_ne_ by stimulus strength:\n')
+    % rm = fitrm(mpfc_ne_miss_tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    % fprintf('miss mpfc_ne_ by stimulus strength:\n')
+    % ranova(rm)
+
+    mpfc_tbl = [mpfc_ne_hit_tbl; mpfc_ne_miss_tbl];
+    rm = fitrm(mpfc_tbl, sprintf('t0-t%i ~ intensity*response',c-1), 'WithinDesign', time);
+    fprintf('hit and miss mpfc by stimulus strength:\n')
     ranova(rm)
+
+    s1_tbl = [s1_ne_hit_tbl; s1_ne_miss_tbl];
+    rm = fitrm(s1_tbl, sprintf('t0-t%i ~ intensity*response',c-1), 'WithinDesign', time);
+    fprintf('hit and miss s1 by stimulus strength:\n')
+    ranova(rm)
+    keyboard 
 
     saveas(s1_fig, 'Figures/figb.fig')
     saveas(s1_fig, 'Figures/figb.svg')

@@ -137,11 +137,11 @@ function fig2c(data, tbounds, alignTo)
     % end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
-    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    hit_tbl = table(ones(size(intensity)), intensity, mat(:,1), 'VariableNames', {'response', 'intensity', 't0'});
     for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+        hit_tbl = [hit_tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    rm = fitrm(hit_tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
     fprintf('hit pupil_ne_ by stimulus strength:\n')
     ranova(rm)
 
@@ -156,13 +156,20 @@ function fig2c(data, tbounds, alignTo)
     % end
     mat = mat(:, t>0 & t<=5);
     time =t(:, t>0 & t<=5);
-    tbl = table(intensity, mat(:,1), 'VariableNames', {'intensity', 't0'});
+    miss_tbl = table(zeros(size(intensity)), intensity, mat(:,1), 'VariableNames', {'response', 'intensity', 't0'});
     for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+        miss_tbl = [miss_tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
+    rm = fitrm(miss_tbl, sprintf('t0-t%i ~ intensity',c-1), 'WithinDesign', time);
     fprintf('miss pupil_ne_ by stimulus strength:\n')
     ranova(rm)
+
+    tbl = [hit_tbl; miss_tbl];
+    rm = fitrm(tbl, sprintf('t0-t%i ~ intensity*response',c-1), 'WithinDesign', time);
+    fprintf('hit and miss pupil_ne_ by stimulus strength:\n')
+    ranova(rm)
+
+    keyboard 
 
     saveas(pupil_fig, 'Figures/fig2c.fig')
     saveas(pupil_fig, 'Figures/fig2c.svg')
