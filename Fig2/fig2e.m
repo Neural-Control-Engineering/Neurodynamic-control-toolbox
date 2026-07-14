@@ -8,6 +8,7 @@ function fig2e(data, tbounds, alignTo)
     sessions = {};
     subjects = {};
     responses = [];
+    outcomes = [];
     for s = 1:length(stim_strengths)
         stmp = filterTrials(data, 'stim_strength', stim_strengths(s));
         [pupil, t] = avg_pupil_traces(stmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
@@ -25,6 +26,11 @@ function fig2e(data, tbounds, alignTo)
                 responses = [responses; 1];
             else
                 responses = [responses; 0];
+            end
+            if strcmp(stmp(t,:).categorical_outcome{1}, 'Hit') | strcmp(stmp(t,:).categorical_outcome{1}, 'CR')
+                outcomes = [outcomes; 1];
+            else
+                outcomes = [outcomes; 0];
             end
             subjects = vertcat(subjects, stmp(t,:).session_id{1}(1:3));
         end
@@ -45,9 +51,9 @@ function fig2e(data, tbounds, alignTo)
     saveas(fig, 'Figures/fig2e.fig')
     saveas(fig, 'Figures/fig2e.svg')
 
-    T = table(dilations, baselines, responses, stimuli, sessions, subjects,  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Stimulus', 'Session', 'Subject'});
+    T = table(dilations, baselines, responses, outcomes, stimuli, sessions, subjects,  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Outcome', 'Stimulus', 'Session', 'Subject'});
 
-    lmeTbl = T(:, {'Dilation', 'Baseline','Stimulus','Response','Session', 'Subject'});
+    lmeTbl = T(:, {'Dilation', 'Baseline','Stimulus','Response', 'Outcome', 'Session', 'Subject'});
 
     % Make sure response is numeric
     lmeTbl.Dilation = double(lmeTbl.Dilation);
@@ -56,6 +62,7 @@ function fig2e(data, tbounds, alignTo)
     lmeTbl.Baseline = double(lmeTbl.Baseline);
     lmeTbl.Stimulus = categorical(lmeTbl.Stimulus);
     lmeTbl.Response = categorical(lmeTbl.Response);
+    lmeTbl.Outcome = categorical(lmeTbl.Outcome);
     lmeTbl.Session  = categorical(lmeTbl.Session);
     lmeTbl.Subject  = categorical(lmeTbl.Subject);
 
@@ -64,6 +71,7 @@ function fig2e(data, tbounds, alignTo)
             isundefined(lmeTbl.Stimulus) | ...
             isnan(lmeTbl.Baseline) | ...
             isundefined(lmeTbl.Response) | ...
+            isundefined(lmeTbl.Outcome) | ...
             isundefined(lmeTbl.Subject) | ...
             isundefined(lmeTbl.Session);
 
@@ -72,14 +80,14 @@ function fig2e(data, tbounds, alignTo)
     % Optional but useful: remove unused category levels
     lmeTbl.Stimulus = removecats(lmeTbl.Stimulus);
     lmeTbl.Response = removecats(lmeTbl.Response);
+    lmeTbl.Outcome = removecats(lmeTbl.Outcome);
     lmeTbl.Session  = removecats(lmeTbl.Session);
     lmeTbl.Subject  = removecats(lmeTbl.Subject);
 
+    fprintf('Dilation by stimulus, response, baseline LME\n')
     lme = fitlme(lmeTbl, ...
         'Dilation ~ Stimulus*Response*Baseline + (1|Session) + (1|Subject)');
     
     anova(lme)
-
-    keyboard 
 
 end

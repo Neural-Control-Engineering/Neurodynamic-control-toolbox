@@ -1482,3 +1482,6 @@ choice behavior (state 0), and conservative choice behavior (state 2)
 - The ordering of results is disorganized at times. For example, on lines 305-339 
 effects of evoked and baseline NE signals are reported in an intermixed manner,
 hindering the flow of the paragraph.
+
+* [2026-7-14 Tue] - working through figures / stats 
+** 
