@@ -156,7 +156,7 @@ function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver,
         isundefined(tbl.session);
     tbl(badRows,:) = [];
     lme = fitlme(tbl, ...
-        'xcorr ~ response*outcome + (1|session) + (1|subject)');
+        'xcorr ~ response + outcome + (1|session) + (1|subject)');
     anova(lme)
 
     saveas(fig_session, 'Figures/fig3d.fig')
