@@ -2,6 +2,8 @@ function [baselines_animal, baselines_session] = fig2gtrial(data, tbounds, align
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     baselines = {[],[],[],[]};
     sesh = {{},{},{},{}};
+    result = {};
+    count = 1;
 
     for o = 1:length(outcomes)
         outcome = outcomes{o};
@@ -20,7 +22,7 @@ function [baselines_animal, baselines_session] = fig2gtrial(data, tbounds, align
     end
     subject = subject';
     response = [ones(size(baselines{1})); zeros(size(baselines{2})); zeros(size(baselines{3})); ones(size(baselines{4}))];
-    outcomes = [ones(size(baselines{1})); zeros(size(baselines{2})); ones(size(baselines{3})); zeros(size(baselines{4}))];
+    outcomes = [zeros(size(baselines{1})); zeros(size(baselines{2}))+1; zeros(size(baselines{3}))+2; zeros(size(baselines{4}))+3];
 
     T = table(all_baselines, response, outcomes, session, subject,  'VariableNames', {'Baseline', 'Response', 'Outcome', 'Session', 'Subject'});
 
@@ -55,5 +57,21 @@ function [baselines_animal, baselines_session] = fig2gtrial(data, tbounds, align
         'Baseline ~ Response + (1|Session) + (1|Subject)');
     anova(lme)
 
+    fprintf('Baseline by outcome LME\n')
+    lmeo = fitlme(lmeTbl, ...
+        'Baseline ~ Outcome + (1|Session) + (1|Subject)');
+    anova(lmeo)
+    % compare(lme, lmeo)
+    
+    figure();
+    hold on; 
+    % for i = 1:length(baselines)
+    %     plot((rand(size(baselines{i}))-0.5)*0.1+i, baselines{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', 'w', 'MarkerSize', 2)
+    % end
+    bar(1:4, cellfun(@nanmean, baselines), 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(1:4, cellfun(@nanmean, baselines), cellfun(@ste, baselines), 'k.', 'LineWidth', 2, 'CapSize', 25)
+    xticks(1:4)
+    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm'})
+    xtickangle(45)
     keyboard 
 end

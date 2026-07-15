@@ -1505,7 +1505,10 @@ hindering the flow of the paragraph.
 **** H-I -> G-H 
 **** new I - increase by baseline 
 **** J-L no change 
-*** Figure 5 - no changes 
+*** Figure 5
+**** B - trial-wise now  
+*** Figure 6 - need to update H response time 
+*** Figure 7 - maybe add baseline NE 
 ** open questions 
 *** Figures 2-4: get rid of response vs. withhold 
 *** trial-wise lme's for metrics other than dilation / NE xcorr / change in NE
