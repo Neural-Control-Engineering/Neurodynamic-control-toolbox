@@ -1,92 +1,135 @@
-function [dilations_animal, dilations_session] = fig2h(data, tbounds, alignTo)
-    outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
-
-    animals = fetchAnimals(data);
-    sessions = unique(data.session_id);
-    animal = {[], [], [], [], [], []};
-    session = {[], [], [], [], [], []};
-
-    if ~exist('alignTo', 'var')
-        alignTo = 'stimulus';
-    end
-
-    for a = 1:length(animals)
-        atmp = filterTrials(data, 'animal', num2str(animals(a)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(atmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    animal{o} = [animal{o}; nanmean(pupil)];
+function [x, ss, tcile] = fig2h(data)
+    % ptiles = 25:25:100;
+    % ptiles = [33, 66, 100];
+    ptiles = [20,40,60,80,100];
+    % ptiles = [10,20,30,40,50,60,70,80,90,100];
+    low = prctile(data.pupil_base_before_stimulus, 0);
+    stim_strengths = unique(data.stimulus_strength);
+    cols = distinguishable_colors(length(ptiles));
+    % animal_fig = figure();
+    session_fig = figure();
+    rppa_session = {};
+    rppa_animal = {};
+    fas = {};
+    for i = 1:length(ptiles)
+        ptile = ptiles(i);
+        high = prctile(data.pupil_base_before_stimulus, ptile);
+        x = data.pupil_base_before_stimulus >= low & data.pupil_base_before_stimulus <= high;
+        low = high;
+        tmp = data(x,:);
+        stim_strengths = unique(tmp.stimulus_strength);
+        sessions = unique(tmp.session_id);
+        animals = fetchAnimals(tmp);
+        session_mat = nan(length(sessions), length(stim_strengths));
+        for s = 1:length(sessions)
+            stmp = filterTrials(tmp, 'session_id', num2str(sessions(s)));
+            sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
+            fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+            session_mat(s,1) = size(fatmp,1) / size(sstmp,1);
+            for ss = 2:length(stim_strengths)
+                sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(ss));
+                otmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                hr = size(otmp,1) / size(sstmp,1);
+                if length(unique(stmp.stimulus_strength)) == 2
+                    session_mat(s,end) = hr;
                 else
-                    animal{o} = [animal{o}; pupil];
+                    session_mat(s, ss) = hr;
+                end
+            end
+        end
+        animal_mat = nan(length(animals), length(stim_strengths));
+        for s = 1:length(animals)
+            stmp = filterTrials(tmp, 'animal', num2str(animals(s)));
+            sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(1));
+            fatmp = filterTrials(sstmp, 'categorical_outcome', 'FA');
+            animal_mat(s,1) = size(fatmp,1) / size(sstmp,1);
+            for ss = 2:length(stim_strengths)
+                sstmp = filterTrials(stmp, 'stim_strength', stim_strengths(ss));
+                otmp = filterTrials(sstmp, 'categorical_outcome', 'Hit');
+                hr = size(otmp,1) / size(sstmp,1);
+                if length(unique(stmp.stimulus_strength)) == 2
+                    animal_mat(s,end) = hr;
+                else
+                    animal_mat(s, ss) = hr;
+                end
+            end
+        end
+        switch i 
+            case 1  
+                l = sprintf('1st quintile', i);
+            case 2
+                l = sprintf('2nd quintile', i);
+            case 3
+                l = sprintf('3rd quintile', i);
+            otherwise
+                l = sprintf('%ith quintile', i);
+        end
+        % l = {'1st quintile', '2nd quintile', '3rd quintile', '4th quintile', '5th quintile'};
+        
+        figure(session_fig)
+        n = size(session_mat,1);
+        semshade(session_mat, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, sprintf('%s (n=%i)', l, n));
+        hold on
+        rppa_session{i} = session_mat;
+        % figure(animal_fig)
+        % n = size(animal_mat,1);
+        % semshade(animal_mat, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, sprintf('%s (n=%i)', l, n));
+        % hold on
+        rppa_animal{i} = session_mat;
+    end
+    x = [];
+    ss = {};
+    tcile = {};
+    all_count = 1;
+    for k = 1:length(ptiles)
+        for i = 1:size(rppa_animal{k},1)
+            for j = 1:size(rppa_animal{k},2)
+                if ~isnan(rppa_animal{k}(i,j))
+                    x = [x, rppa_animal{k}(i,j)];
+                    ss{all_count} = num2str(stim_strengths(j));
+                    tcile{all_count} = num2str(k);
+                    all_count = all_count + 1;
                 end
             end
         end
     end
 
-    for s = 1:length(sessions)
-        stmp = filterTrials(data, 'session_id', num2str(sessions(s)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(stmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    session{o} = [session{o}; nanmean(pupil)];
-                else
-                    session{o} = [session{o}; pupil];
-                end
-            else
-                session{o} = [session{o}; nan(1,size(session{o},2))];
-            end
-        end
+    % keyboard
+    % figure(animal_fig)
+    % xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
+    % ylabel('Response Probability', 'FontSize', 14)
+    % leg = legend('location', 'southeast');
+    % leg.Title.String = 'Baseline Pupil Area';
+
+    figure(session_fig)
+    xlabel('Stimulus Strength (PSI)', 'FontSize', 14)
+    ylabel('Response Probability', 'FontSize', 14)
+    leg = legend('location', 'southeast');
+    leg.Title.String = 'Baseline Pupil Area';
+
+    saveas(session_fig, 'Figures/fig2j.fig')
+    saveas(session_fig, 'Figures/fig2j.svg')
+
+    % terciles = [zeros(49,1); zeros(49,1)+1; zeros(49,1)+2; zeros(49,1)+3; zeros(49,1)+4];
+    % stim_strengths = stim_strengths .* 10;
+    % mat = [rppa_session{1}; rppa_session{2}; rppa_session{3}; rppa_session{4}; rppa_session{5}];
+    % tbl = table(terciles, mat(:,1), mat(:,2), mat(:,3), mat(:,4), mat(:,5), mat(:,6), mat(:,7), 'VariableNames', {'tercile', 't0', 't1', 't2', 't3', 't4', 't5', 't6'});
+    % rm = fitrm(tbl, 't0-t6 ~ tercile', 'WithinDesign', stim_strengths);
+    % ranova(rm)
+
+    percentile = [];
+    mat = [];
+    stim_strengths = stim_strengths .* 10;
+    for i = 1:length(rppa_session)
+        percentile = [percentile; zeros(size(rppa_session{i},1),1)+i-1];
+        mat = [mat; rppa_session{i}];
     end
 
-    dilations_animal = {[], [], [], []};
-    dilations_sessions = {[], [], [], []};
-    for o = 1:length(outcomes)
-        baselines_animal =  nanmean(animal{o}(:,(t > -0.5 & t < 0)),2);
-        evoked_animal = nanmean(animal{o}(:,(t > 0 & t < 6)),2);
-        baselines_session =  nanmean(session{o}(:,(t > -0.5 & t < 0)),2);
-        evoked_session = nanmean(session{o}(:,(t > 0 & t < 6)),2);
-        dilations_animal{o} = evoked_animal - baselines_animal;
-        dilations_session{o} = evoked_session - baselines_session;
+    tbl = table(percentile, mat(:,1), 'VariableNames', {'percentile', 't0'});
+    for c = 2:size(mat,2)
+        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
     end
+    rm = fitrm(tbl, sprintf('t0-t%i ~ percentile',c-1), 'WithinDesign', stim_strengths);
+    ranova(rm)
 
-    x = [1:4, 6:7];
-    labels = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold'};
-
-    for i = 1:length(dilations_session) 
-        avg(i) = mean(dilations_session{i});
-        err(i) = std(dilations_session{i}) / sqrt(length(dilations_session{i}));
-    end
-    
-    fig_sesh = figure();
-    hold on 
-    for i = 1:length(x)
-        plot(zeros(1,length(dilations_session{i}))+x(i)+(rand([1,length(dilations_session{i})])-0.5)*-0.3, ...
-            dilations_session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
-    end
-    errorbar(x, cellfun(@nanmean, dilations_session), cellfun(@ste, dilations_session), 'k.', 'CapSize', 15, 'LineWidth', 2)
-    lims = ylim;
-    plot([5,5], lims, 'k--')
-    yticks([lims(1), 0, lims(2)])
-    xticks(x)
-    xticklabels(labels)
-    xtickangle(45)
-    ylabel('Mean Pupil Dilation (z-score)')
-
-    mat = [dilations_session{1}, dilations_session{2}, dilations_session{3}, dilations_session{4}];
-    [p, tbl, stats] = anova1(mat)
-    fprintf('Pupil dilations:\n')
-    fprintf(sprintf('Outcome anova: p = %d\n', p))
-    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
-    mc = multcompare(stats)
-    keyboard 
-
-    saveas(fig_sesh, 'Figures/fig2h.fig')
-    saveas(fig_sesh, 'Figures/fig2h.svg')
-    
 end

@@ -15,7 +15,11 @@ function fig2e(data, tbounds, alignTo)
         pupil = pupil(:,2:end-1);
         t = t(2:end-1);
         b =  nanmean(pupil(:,(t > -0.5 & t < 0)),2);
-        e = nanmean(pupil(:,(t > 0 & t < 6)),2);
+        % e = nan(size(b));
+        % for i = 1:size(pupil,1)
+        %     e(i) = max(smooth(pupil(i,(t > 0 & t < 6)),5));
+        % end
+        e = max(pupil(:,(t > 0 & t < 6)),[],2);
         d = e - b;
         baselines = [baselines; b];
         dilations = [dilations; d];
@@ -51,9 +55,9 @@ function fig2e(data, tbounds, alignTo)
     saveas(fig, 'Figures/fig2e.fig')
     saveas(fig, 'Figures/fig2e.svg')
 
-    T = table(dilations, baselines, responses, outcomes, stimuli, sessions, subjects,  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Outcome', 'Stimulus', 'Session', 'Subject'});
+    T = table(dilations, baselines, responses, stimuli, sessions, subjects,  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Stimulus', 'Session', 'Subject'});
 
-    lmeTbl = T(:, {'Dilation', 'Baseline','Stimulus','Response', 'Outcome', 'Session', 'Subject'});
+    lmeTbl = T(:, {'Dilation', 'Baseline','Stimulus','Response', 'Session', 'Subject'});
 
     % Make sure response is numeric
     lmeTbl.Dilation = double(lmeTbl.Dilation);
@@ -62,7 +66,6 @@ function fig2e(data, tbounds, alignTo)
     lmeTbl.Baseline = double(lmeTbl.Baseline);
     lmeTbl.Stimulus = categorical(lmeTbl.Stimulus);
     lmeTbl.Response = categorical(lmeTbl.Response);
-    lmeTbl.Outcome = categorical(lmeTbl.Outcome);
     lmeTbl.Session  = categorical(lmeTbl.Session);
     lmeTbl.Subject  = categorical(lmeTbl.Subject);
 
@@ -71,7 +74,6 @@ function fig2e(data, tbounds, alignTo)
             isundefined(lmeTbl.Stimulus) | ...
             isnan(lmeTbl.Baseline) | ...
             isundefined(lmeTbl.Response) | ...
-            isundefined(lmeTbl.Outcome) | ...
             isundefined(lmeTbl.Subject) | ...
             isundefined(lmeTbl.Session);
 
@@ -80,7 +82,6 @@ function fig2e(data, tbounds, alignTo)
     % Optional but useful: remove unused category levels
     lmeTbl.Stimulus = removecats(lmeTbl.Stimulus);
     lmeTbl.Response = removecats(lmeTbl.Response);
-    lmeTbl.Outcome = removecats(lmeTbl.Outcome);
     lmeTbl.Session  = removecats(lmeTbl.Session);
     lmeTbl.Subject  = removecats(lmeTbl.Subject);
 
@@ -89,5 +90,82 @@ function fig2e(data, tbounds, alignTo)
         'Dilation ~ Stimulus*Response*Baseline + (1|Session) + (1|Subject)');
     
     anova(lme)
+
+    % fig = figure();
+    % scatter(baselines, dilations, 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1])
+    % x = baselines;
+    % y = dilations;
+    % mdl = fitlm(x, y)
+    % [FM, S]=polyfit(x(~isnan(x)),y(~isnan(y)),1);
+    % [FM_vals, delta] = polyval(FM,linspace(min(x),max(x),10), S); 
+    % hold on; plot(linspace(min(x),max(x),10), FM_vals, 'k--', 'linewidth',2) 
+    % xlabel('Baseline Pupil Area (z-score)', 'FontSize', 16)
+    % ylabel('Pupil Dilation (z-score)', 'FontSize', 16)
+    % xlim([-2.5,5.1])
+    % saveas(fig, 'Figures/fig2e.fig')
+    % saveas(fig, 'Figures/fig2e.svg')
+    x_min = -2; %min(baselines);
+    x_max = 5; %max(baselines);
+    x = linspace(x_min, x_max, 100)';
+    animals = fetchAnimals(data);
+    
+    fig = figure(); hold on;
+    tl = tiledlayout(2,4);
+    for s = 1:length(stim_strengths)
+        axs(s) = nexttile;
+        hold on 
+        ss = stim_strengths(s);
+        for r = 0:1
+            y = [];
+            % tbl = table(x, repmat(ss, size(x)), repmat(r,size(x)), subj', sesh', 'VariableNames', {'Baseline', 'Stimulus', 'Response', 'Subject', 'Session'});
+            for a = 1:length(animals)
+                sessions = unique(data(contains(data.session_id, strcat(num2str(animals(a)), '-R')),:).session_id);
+                for h = 1:length(sessions)
+                    subj = {};
+                    sesh = {};
+                    for i = 1:length(x)
+                        subj{i} = sessions{h}(1:3);
+                        sesh{i} = sessions{h};
+                    end
+                    tbl = table(x, repmat(ss, size(x)), repmat(r,size(x)), subj', sesh', 'VariableNames', {'Baseline', 'Stimulus', 'Response', 'Subject', 'Session'});
+                    % Make predictors categorical
+                    tbl.Baseline = double(tbl.Baseline);
+                    tbl.Stimulus = categorical(tbl.Stimulus);
+                    tbl.Response = categorical(tbl.Response);
+                    tbl.Session  = categorical(tbl.Session);
+                    tbl.Subject  = categorical(tbl.Subject);
+                    % Remove rows with missing values in any model variable
+                    badRows = isundefined(tbl.Stimulus) | ...
+                            isnan(tbl.Baseline) | ...
+                            isundefined(tbl.Response) | ...
+                            isundefined(tbl.Subject) | ...
+                            isundefined(tbl.Session);
+                    tbl(badRows,:) = [];
+                    % Optional but useful: remove unused category levels
+                    tbl.Stimulus = removecats(tbl.Stimulus);
+                    tbl.Response = removecats(tbl.Response);
+                    tbl.Session  = removecats(tbl.Session);
+                    tbl.Subject  = removecats(tbl.Subject);
+                    y = [y; predict(lme, tbl)'];
+                end
+            end
+            if r
+                % semshade(y, 0.3, cols(s,:), cols(s,:), x, 1, '', '-');
+                % plot(baselines(responses == r & stimuli == ss), dilations(responses == r & stimuli == ss), 'o', 'Color', cols(s,:))
+                plot(x, mean(y), '-', 'Color', cols(s,:), 'LineWidth', 2)
+            else
+                % semshade(y, 0.3, cols(s,:), cols(s,:), x, 1, '', '--');
+                % plot(baselines(responses == r & stimuli == ss), dilations(responses == r & stimuli == ss), 'x', 'Color', cols(s,:))
+                plot(x, mean(y), ':', 'Color', cols(s,:), 'LineWidth', 2)
+            end
+        end
+        xlim([-2,5])
+    end
+    unifyYLimits(axs)
+    xlabel(tl, 'Baseline Pupil Area (z-score)', 'FontSize', 16)
+    ylabel(tl, '\Delta Pupil Area (z-score)', 'FontSize', 16)
+
+    saveas(fig, 'Figures/fig2e.fig')
+    saveas(fig, 'Figures/fig2e.svg')
 
 end

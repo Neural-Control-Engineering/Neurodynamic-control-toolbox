@@ -1,124 +1,77 @@
 function fig2b(data, tbounds, alignTo)
-    if ~exist('alignTo', 'var')
-        alignTo = 'stimulus';
-    end
-    pupil_animal = {[], [], [], [], [], [], []};
-    pupil_session = pupil_animal;
-    animals = fetchAnimals(data);
-    sessions = unique(data.session_id);
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    baselines = {[],[],[],[]};
+    sesh = {{},{},{},{}};
 
-    for a = 1:length(animals)
-        atmp = filterTrials(data, 'animal', num2str(animals(a)));
-        stim_strengths = unique(atmp.stimulus_strength);
-        for i = 1:length(stim_strengths)
-            stim = stim_strengths(i);
-            otmp = filterTrials(atmp, 'stim_strength', stim);
-            if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if length(stim_strengths) == 7 || i == 1
-                    if size(pupil,1) > 1
-                        pupil_animal{i} = [pupil_animal{i}; nanmean(pupil(:,2:end-1))];
-                    else
-                        pupil_animal{i} = [pupil_animal{i}; pupil(2:end-1)];
-                    end
-                else
-                    pupil_animal{end} = [pupil_animal{end}; nanmean(pupil(:,2:end-1))];
-                end
-            end
+    for o = 1:length(outcomes)
+        outcome = outcomes{o};
+        otmp = filterTrials(data, 'categorical_outcome', outcome);
+        if ~isempty(otmp)
+            [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
+            baselines{o} = nanmean(pupil(:,(t > -0.5 & t < 0)),2);
         end
+        sesh{o} = otmp.session_id;
     end
-
-    for a = 1:length(sessions)
-        atmp = filterTrials(data, 'session_id', num2str(sessions(a)));
-        stim_strengths = unique(atmp.stimulus_strength);
-        for i = 1:length(stim_strengths)
-            stim = stim_strengths(i);
-            otmp = filterTrials(atmp, 'stim_strength', stim);
-            if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if length(stim_strengths) == 7 || i == 1
-                    if size(pupil,1) > 1
-                        pupil_session{i} = [pupil_session{i}; nanmean(pupil(:,2:end-1))];
-                    else
-                        pupil_session{i} = [pupil_session{i}; pupil(2:end-1)];
-                    end
-                else
-                    pupil_session{end} = [pupil_session{end}; nanmean(pupil(:,2:end-1))];
-                end
-            end
-        end
+    all_baselines = [baselines{1}; baselines{2}; baselines{3}; baselines{4}];
+    session = vertcat(sesh{1}, sesh{2}, sesh{3}, sesh{4});
+    subject = {};
+    for i = 1:length(session)
+        subject{i} = session{i}(1:3);
     end
+    subject = subject';
+    response = [ones(size(baselines{1})); zeros(size(baselines{2})); zeros(size(baselines{3})); ones(size(baselines{4}))];
+    outcomes = [zeros(size(baselines{1})); zeros(size(baselines{2}))+1; zeros(size(baselines{3}))+2; zeros(size(baselines{4}))+3];
 
-    stim_strenghts = unique(data.stimulus_strength);
-    cols = distinguishable_colors(length(stim_strengths)+1);
+    T = table(all_baselines, response, outcomes, session, subject,  'VariableNames', {'Baseline', 'Response', 'Outcome', 'Session', 'Subject'});
 
-    t = t(2:end-1);
+    lmeTbl = T(:, {'Baseline','Response', 'Outcome', 'Session', 'Subject'});
 
-    session_fig = figure();
-    hold on
-    for i = 1:length(stim_strengths)
-        stim = stim_strengths(i);
-        l = sprintf('%.1f PSI', stim*10);
-        out = semshade(pupil_session{i}, 0.3, cols(i,:), cols(i,:), ...
-                t, 1, l);
-    end
-    ylim([-0.3, 1.3])
-    xlim(tbounds)
-    leg = legend();
-    leg.Title.String = 'Stimulus Strength';
-    plot([0,0], [-0.3, 1.3], 'k:', 'HandleVisibility', 'off')
-    ylabel('Pupil Area (z-score)', 'FontSize', 14)
-    xlabel('Time (s)', 'FontSize', 14)
-    leg = legend();
-    leg.Title.String = 'Stimulus Strength';
+    % Make sure response is numeric
+    lmeTbl.Baseline = double(lmeTbl.Baseline);
 
-    % animal_fig = figure();
-    % hold on
-    % for i = 1:length(stim_strengths)
-    %     stim = stim_strengths(i);
-    %     l = sprintf('%.1f PSI', stim*10);
-    %     out = semshade(pupil_animal{i}, 0.3, cols(i,:), cols(i,:), ...
-    %             t, 1, l);
+    % Make predictors categorical
+    lmeTbl.Response = categorical(lmeTbl.Response);
+    lmeTbl.Session  = categorical(lmeTbl.Session);
+    lmeTbl.Subject  = categorical(lmeTbl.Subject);
+    lmeTbl.Outcome  = categorical(lmeTbl.Outcome);
+
+    % Remove rows with missing values in any model variable
+    badRows = isnan(lmeTbl.Baseline) | ...
+            isundefined(lmeTbl.Response) | ...
+            isundefined(lmeTbl.Outcome) | ...
+            isundefined(lmeTbl.Subject) | ...
+            isundefined(lmeTbl.Session);
+
+    lmeTbl(badRows,:) = [];
+
+    % Optional but useful: remove unused category levels
+    lmeTbl.Response = removecats(lmeTbl.Response);
+    lmeTbl.Session  = removecats(lmeTbl.Session);
+    lmeTbl.Subject  = removecats(lmeTbl.Subject);
+    lmeTbl.Outcome  = removecats(lmeTbl.Outcome);
+
+    fprintf('Baseline by response LME\n')
+    lme = fitlme(lmeTbl, ...
+        'Baseline ~ Response + (1|Session) + (1|Subject)');
+    anova(lme)
+
+    fprintf('Baseline by outcome LME\n')
+    lmeo = fitlme(lmeTbl, ...
+        'Baseline ~ Outcome + (1|Session) + (1|Subject)');
+    anova(lmeo)
+    % compare(lme, lmeo)
+    
+    fig = figure();
+    hold on; 
+    % for i = 1:length(baselines)
+    %     plot((rand(size(baselines{i}))-0.5)*0.1+i, baselines{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', 'w', 'MarkerSize', 2)
     % end
-    % ylim([-0.3, 1.3])
-    % xlim(tbounds)
-    % leg = legend();
-    % leg.Title.String = 'Stimulus Strength';
-    % plot([0,0], [-0.3, 1.3], 'k:', 'HandleVisibility', 'off')
-    % ylabel('Pupil Area (z-score)', 'FontSize', 14)
-    % xlabel('Time (s)', 'FontSize', 14)
-    % leg = legend();
-    % leg.Title.String = 'Stimulus Strength';
-    % saveas(fig, 'Analysis/paper_figures/figure2/pupilByStimStrength.fig')
-    % leg.Title.FontSize = 12;
+    bar(1:4, cellfun(@nanmean, baselines), 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(1:4, cellfun(@nanmean, baselines), cellfun(@ste, baselines), 'k.', 'LineWidth', 2, 'CapSize', 25)
+    xticks(1:4)
+    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm'})
+    xtickangle(45)
 
-    % mat = zeros(length(pupil_session), 49);
-    % for i = 1:length(pupil_session)
-    %     for j = 1:size(pupil_session{i},1)
-    %         dilate = max(pupil_session{i}(j,6:end));
-    %         baseline = mean(pupil_session{i}(j,1:5));
-    %         mat(i,j) = dilate - baseline;
-    %     end
-    % end
-    keyboard 
-    mat = [];
-    ss = [];
-    for i = 1:length(pupil_session)
-        mat = [mat; pupil_session{i}];
-        ss = [ss; repmat(stim_strengths(i),size(pupil_session{i},1),1)];
-    end
-    mat = mat(:,t>0);
-    time = t(t>0);
-    tbl = table(ss, mat(:,1), 'VariableNames', {'stim_strength', 't0'});
-    for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i', c-1)})];
-    end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ stim_strength', 'WithinDesign', stim_strengths));
-    ranova(rm)
-
-    % [p, ~, stats] = anova1(mat')
-    % multcompare(stats)
-
-    saveas(session_fig, 'Figures/fig2b.fig')
-    saveas(session_fig, 'Figures/fig2b.svg')
+    saveas(fig, 'Figures/fig2b.fig')
+    saveas(fig, 'Figures/fig2b.svg')
 end

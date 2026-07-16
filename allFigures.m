@@ -1,4 +1,6 @@
 % load and preprocess data 
+set(0, 'DefaultFigureWindowStyle', 'normal');
+delete ssd_stats.txt
 diary ssd_stats.txt
 addpath(genpath('./'))
 Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
@@ -54,14 +56,14 @@ close all
 % figure 2
 % Figure 2. Pupil size dependent behavior. 
 % A) Example segmentation of mouse pupil contour by DLC (top) and the histogram of pupil fluctuations (bottom).
+% B) Baseline pupil area across outcomes 
 % B) Pupil dilation evoked by the presentation of different tactile stimuli.
 % C) Pupil dynamics around stimulus presentation for four different behavioral outcomes.
 % D) Pupil dilation with different baseline pupil size.
 % E) Scatter plot showing negative correlation between baseline pupil size and pupil dilation for an example session.
-% F) Pearson’s correlation coefficients between baseline pupil size and pupil dilation for different behavioral outcomes.
-% G-H) Quantification of baseline pupil size and dilation for different behavioral outcomes.
-% I) Response time during low, medium, and high pupil-linked arousal levels.
-% J-K) Response probablity and perceptual sensitivity during low, medium, and high pupil-linked arousal levels
+% F) Pupil dilation across different outcomes 
+% G) Response time by pupil-linked arousal levels.
+% H-I) Response probablity and perceptual sensitivity during by pupil-linked arousal levels
 fprintf('Figure 2:\n')
 fprintf('Figure 2a:\n')
 fig2a(data)
@@ -76,15 +78,11 @@ fig2e(data, tbounds, alignTo);
 fprintf('Figure 2f:\n')
 fig2f(data, tbounds, alignTo);
 fprintf('Figure 2g:\n')
-fig2g(data, tbounds, alignTo);
+fig2g(data);
 fprintf('Figure 2h:\n')
-fig2h(data, tbounds, alignTo);
+fig2h(data);
 fprintf('Figure 2i:\n')
 fig2i(data);
-fprintf('Figure 2j:\n')
-fig2j(data);
-fprintf('Figure 2k:\n')
-fig2k(data);
 close all
 
 % Figure 3. NE dynamics in S1 and mPFC during the tactile detection task. 
@@ -120,7 +118,7 @@ close all
 fprintf('Figure 4:\n')
 fprintf('Figure 4a:\n')
 fig4a(data, tbounds, alignTo, 'z-score');
-fprintf('Figure 4b:\n')
+fprintf('Figure 4b and 4h:\n')
 fig4bh(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4c:\n')
 fig4c(data, tbounds, alignTo, 'z-score');
@@ -133,8 +131,6 @@ fig4f(data, 'z-score');
 %% s2
 fprintf('Figure 4g:\n')
 fig4g(data, tbounds, alignTo, 'z-score');
-fprintf('Figure 4h:\n')
-fig4h(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4i:\n')
 fig4i(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4j:\n')
@@ -147,9 +143,13 @@ close all
 
 % figure 5 - grab NE signals for different baseline pupil area levels
 fprintf('Figure 5:\n')
-fprintf('Figure 5a and 5b:\n')
-fig5ab(data, tbounds, alignTo, 'z-score');
+fprintf('Figure 5a:\n')
+fig5a(data, tbounds, alignTo, 'z-score');
+fprintf('Figure 5b:\n')
+fig5b(data, tbounds, alignTo, 'z-score');
 close all
+
+keyboard
 
 % figure 6 - summary of GLM-HMM modeling
 fig6()

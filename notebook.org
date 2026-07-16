@@ -1514,3 +1514,8 @@ hindering the flow of the paragraph.
 *** trial-wise lme's for metrics other than dilation / NE xcorr / change in NE
 ** TODOS 
 *** TODO: check time in anova for pupil (61 and 67 in different places)
+
+* [2026-7-16 Thu] 
+** dilations and increases were computed with mean over 6s following stimulus 
+*** pupil dilation should definitely be max (way less negative change in area)
+*** open question re NE 

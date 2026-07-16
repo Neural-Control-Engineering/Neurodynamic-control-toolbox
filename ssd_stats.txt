@@ -1,3 +1,5 @@
+Trials per session: 1.290408e+02 +/- 5.019686e+00
+Session duration (min): 5.636727e+01 +/- 9.318071e-02
 Figure 1:
 Figure 1c:
 Figure 1e:
@@ -9,22 +11,367 @@ fig =
 
       Number: 4
         Name: ''
-       Color: [0.9400 0.9400 0.9400]
-    Position: [1220 1298 560 420]
+       Color: [0.9608 0.9608 0.9608]
+    Position: [423 230 1074 647]
        Units: 'pixels'
 
   Use GET to show all properties
 
 Figure 2:
+Figure 2a:
 Figure 2b:
+Baseline by response LME
 
-p =
+ans = 
 
-   8.6684e-24
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat      DF1    DF2     pValue    
+    {'(Intercept)'}        0.02599    1      6232       0.87193
+    {'Response'   }         82.537    1      6232    1.3686e-19
+
+Baseline by outcome LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue    
+    {'(Intercept)'}        157.69    1      6230    9.7922e-36
+    {'Outcome'    }        33.895    3      6230    1.0093e-21
 
 Figure 2c:
+hit pupil_ne_ by stimulus strength:
+
+ans =
+
+  3×8 table
+
+                        SumSq      DF       MeanSq        F       pValue    pValueGG      pValueHF      pValueLB 
+                        ______    _____    ________    _______    ______    _________    __________    __________
+
+    (Intercept):Time    204.15       50      4.0829     75.793         0    1.156e-37    4.7617e-38    3.7651e-16
+    intensity:Time      1.8961       50    0.037922    0.70396    0.9438      0.53048       0.53196       0.40223
+    Error(Time)         697.61    12950    0.053869                                                              
+
+miss pupil_ne_ by stimulus strength:
+
+ans =
+
+  3×8 table
+
+                        SumSq      DF      MeanSq       F         pValue        pValueGG      pValueHF      pValueLB 
+                        ______    _____    _______    ______    ___________    __________    __________    __________
+
+    (Intercept):Time    8.5057       50    0.17011    1.5675      0.0064814       0.20785       0.20756       0.21196
+    intensity:Time      78.099       50      1.562    14.393    5.9327e-115    3.7796e-07    3.3386e-07    0.00019404
+    Error(Time)         1139.5    10500    0.10853                                                                   
+
+hit and miss pupil_ne_ by stimulus strength:
+
+ans =
+
+  5×8 table
+
+                               SumSq      DF       MeanSq       F         pValue        pValueGG      pValueHF      pValueLB 
+                               ______    _____    ________    ______    ___________    __________    __________    __________
+
+    (Intercept):Time           8.5057       50     0.17011    2.1714     3.3458e-06       0.10351       0.10317       0.14127
+    response:Time              121.23       50      2.4246    30.948    3.1361e-281    4.2352e-16    3.5583e-16    4.4602e-08
+    intensity:Time             78.099       50       1.562    19.938    3.5657e-172     1.187e-10    1.0669e-10    1.0034e-05
+    response:intensity:Time    43.523       50     0.87045    11.111     2.7174e-85    3.2527e-06    3.0848e-06    0.00092618
+    Error(Time)                1837.1    23450    0.078342                                                                   
+
 Figure 2d:
 Figure 2e:
+
+mdl = 
+
+
+Linear regression model:
+    y ~ 1 + x1
+
+Estimated Coefficients:
+                   Estimate       SE        tStat       pValue  
+                   ________    ________    _______    __________
+
+    (Intercept)     0.91228    0.010088      90.43             0
+    x1             -0.14413      0.0102    -14.131    1.1673e-44
+
+
+Number of observations: 6323, Error degrees of freedom: 6321
+Root Mean Squared Error: 0.795
+R-squared: 0.0306,  Adjusted R-Squared: 0.0305
+F-statistic vs. constant model: 200, p-value = 1.17e-44
+Dilation by stimulus, response, baseline LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                                  FStat     DF1    DF2     pValue    
+    {'(Intercept)'               }        37.903    1      6295    7.8932e-10
+    {'Baseline'                  }        4.7118    1      6295      0.029994
+    {'Stimulus'                  }        16.107    6      6295    1.7653e-18
+    {'Response'                  }        29.436    1      6295    5.9942e-08
+    {'Baseline:Stimulus'         }        1.4939    6      6295       0.17584
+    {'Baseline:Response'         }        1.1714    1      6295       0.27916
+    {'Stimulus:Response'         }        3.9431    6      6295    0.00061287
+    {'Baseline:Stimulus:Response'}        1.2328    6      6295       0.28587
+
+Figure 2f:
+Dilation by response LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue     
+    {'(Intercept)'}         45.11    1      6232     2.0278e-11
+    {'Response'   }        913.03    1      6232    2.7164e-187
+
+Dilation by outcome LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue     
+    {'(Intercept)'}        161.32    1      6230     1.6481e-36
+    {'Outcome'    }        307.67    3      6230    2.8318e-186
+
+Figure 2g:
+RT by baseline pupil LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue    
+    {'(Intercept)'}        189.68    1      3247    5.5181e-42
+    {'Pupil'      }        3.8955    4      3247     0.0036869
+
+Figure 2h:
+
+ans =
+
+  3×8 table
+
+                         SumSq      DF      MeanSq       F         pValue       pValueGG      pValueHF      pValueLB 
+                        _______    ____    ________    ______    ___________    _________    __________    __________
+
+    (Intercept):Time     49.783       6      8.2971    144.97    2.9735e-136    3.321e-93    1.9106e-95    4.0447e-25
+    percentile:Time     0.96396       6     0.16066    2.8071       0.010257     0.024152      0.023086      0.095512
+    Error(Time)           64.56    1128    0.057234                                                                  
+
+Figure 2i:
+
+ans =
+
+  3×8 table
+
+                        SumSq      DF     MeanSq       F         pValue        pValueGG      pValueHF      pValueLB 
+                        ______    ____    _______    ______    ___________    __________    __________    __________
+
+    (Intercept):Time    206.75       5      41.35    119.04    3.3416e-102    5.8455e-78    2.5519e-79    9.7213e-23
+    tercile:Time        3.7649       5    0.75298    2.1677       0.055429      0.074707      0.073458       0.14226
+    Error(Time)         413.36    1190    0.34736                                                                   
+
+Figure 3:
+Figure 3b:
+Figure 3c:
+Figure 3d:
+Correlation by response LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue    
+    {'(Intercept)'}        23.585    1      6232    1.2242e-06
+    {'Response'   }        9.1928    1      6232     0.0024397
+
+Correlation by outcome LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue    
+    {'(Intercept)'}        21.765    1      6230    3.1459e-06
+    {'Result'     }         3.288    3      6230      0.019821
+
+Figure 4:
+Figure 4a:
+Baseline by response LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat      DF1    DF2     pValue  
+    {'(Intercept)'}         2.7268    1      6232    0.098728
+    {'Response'   }        0.73072    1      6232     0.39268
+
+Baseline by outcome LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat      DF1    DF2     pValue 
+    {'(Intercept)'}        0.11568    1      6230    0.73378
+    {'Outcome'    }        0.97664    3      6230    0.40263
+
+Figure 4b and 4h:
+hit and miss mpfc by stimulus strength:
+
+ans =
+
+  5×8 table
+
+                               SumSq         DF        MeanSq       F         pValue        pValueGG      pValueHF     pValueLB
+                               ______    __________    _______    ______    ___________    __________    __________    ________
+
+    (Intercept):Time           184.31           599     0.3077     1.846     1.6803e-32       0.01649      0.014948      0.1749
+    intensity:Time             446.17           599    0.74485    4.4687     1.086e-257    1.1139e-09    5.3612e-10    0.035049
+    response:Time              441.48           599    0.73702    4.4217    5.3966e-253    1.5521e-09    7.5696e-10    0.036017
+    intensity:response:Time    155.69           599    0.25992    1.5594     4.8005e-17      0.062733      0.059488     0.21238
+    Error(Time)                 46826    2.8093e+05    0.16668                                                                 
+
+hit and miss s1 by stimulus strength:
+
+ans =
+
+  5×8 table
+
+                               SumSq         DF        MeanSq       F         pValue        pValueGG      pValueHF     pValueLB 
+                               ______    __________    _______    ______    ___________    __________    __________    _________
+
+    (Intercept):Time           289.41           599    0.48316    2.9271    4.2988e-113    0.00013027    0.00010351     0.087768
+    intensity:Time             704.86           599     1.1767    7.1288              0    1.3596e-15    4.6855e-16    0.0078487
+    response:Time              193.67           599    0.32332    1.9587     1.7765e-39      0.015053      0.013839      0.16231
+    intensity:response:Time    121.54           599     0.2029    1.2292     0.00010247       0.24177       0.23932      0.26813
+    Error(Time)                 46372    2.8093e+05    0.16507                                                                  
+
+Figure 4c:
+
+mdl = 
+
+
+Linear regression model:
+    y ~ 1 + x1
+
+Estimated Coefficients:
+                   Estimate       SE         tStat       pValue  
+                   ________    _________    _______    __________
+
+    (Intercept)      1.7162    0.0088369      194.2             0
+    x1             -0.34815     0.011265    -30.906    1.907e-195
+
+
+Number of observations: 6323, Error degrees of freedom: 6321
+Root Mean Squared Error: 0.703
+R-squared: 0.131,  Adjusted R-Squared: 0.131
+F-statistic vs. constant model: 955, p-value = 1.91e-195
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                                  FStat      DF1    DF2     pValue    
+    {'(Intercept)'               }         224.37    1      6295    7.2429e-50
+    {'Baseline'                  }         129.43    1      6295    1.0651e-29
+    {'Stimulus'                  }         4.5697    6      6295    0.00012357
+    {'Response'                  }         17.935    1      6295    2.3178e-05
+    {'Baseline:Stimulus'         }         1.8285    6      6295      0.089459
+    {'Baseline:Response'         }          1.313    1      6295       0.25189
+    {'Stimulus:Response'         }        0.63279    6      6295       0.70415
+    {'Baseline:Stimulus:Response'}         2.7273    6      6295      0.012004
+
+Figure 4d:
+Increase in S1 NE response LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue     
+    {'(Intercept)'}        260.54    1      6232     1.8929e-57
+    {'Response'   }        557.92    1      6232    3.2778e-118
+
+Increase in S1 NE outcome LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue     
+    {'(Intercept)'}        431.55    1      6230     9.7927e-93
+    {'Outcome'    }        190.61    3      6230    2.9047e-118
+
+Figure 4e:
+RT by baseline S1 NE LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue    
+    {'(Intercept)'}         187.4    1      3247    1.6314e-41
+    {'Baseline'   }        9.9456    4      3247    5.3549e-08
+
+Figure 4f:
+
+ans =
+
+  3×8 table
+
+                         SumSq      DF      MeanSq        F         pValue        pValueGG       pValueHF       pValueLB 
+                        _______    ____    ________    _______    ___________    ___________    ___________    __________
+
+    (Intercept):Time     50.124       6       8.354     161.13    3.2686e-148    1.1535e-106    2.3741e-109    3.9013e-27
+    tercile:Time        0.25664       6    0.042774    0.82499        0.55051        0.51626        0.51884       0.36488
+    Error(Time)          59.107    1140    0.051848                                                                      
+
+Figure 4g:
+Baseline by response LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat      DF1    DF2     pValue  
+    {'(Intercept)'}         2.8502    1      6232    0.091412
+    {'Response'   }        0.42722    1      6232     0.51338
+
+Baseline by outcome LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat      DF1    DF2     pValue  
+    {'(Intercept)'}        0.46561    1      6230     0.49504
+    {'Outcome'    }         2.6057    3      6230    0.050044
+
+Figure 4i:
 
 mdl = 
 
@@ -36,535 +383,204 @@ Estimated Coefficients:
                    Estimate       SE         tStat       pValue   
                    ________    _________    _______    ___________
 
-    (Intercept)       0.373    0.0089661     41.601    4.8222e-304
-    x1             -0.36084     0.010359    -34.832    2.0835e-226
+    (Intercept)     1.7093     0.0097508     175.29              0
+    x1             -0.4014      0.012319    -32.582    2.1365e-215
 
 
-Number of observations: 3276, Error degrees of freedom: 3274
-Root Mean Squared Error: 0.495
-R-squared: 0.27,  Adjusted R-Squared: 0.27
-F-statistic vs. constant model: 1.21e+03, p-value = 2.08e-226
-Figure 2f:
-Pupil baseline vs dilation pearsons correlation coefficient:
-Outcome anova: p = 9.348998e-03
-Responded vs. Withheld, Wilcoxon signed-rank: p = 3.763181e-04
-Figure 2g:
-Pupil baseline:
-Outcome anova: p = 1.209715e-09
-Responded vs. Withheld, Wilcoxon signed-rank: p = 2.131197e-07
-Figure 2h:
-Pupil dilations:
-Outcome anova: p = 6.103717e-12
-Responded vs. Withheld, Wilcoxon signed-rank: p = 1.309054e-08
-Figure 2i:
-Pupil area vs reaction time:
-One way anova: p = 7.630358e-01
-Figure 2j:
-Figure 2k:
-Figure 3:
-Figure 3b:
-Figure 3c:
-Figure 3d:
-NE mPFC x S1 Outcome anova: p = 2.646066e-01
-Responded vs. Withheld, Wilcoxon signed-rank: p = 2.620095e-02
-Correct vs. Incorrect, Wilcoxon signed-rank: p = 4.720177e-02
-Figure 4:
-Figure 4a:
-Figure 4b:
-Figure 4c:
-S1 NE baseline:
-Outcome anova: p = 1.340601e-01
-Responded vs. Withheld, Wilcoxon signed-rank: p = 8.539939e-01
-Figure 4d:
-S1 NE stim induced increase:
-Outcome anova: p = 3.024798e-12
-Responded vs. Withheld, Wilcoxon signed-rank: p = 1.422358e-09
-Figure 4e:
-Reaction Time by Baseline NE S1:
-One way anova: p = 3.882734e-01
-Figure 4f:
-Figure 4g:
-Figure 4h:
-Figure 4i:
-mPFC NE baseline:
-Outcome anova: p = 1.478739e-01
-Responded vs. Withheld, Wilcoxon signed-rank: p = 6.015081e-01
+Number of observations: 6323, Error degrees of freedom: 6321
+Root Mean Squared Error: 0.775
+R-squared: 0.144,  Adjusted R-Squared: 0.144
+F-statistic vs. constant model: 1.06e+03, p-value = 2.14e-215
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                                  FStat      DF1    DF2     pValue    
+    {'(Intercept)'               }         110.17    1      6295    1.4631e-25
+    {'Baseline'                  }         173.85    1      6295    3.5185e-39
+    {'Stimulus'                  }         5.2371    6      6295     2.169e-05
+    {'Response'                  }         47.753    1      6295    5.3098e-12
+    {'Baseline:Stimulus'         }         0.6489    6      6295        0.6911
+    {'Baseline:Response'         }        0.10206    1      6295       0.74938
+    {'Stimulus:Response'         }         1.2259    6      6295       0.28942
+    {'Baseline:Stimulus:Response'}        0.63441    6      6295       0.70284
+
 Figure 4j:
-S1 NE stim induced increase:
-Outcome anova: p = 7.161965e-12
-Responded vs. Withheld, Wilcoxon signed-rank: p = 5.095113e-09
+Increase in mPFC NE response LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue     
+    {'(Intercept)'}        109.47    1      6232     2.0763e-25
+    {'Response'   }        847.12    1      6232    9.7339e-175
+
+Increase in mPFC NE outcome LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue     
+    {'(Intercept)'}        218.48    1      6230     1.2858e-48
+    {'Outcome'    }        282.59    3      6230    5.5238e-172
+
 Figure 4k:
-Reaction Time by Baseline NE mPFC:
-One way anova: p = 9.180368e-01
+RT by baseline PFC NE LME
+
+ans = 
+
+
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
+
+    Term                   FStat     DF1    DF2     pValue    
+    {'(Intercept)'}        195.48    1      3247    3.5352e-43
+    {'Baseline'   }        1.2837    4      3247         0.274
+
 Figure 4l:
+
+ans =
+
+  3×8 table
+
+                         SumSq      DF      MeanSq        F         pValue        pValueGG      pValueHF      pValueLB 
+                        _______    ____    ________    _______    ___________    __________    __________    __________
+
+    (Intercept):Time     45.425       6      7.5708     142.56    5.3997e-135    4.6777e-88    4.9395e-90    6.5715e-25
+    tercile:Time        0.30173       6    0.050289    0.94697        0.46025       0.43397       0.43541       0.33172
+    Error(Time)          60.858    1146    0.053105                                                                    
+
 Figure 5:
+Figure 5a:
+S1 Hit:
+
+ans =
+
+  3×8 table
+
+                        SumSq         DF        MeanSq       F       pValue     pValueGG      pValueHF      pValueLB 
+                        ______    __________    _______    ______    ______    __________    __________    __________
+
+    (Intercept):Time    2031.1           718     2.8288    26.046       0      1.7929e-48    1.1633e-50    6.7618e-07
+    quintile:Time       1476.2           718      2.056    18.931       0      1.4889e-34     4.398e-36    2.0031e-05
+    Error(Time)          18793    1.7304e+05    0.10861                                                              
+
+mPFC Hit:
+
+ans =
+
+  3×8 table
+
+                        SumSq         DF        MeanSq       F       pValue     pValueGG      pValueHF      pValueLB 
+                        ______    __________    _______    ______    ______    __________    __________    __________
+
+    (Intercept):Time    1764.4           718     2.4574     20.14       0      5.1316e-41    4.5512e-43    1.1155e-05
+    quintile:Time       1328.4           718     1.8501    15.163       0      4.7967e-30    1.6139e-31    0.00012776
+    Error(Time)          21114    1.7304e+05    0.12202                                                              
+
+S1 Miss:
+
+ans =
+
+  3×8 table
+
+                        SumSq         DF        MeanSq       F       pValue     pValueGG      pValueHF      pValueLB 
+                        ______    __________    _______    ______    ______    __________    __________    __________
+
+    (Intercept):Time    708.73           718    0.98709    7.7651       0      3.6717e-20    8.2673e-22     0.0057919
+    quintile:Time       1359.3           718     1.8932    14.893       0      3.9533e-44    5.9432e-48    0.00014952
+    Error(Time)          20080    1.5796e+05    0.12712                                                              
+
+mPFC Miss:
+
+ans =
+
+  3×8 table
+
+                        SumSq         DF        MeanSq       F       pValue     pValueGG      pValueHF      pValueLB 
+                        ______    __________    _______    ______    ______    __________    __________    __________
+
+    (Intercept):Time    909.76           718     1.2671    11.077       0      2.4934e-41    2.9884e-46     0.0010243
+    quintile:Time       1262.9           718     1.7589    15.377       0       6.313e-61    2.6074e-68    0.00011764
+    Error(Time)          18068    1.5796e+05    0.11438                                                              
+
+S1 CR:
+
+ans =
+
+  3×8 table
+
+                        SumSq         DF        MeanSq       F       pValue     pValueGG      pValueHF     pValueLB 
+                        ______    __________    _______    ______    ______    __________    __________    _________
+
+    (Intercept):Time    1055.6           718     1.4701    5.9223       0      2.7967e-16    5.5007e-18     0.015824
+    quintile:Time       1631.4           718     2.2721     9.153       0      1.1297e-28    7.5237e-32    0.0028074
+    Error(Time)          35825    1.4432e+05    0.24824                                                             
+
+mPFC CR:
+
+ans =
+
+  3×8 table
+
+                        SumSq         DF        MeanSq       F       pValue     pValueGG      pValueHF     pValueLB
+                        ______    __________    _______    ______    ______    __________    __________    ________
+
+    (Intercept):Time    850.85           718      1.185    5.0659       0      9.1024e-16    7.4619e-18    0.025484
+    quintile:Time       1069.2           718     1.4891    6.3658       0      1.0057e-21    1.0568e-24    0.012409
+    Error(Time)          33759    1.4432e+05    0.23392                                                            
+
+S1 FA:
+
+ans =
+
+  3×8 table
+
+                        SumSq      DF      MeanSq       F         pValue      pValueGG     pValueHF     pValueLB
+                        ______    _____    _______    ______    __________    _________    _________    ________
+
+    (Intercept):Time    625.99      718    0.87185    2.0466    3.9162e-52    0.0071853    0.0010483    0.15931 
+    quintile:Time       399.12      718    0.55588    1.3049    8.7175e-08      0.18016      0.13237    0.25924 
+    Error(Time)          14070    33028    0.42601                                                              
+
+mPFC FA:
+
+ans =
+
+  3×8 table
+
+                        SumSq      DF      MeanSq       F         pValue      pValueGG      pValueHF     pValueLB
+                        ______    _____    _______    ______    __________    _________    __________    ________
+
+    (Intercept):Time    702.89      718    0.97896    2.2328    5.6888e-67    0.0027478    0.00023297    0.14194 
+    quintile:Time        415.1      718    0.57813    1.3186    2.6814e-08      0.17133       0.12303    0.25678 
+    Error(Time)          14481    33028    0.43845                                                               
+
 Figure 5b:
-Figure 5c:
-Figure 5d:
-Trials per state/session:
-One way anova: p = 3.007588e-02
-Figure 5e:
-Reaction time by state:
-One way anova: p = 5.694826e-01
-Figure 5f:
-Criterion by state:
-One way anova: p = 7.293561e-02
-Figure 6:
-Figure 6a:
-Figure 6b:
-Baseline Pupil Diameter:
-Hit - one way anova: p = 1.932319e-02
-Miss - one way anova: p = 2.292065e-03
-CR - one way anova: p = 1.870149e-03
-FA - one way anova: p = 7.760807e-03
-Figure 6c:
-Pupil Dilation:
-Hit - one way anova: p = 3.144396e-01
-Miss - one way anova: p = 2.673812e-01
-CR - one way anova: p = 6.705265e-01
-FA - one way anova: p = 4.903710e-03
-Figure 7:
-Figure 7a:
-Figure 7b:
-S1 NE Baseline:
-Hit - one way anova: p = 1.273121e-01
-Miss - one way anova: p = 1.374755e-01
-CR - one way anova: p = 1.230440e-01
-FA - one way anova: p = 3.819298e-01
-Figure 7c:
-S1 NE Increase:
-Hit - one way anova: p = 6.192882e-01
-Miss - one way anova: p = 9.599444e-02
-CR - one way anova: p = 1.141679e-01
-FA - one way anova: p = 7.435748e-02
-Figure 7d:
-Figure 7e:
-mPFC NE Baseline:
-Hit - one way anova: p = 5.038694e-01
-Miss - one way anova: p = 9.466895e-01
-CR - one way anova: p = 7.266781e-01
-FA - one way anova: p = 2.156482e-01
-Figure 7f:
-mPFC NE Increase:
-Hit - one way anova: p = 1.811211e-01
-Miss - one way anova: p = 9.204178e-01
-CR - one way anova: p = 3.081894e-01
-FA - one way anova: p = 4.744092e-01
-Figure 8:
-Figure 8a:
-Figure 8b:
-Xcorr by state:
-one way anova: p = 6.099767e-04
-addpath(genpath('./'))
-Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
-data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
-animals = fetchAnimals(data);
-data(cellfun(@isempty, data.photometry_ch1),:) = [];
-tbounds = [-0.5, 6.0];
-alignTo = 'stimulus';
-ssd_version = 'v3';
-kstates = [2,3,4,5];
-data_versions = {'last_trial_behavior_no_bias', ... 
-    'last_trial_behavior_drop_stim_no_bias', ...
-    'just_stim', ...
-    'spontaneous_pupil_stim_v2', ...
-     };
-data_version = 'spontaneous_pupil_stim_v2';
-k = 4;
-psychver = 'byanimal';
-fig7b(data, k, data_version, ssd_version, psychver, animals)
-S1 NE Baseline:
-Hit - one way anova: p = 1.273121e-01
-Miss - one way anova: p = 1.374755e-01
-CR - one way anova: p = 1.230440e-01
-FA - one way anova: p = 3.819298e-01
-fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
-[Warning: Columns of X are linearly dependent to within machine precision.
-Using only the first 272 components to compute TSQUARED.] 
-[> In pca>localTSquared (line 515)
-In pca (line 361)
-In fig7c_alt>lumpByResponseProb (line 90)
-In fig7c_alt (line 2)] 
-NE S1 PC Comparisons
+Baseline S1 NE by baseline pupil LME
 
-Hit:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 5.679527e-01
-State 0 vs state 2:
-Mann Whitney: p = 5.079300e-01
-State 0 vs state 3:
-Mann Whitney: p = 6.573495e-02
-State 1 vs state 2:
-Mann Whitney: p = 8.659856e-01
-State 1 vs state 3:
-Mann Whitney: p = 1.483884e-02
-State 2 vs state 3:
-Mann Whitney: p = 1.926406e-03
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 1.540925e-02
-State 0 vs state 2:
-Mann Whitney: p = 6.049741e-02
-State 0 vs state 3:
-Mann Whitney: p = 2.992124e-01
-State 1 vs state 2:
-Mann Whitney: p = 3.527812e-01
-State 1 vs state 3:
-Mann Whitney: p = 1.421635e-02
-State 2 vs state 3:
-Mann Whitney: p = 3.882053e-02
+ans = 
 
-Miss:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 4.948266e-02
-State 0 vs state 2:
-Mann Whitney: p = 9.296466e-01
-State 0 vs state 3:
-Mann Whitney: p = 7.839441e-03
-State 1 vs state 2:
-Mann Whitney: p = 3.182683e-02
-State 1 vs state 3:
-Mann Whitney: p = 7.057901e-01
-State 2 vs state 3:
-Mann Whitney: p = 3.493202e-03
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 3.545552e-01
-State 0 vs state 2:
-Mann Whitney: p = 5.664908e-05
-State 0 vs state 3:
-Mann Whitney: p = 5.731878e-01
-State 1 vs state 2:
-Mann Whitney: p = 6.278904e-03
-State 1 vs state 3:
-Mann Whitney: p = 5.853202e-01
-State 2 vs state 3:
-Mann Whitney: p = 2.243782e-04
 
-CR:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 2.746205e-01
-State 0 vs state 2:
-Mann Whitney: p = 9.852496e-01
-State 0 vs state 3:
-Mann Whitney: p = 5.967875e-02
-State 1 vs state 2:
-Mann Whitney: p = 1.763500e-01
-State 1 vs state 3:
-Mann Whitney: p = 5.701579e-01
-State 2 vs state 3:
-Mann Whitney: p = 1.577926e-02
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 1.908574e-02
-State 0 vs state 2:
-Mann Whitney: p = 2.444675e-03
-State 0 vs state 3:
-Mann Whitney: p = 8.342609e-01
-State 1 vs state 2:
-Mann Whitney: p = 7.774860e-01
-State 1 vs state 3:
-Mann Whitney: p = 1.496798e-03
-State 2 vs state 3:
-Mann Whitney: p = 2.751996e-05
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
 
-FA:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 8.857143e-01
-State 0 vs state 2:
-Mann Whitney: p = 1.483354e-01
-State 0 vs state 3:
-Mann Whitney: p = 7.035589e-01
-State 1 vs state 2:
-Mann Whitney: p = 2.824591e-01
-State 1 vs state 3:
-Mann Whitney: p = 9.214134e-01
-State 2 vs state 3:
-Mann Whitney: p = 6.150357e-02
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 4.857143e-01
-State 0 vs state 2:
-Mann Whitney: p = 2.824591e-01
-State 0 vs state 3:
-Mann Whitney: p = 1.629426e-01
-State 1 vs state 2:
-Mann Whitney: p = 4.363852e-01
-State 1 vs state 3:
-Mann Whitney: p = 7.035589e-01
-State 2 vs state 3:
-Mann Whitney: p = 3.414363e-01
-close all
-fig7c(data, k, data_version, ssd_version, psychver, animals)
-S1 NE Increase:
-Hit - one way anova: p = 6.192882e-01
-Miss - one way anova: p = 9.599444e-02
-CR - one way anova: p = 1.141679e-01
-FA - one way anova: p = 7.435748e-02
-close all
-fig7e(data, k, data_version, ssd_version, psychver, animals)
-mPFC NE Baseline:
-Hit - one way anova: p = 5.038694e-01
-Miss - one way anova: p = 9.466895e-01
-CR - one way anova: p = 7.266781e-01
-FA - one way anova: p = 2.156482e-01
-close all
-fig7c_alt(data, k, data_version, ssd_version, psychver, animals)
-[Warning: Columns of X are linearly dependent to within machine precision.
-Using only the first 272 components to compute TSQUARED.] 
-[> In pca>localTSquared (line 515)
-In pca (line 361)
-In fig7c_alt>lumpByResponseProb (line 90)
-In fig7c_alt (line 2)] 
-NE S1 PC Comparisons
+    Term                   FStat      DF1    DF2     pValue   
+    {'(Intercept)'}        0.38772    1      6319      0.53352
+    {'Ptile'      }         15.328    3      6319    6.195e-10
 
-Hit:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 5.679527e-01
-State 0 vs state 2:
-Mann Whitney: p = 5.079300e-01
-State 0 vs state 3:
-Mann Whitney: p = 6.573495e-02
-State 1 vs state 2:
-Mann Whitney: p = 8.659856e-01
-State 1 vs state 3:
-Mann Whitney: p = 1.483884e-02
-State 2 vs state 3:
-Mann Whitney: p = 1.926406e-03
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 1.540925e-02
-State 0 vs state 2:
-Mann Whitney: p = 6.049741e-02
-State 0 vs state 3:
-Mann Whitney: p = 2.992124e-01
-State 1 vs state 2:
-Mann Whitney: p = 3.527812e-01
-State 1 vs state 3:
-Mann Whitney: p = 1.421635e-02
-State 2 vs state 3:
-Mann Whitney: p = 3.882053e-02
+Baseline PFC NE by baseline pupil LME
 
-Miss:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 4.948266e-02
-State 0 vs state 2:
-Mann Whitney: p = 9.296466e-01
-State 0 vs state 3:
-Mann Whitney: p = 7.839441e-03
-State 1 vs state 2:
-Mann Whitney: p = 3.182683e-02
-State 1 vs state 3:
-Mann Whitney: p = 7.057901e-01
-State 2 vs state 3:
-Mann Whitney: p = 3.493202e-03
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 3.545552e-01
-State 0 vs state 2:
-Mann Whitney: p = 5.664908e-05
-State 0 vs state 3:
-Mann Whitney: p = 5.731878e-01
-State 1 vs state 2:
-Mann Whitney: p = 6.278904e-03
-State 1 vs state 3:
-Mann Whitney: p = 5.853202e-01
-State 2 vs state 3:
-Mann Whitney: p = 2.243782e-04
+ans = 
 
-CR:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 2.746205e-01
-State 0 vs state 2:
-Mann Whitney: p = 9.852496e-01
-State 0 vs state 3:
-Mann Whitney: p = 5.967875e-02
-State 1 vs state 2:
-Mann Whitney: p = 1.763500e-01
-State 1 vs state 3:
-Mann Whitney: p = 5.701579e-01
-State 2 vs state 3:
-Mann Whitney: p = 1.577926e-02
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 1.908574e-02
-State 0 vs state 2:
-Mann Whitney: p = 2.444675e-03
-State 0 vs state 3:
-Mann Whitney: p = 8.342609e-01
-State 1 vs state 2:
-Mann Whitney: p = 7.774860e-01
-State 1 vs state 3:
-Mann Whitney: p = 1.496798e-03
-State 2 vs state 3:
-Mann Whitney: p = 2.751996e-05
 
-FA:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 8.857143e-01
-State 0 vs state 2:
-Mann Whitney: p = 1.483354e-01
-State 0 vs state 3:
-Mann Whitney: p = 7.035589e-01
-State 1 vs state 2:
-Mann Whitney: p = 2.824591e-01
-State 1 vs state 3:
-Mann Whitney: p = 9.214134e-01
-State 2 vs state 3:
-Mann Whitney: p = 6.150357e-02
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 4.857143e-01
-State 0 vs state 2:
-Mann Whitney: p = 2.824591e-01
-State 0 vs state 3:
-Mann Whitney: p = 1.629426e-01
-State 1 vs state 2:
-Mann Whitney: p = 4.363852e-01
-State 1 vs state 3:
-Mann Whitney: p = 7.035589e-01
-State 2 vs state 3:
-Mann Whitney: p = 3.414363e-01
-close all
-fig7f(data, k, data_version, ssd_version, psychver, animals)
-mPFC NE Increase:
-Hit - one way anova: p = 1.811211e-01
-Miss - one way anova: p = 9.204178e-01
-CR - one way anova: p = 3.081894e-01
-FA - one way anova: p = 4.744092e-01
-close all
-fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
-[Warning: Columns of X are linearly dependent to within machine precision.
-Using only the first 271 components to compute TSQUARED.] 
-[> In pca>localTSquared (line 515)
-In pca (line 361)
-In fig7f_alt>lumpByResponseProb (line 90)
-In fig7f_alt (line 2)] 
-fig7f_alt(data, k, data_version, ssd_version, psychver, animals)
-[Warning: Columns of X are linearly dependent to within machine precision.
-Using only the first 271 components to compute TSQUARED.] 
-[> In pca>localTSquared (line 515)
-In pca (line 361)
-In fig7f_alt>lumpByResponseProb (line 90)
-In fig7f_alt (line 2)] 
-NE S1 PC Comparisons
+    ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
 
-Hit:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 1.831933e-01
-State 0 vs state 2:
-Mann Whitney: p = 1.273192e-01
-State 0 vs state 3:
-Mann Whitney: p = 6.962866e-01
-State 1 vs state 2:
-Mann Whitney: p = 7.565684e-01
-State 1 vs state 3:
-Mann Whitney: p = 2.782565e-02
-State 2 vs state 3:
-Mann Whitney: p = 4.293928e-04
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 5.589975e-03
-State 0 vs state 2:
-Mann Whitney: p = 8.831637e-07
-State 0 vs state 3:
-Mann Whitney: p = 1.701142e-08
-State 1 vs state 2:
-Mann Whitney: p = 9.992329e-05
-State 1 vs state 3:
-Mann Whitney: p = 1.675514e-07
-State 2 vs state 3:
-Mann Whitney: p = 1.723083e-01
+    Term                   FStat        DF1    DF2     pValue    
+    {'(Intercept)'}        0.0052629    1      6319       0.94217
+    {'Ptile'      }           23.528    3      6319    3.8735e-15
 
-Miss:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 4.301588e-01
-State 0 vs state 2:
-Mann Whitney: p = 5.814742e-01
-State 0 vs state 3:
-Mann Whitney: p = 2.117248e-01
-State 1 vs state 2:
-Mann Whitney: p = 6.565400e-01
-State 1 vs state 3:
-Mann Whitney: p = 9.702136e-01
-State 2 vs state 3:
-Mann Whitney: p = 4.578140e-01
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 8.492201e-01
-State 0 vs state 2:
-Mann Whitney: p = 2.572133e-01
-State 0 vs state 3:
-Mann Whitney: p = 2.505517e-01
-State 1 vs state 2:
-Mann Whitney: p = 2.352877e-01
-State 1 vs state 3:
-Mann Whitney: p = 3.099019e-01
-State 2 vs state 3:
-Mann Whitney: p = 5.820096e-03
-
-CR:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 6.424067e-01
-State 0 vs state 2:
-Mann Whitney: p = 5.283663e-01
-State 0 vs state 3:
-Mann Whitney: p = 9.608405e-02
-State 1 vs state 2:
-Mann Whitney: p = 8.713012e-01
-State 1 vs state 3:
-Mann Whitney: p = 3.185612e-01
-State 2 vs state 3:
-Mann Whitney: p = 1.830202e-01
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 9.611746e-02
-State 0 vs state 2:
-Mann Whitney: p = 1.067242e-02
-State 0 vs state 3:
-Mann Whitney: p = 8.068907e-01
-State 1 vs state 2:
-Mann Whitney: p = 6.434548e-01
-State 1 vs state 3:
-Mann Whitney: p = 1.975091e-02
-State 2 vs state 3:
-Mann Whitney: p = 4.265172e-04
-
-FA:
-First dimension:
-State 0 vs state 1:
-Mann Whitney: p = 2.000000e-01
-State 0 vs state 2:
-Mann Whitney: p = 2.377100e-02
-State 0 vs state 3:
-Mann Whitney: p = 4.690421e-02
-State 1 vs state 2:
-Mann Whitney: p = 1.702780e-01
-State 1 vs state 3:
-Mann Whitney: p = 3.746043e-01
-State 2 vs state 3:
-Mann Whitney: p = 1.931742e-01
-Second dimension:
-State 0 vs state 1:
-Mann Whitney: p = 3.428571e-01
-State 0 vs state 2:
-Mann Whitney: p = 4.949407e-02
-State 0 vs state 3:
-Mann Whitney: p = 9.126679e-03
-State 1 vs state 2:
-Mann Whitney: p = 3.541542e-01
-State 1 vs state 3:
-Mann Whitney: p = 7.888734e-01
-State 2 vs state 3:
-Mann Whitney: p = 4.307876e-02

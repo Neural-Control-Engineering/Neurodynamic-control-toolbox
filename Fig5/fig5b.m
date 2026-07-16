@@ -1,4 +1,4 @@
-function fig5btrial(data, tbounds, alignTo, ver)
+function fig5b(data, tbounds, alignTo, ver)
     ptiles = [20,40,60,80,100];
     low = prctile(data.pupil_base_before_stimulus, 0);
     cols = distinguishable_colors(length(ptiles));
@@ -88,23 +88,28 @@ function fig5btrial(data, tbounds, alignTo, ver)
         'Baseline ~ Ptile + (1|Session) + (1|Subject)');
     anova(lme)
 
-    figure(); hold on;
+    fig = figure('Position', [1 1 477 658]);
+    tl = tiledlayout(2,1);
+    axs(1) = nexttile; hold on;
     for i = 1:length(s1_baseline)
         bar(i, nanmean(s1_baseline{i}), 'FaceColor', cols(i,:))
     end
     errorbar(1:length(s1_baseline), cellfun(@nanmean, s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
     xticks(1:5)
-    xlabel('Baseline Pupil Size Quintile', 'FontSize', 16)
-    ylabel('Baseline S1 NE (z-score)', 'FontSize', 16)
+    title('All Trials', 'FontSize', 16)
+    ylabel('Baseline NE in S1 (z-score)', 'FontSize', 16)
 
-    figure(); hold on;
+    axs(2) = nexttile; hold on;
     for i = 1:length(pfc_baseline)
         bar(i, nanmean(pfc_baseline{i}), 'FaceColor', cols(i,:))
     end
     errorbar(1:length(pfc_baseline), cellfun(@nanmean, pfc_baseline), cellfun(@ste, pfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
     xticks(1:5)
-    xlabel('Baseline Pupil Size Quintile', 'FontSize', 16)
-    ylabel('Baseline PFC NE (z-score)', 'FontSize', 16)
+    ylabel('Baseline NE in PFC (z-score)', 'FontSize', 16)
+    xlabel(tl, 'Baseline Pupil Size Quintile', 'FontSize', 16)
+    unifyYLimits(axs)
 
+    saveas(fig, 'Figures/fig5b.fig')
+    saveas(fig, 'Figures/fig5b.svg')
     
 end
