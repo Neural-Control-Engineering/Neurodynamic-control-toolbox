@@ -87,7 +87,7 @@ function fig2e(data, tbounds, alignTo)
 
     fprintf('Dilation by stimulus, response, baseline LME\n')
     lme = fitlme(lmeTbl, ...
-        'Dilation ~ Stimulus*Response*Baseline + (1|Session) + (1|Subject)');
+        'Dilation ~ Stimulus*Response*Baseline + (1|Session) + (1|Subject)')
     
     anova(lme)
 

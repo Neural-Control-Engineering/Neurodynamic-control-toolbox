@@ -77,7 +77,7 @@ function fig4c(data, tbounds, alignTo, ver)
     lmeTbl.Subject  = removecats(lmeTbl.Subject);
 
     lme = fitlme(lmeTbl, ...
-        'Dilation ~ Stimulus*Response*Baseline + (1|Session) + (1|Subject)');
+        'Dilation ~ Stimulus*Response*Baseline + (1|Session) + (1|Subject)')
     
     anova(lme)
 

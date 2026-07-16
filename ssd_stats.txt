@@ -107,6 +107,69 @@ R-squared: 0.0306,  Adjusted R-Squared: 0.0305
 F-statistic vs. constant model: 200, p-value = 1.17e-44
 Dilation by stimulus, response, baseline LME
 
+lme = 
+
+
+Linear mixed-effects model fit by ML
+
+Model information:
+    Number of observations            6323
+    Fixed effects coefficients          28
+    Random effects coefficients         53
+    Covariance parameters                3
+
+Formula:
+    Dilation ~ 1 + Baseline*Stimulus + Baseline*Response + Stimulus*Response + Baseline:Stimulus:Response + (1 | Session) + (1 | Subject)
+
+Model fit statistics:
+    AIC      BIC      LogLikelihood    Deviance
+    13440    13649    -6689.1          13378   
+
+Fixed effects coefficients (95% CIs):
+    Name                                         Estimate     SE          tStat        DF      pValue        Lower         Upper     
+    {'(Intercept)'                      }          0.61447    0.099807       6.1565    6295    7.8932e-10       0.41881       0.81012
+    {'Baseline'                         }        -0.054296    0.025014      -2.1707    6295      0.029994      -0.10333    -0.0052608
+    {'Stimulus_0.05'                    }         0.036623    0.035352       1.0359    6295       0.30027     -0.032679       0.10593
+    {'Stimulus_0.1'                     }         0.071414    0.037794       1.8896    6295      0.058861    -0.0026746        0.1455
+    {'Stimulus_0.2'                     }          0.09135    0.043103       2.1193    6295        0.0341     0.0068535       0.17585
+    {'Stimulus_0.5'                     }           0.3875     0.06217        6.233    6295    4.8717e-10       0.26563       0.50938
+    {'Stimulus_1'                       }           0.4387    0.075086       5.8427    6295    5.3931e-09       0.29151        0.5859
+    {'Stimulus_2'                       }          0.55493    0.083503       6.6457    6295    3.2714e-11       0.39124       0.71863
+    {'Response_1'                       }          0.44667    0.082328       5.4255    6295    5.9942e-08       0.28528       0.60806
+    {'Baseline:Stimulus_0.05'           }         0.041928    0.034704       1.2082    6295       0.22703     -0.026103       0.10996
+    {'Baseline:Stimulus_0.1'            }         0.069045    0.035939       1.9212    6295      0.054756     -0.001408        0.1395
+    {'Baseline:Stimulus_0.2'            }         0.065088     0.04127       1.5771    6295       0.11481     -0.015815       0.14599
+    {'Baseline:Stimulus_0.5'            }        0.0072127    0.045979      0.15687    6295       0.87535     -0.082923      0.097348
+    {'Baseline:Stimulus_1'              }        -0.023535    0.046875     -0.50209    6295       0.61562      -0.11543      0.068355
+    {'Baseline:Stimulus_2'              }        -0.035929    0.056703     -0.63364    6295       0.52634      -0.14709      0.075228
+    {'Baseline:Response_1'              }         -0.11101     0.10257      -1.0823    6295       0.27916      -0.31208      0.090059
+    {'Stimulus_0.05:Response_1'         }        -0.011297     0.11616    -0.097253    6295       0.92253      -0.23901       0.21642
+    {'Stimulus_0.1:Response_1'          }        -0.063067    0.096938     -0.65059    6295       0.51534       -0.2531       0.12697
+    {'Stimulus_0.2:Response_1'          }        -0.050518    0.094339      -0.5355    6295       0.59233      -0.23545       0.13442
+    {'Stimulus_0.5:Response_1'          }         -0.28515     0.10296      -2.7694    6295     0.0056327        -0.487     -0.083303
+    {'Stimulus_1:Response_1'            }         -0.29369     0.11102      -2.6454    6295     0.0081801      -0.51132     -0.076053
+    {'Stimulus_2:Response_1'            }         -0.31793     0.11674      -2.7235    6295      0.006478      -0.54678     -0.089085
+    {'Baseline:Stimulus_0.05:Response_1'}         -0.18142     0.14881      -1.2192    6295       0.22283      -0.47315        0.1103
+    {'Baseline:Stimulus_0.1:Response_1' }          -0.2423     0.11859      -2.0432    6295       0.04107      -0.47478    -0.0098306
+    {'Baseline:Stimulus_0.2:Response_1' }         -0.16366     0.11406      -1.4348    6295       0.15139      -0.38726      0.059943
+    {'Baseline:Stimulus_0.5:Response_1' }         -0.11571     0.11385      -1.0163    6295       0.30953      -0.33889       0.10748
+    {'Baseline:Stimulus_1:Response_1'   }         -0.07334     0.11359     -0.64567    6295       0.51852      -0.29601       0.14933
+    {'Baseline:Stimulus_2:Response_1'   }         -0.10914     0.11787     -0.92594    6295       0.35451      -0.34021       0.12193
+
+Random effects covariance parameters (95% CIs):
+Group: Session (49 Levels)
+    Name1                  Name2                  Type           Estimate    Lower      Upper  
+    {'(Intercept)'}        {'(Intercept)'}        {'std'}        0.19298     0.15348    0.24266
+
+Group: Subject (4 Levels)
+    Name1                  Name2                  Type           Estimate    Lower       Upper  
+    {'(Intercept)'}        {'(Intercept)'}        {'std'}        0.1832      0.083333    0.40273
+
+Group: Error
+    Name               Estimate    Lower      Upper  
+    {'Res Std'}        0.6901      0.67813    0.70228
+
+
 ans = 
 
 
@@ -195,7 +258,7 @@ ans =
     ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
 
     Term                   FStat     DF1    DF2     pValue    
-    {'(Intercept)'}        23.585    1      6232    1.2242e-06
+    {'(Intercept)'}        23.488    1      6232    1.2875e-06
     {'Response'   }        9.1928    1      6232     0.0024397
 
 Correlation by outcome LME
@@ -206,7 +269,7 @@ ans =
     ANOVA MARGINAL TESTS: DFMETHOD = 'RESIDUAL'
 
     Term                   FStat     DF1    DF2     pValue    
-    {'(Intercept)'}        21.765    1      6230    3.1459e-06
+    {'(Intercept)'}        21.675    1      6230    3.2972e-06
     {'Result'     }         3.288    3      6230      0.019821
 
 Figure 4:
@@ -284,6 +347,69 @@ Number of observations: 6323, Error degrees of freedom: 6321
 Root Mean Squared Error: 0.703
 R-squared: 0.131,  Adjusted R-Squared: 0.131
 F-statistic vs. constant model: 955, p-value = 1.91e-195
+
+lme = 
+
+
+Linear mixed-effects model fit by ML
+
+Model information:
+    Number of observations            6323
+    Fixed effects coefficients          28
+    Random effects coefficients         53
+    Covariance parameters                3
+
+Formula:
+    Dilation ~ 1 + Baseline*Stimulus + Baseline*Response + Stimulus*Response + Baseline:Stimulus:Response + (1 | Session) + (1 | Subject)
+
+Model fit statistics:
+    AIC      BIC      LogLikelihood    Deviance
+    11878    12087    -5907.9          11816   
+
+Fixed effects coefficients (95% CIs):
+    Name                                         Estimate     SE          tStat        DF      pValue        Lower         Upper   
+    {'(Intercept)'                      }           1.4182    0.094683       14.979    6295    7.2429e-50        1.2326      1.6039
+    {'Baseline'                         }         -0.31891    0.028032      -11.377    6295    1.0651e-29      -0.37386    -0.26395
+    {'Stimulus_0.05'                    }         0.040167    0.031096       1.2917    6295       0.19651     -0.020792     0.10113
+    {'Stimulus_0.1'                     }         0.060949    0.033358       1.8271    6295      0.067734    -0.0044451     0.12634
+    {'Stimulus_0.2'                     }          0.14425     0.03801        3.795    6295    0.00014903      0.069736     0.21876
+    {'Stimulus_0.5'                     }          0.17552    0.053877       3.2577    6295      0.001129      0.069899     0.28113
+    {'Stimulus_1'                       }          0.16549     0.06325       2.6165    6295      0.008905      0.041502     0.28949
+    {'Stimulus_2'                       }          0.21148     0.07192       2.9405    6295     0.0032885      0.070495     0.35247
+    {'Response_1'                       }          0.27997    0.066108        4.235    6295    2.3178e-05       0.15037     0.40956
+    {'Baseline:Stimulus_0.05'           }        -0.048104    0.039406      -1.2207    6295       0.22224      -0.12535    0.029146
+    {'Baseline:Stimulus_0.1'            }        -0.038363    0.040689     -0.94284    6295        0.3458      -0.11813    0.041402
+    {'Baseline:Stimulus_0.2'            }         0.035857    0.044562      0.80466    6295       0.42105       -0.0515     0.12321
+    {'Baseline:Stimulus_0.5'            }         0.074217    0.058182       1.2756    6295       0.20214     -0.039839     0.18827
+    {'Baseline:Stimulus_1'              }          0.07856    0.062773       1.2515    6295        0.2108     -0.044496     0.20162
+    {'Baseline:Stimulus_2'              }         0.076737    0.077414      0.99126    6295        0.3216      -0.07502     0.22849
+    {'Baseline:Response_1'              }         -0.11217    0.097891      -1.1459    6295       0.25189      -0.30407     0.07973
+    {'Stimulus_0.05:Response_1'         }          0.15238    0.090899       1.6764    6295      0.093717     -0.025813     0.33057
+    {'Stimulus_0.1:Response_1'          }         0.082449    0.078552       1.0496    6295       0.29394      -0.07154     0.23644
+    {'Stimulus_0.2:Response_1'          }         0.068903    0.077077      0.89395    6295       0.37138     -0.082194        0.22
+    {'Stimulus_0.5:Response_1'          }         0.063158     0.08495      0.74348    6295       0.45722      -0.10337     0.22969
+    {'Stimulus_1:Response_1'            }         0.060448    0.091051      0.66389    6295       0.50679      -0.11804     0.23894
+    {'Stimulus_2:Response_1'            }        0.0021077    0.097101     0.021707    6295       0.98268      -0.18824     0.19246
+    {'Baseline:Stimulus_0.05:Response_1'}          0.24007     0.13076        1.836    6295      0.066409     -0.016263      0.4964
+    {'Baseline:Stimulus_0.1:Response_1' }          0.15946     0.11454       1.3921    6295       0.16393     -0.065087     0.38401
+    {'Baseline:Stimulus_0.2:Response_1' }         0.017371     0.10992      0.15803    6295       0.87444      -0.19811     0.23286
+    {'Baseline:Stimulus_0.5:Response_1' }        -0.010931     0.11475    -0.095257    6295       0.92411      -0.23589     0.21402
+    {'Baseline:Stimulus_1:Response_1'   }        -0.091215     0.11649     -0.78303    6295       0.43364      -0.31957     0.13714
+    {'Baseline:Stimulus_2:Response_1'   }        -0.065621     0.12469     -0.52629    6295        0.5987      -0.31005     0.17881
+
+Random effects covariance parameters (95% CIs):
+Group: Session (49 Levels)
+    Name1                  Name2                  Type           Estimate    Lower      Upper  
+    {'(Intercept)'}        {'(Intercept)'}        {'std'}        0.16427     0.13032    0.20706
+
+Group: Subject (4 Levels)
+    Name1                  Name2                  Type           Estimate    Lower       Upper  
+    {'(Intercept)'}        {'(Intercept)'}        {'std'}        0.17653     0.083855    0.37161
+
+Group: Error
+    Name               Estimate    Lower      Upper  
+    {'Res Std'}        0.61002     0.59944    0.62079
+
 
 ans = 
 
@@ -391,6 +517,69 @@ Number of observations: 6323, Error degrees of freedom: 6321
 Root Mean Squared Error: 0.775
 R-squared: 0.144,  Adjusted R-Squared: 0.144
 F-statistic vs. constant model: 1.06e+03, p-value = 2.14e-215
+
+lme = 
+
+
+Linear mixed-effects model fit by ML
+
+Model information:
+    Number of observations            6323
+    Fixed effects coefficients          28
+    Random effects coefficients         53
+    Covariance parameters                3
+
+Formula:
+    Dilation ~ 1 + Baseline*Stimulus + Baseline*Response + Stimulus*Response + Baseline:Stimulus:Response + (1 | Session) + (1 | Subject)
+
+Model fit statistics:
+    AIC      BIC      LogLikelihood    Deviance
+    12721    12931    -6329.7          12659   
+
+Fixed effects coefficients (95% CIs):
+    Name                                         Estimate      SE          tStat        DF      pValue        Lower        Upper   
+    {'(Intercept)'                      }            1.3651     0.13006       10.496    6295    1.4631e-25       1.1101        1.62
+    {'Baseline'                         }          -0.37202    0.028215      -13.185    6295    3.5185e-39     -0.42733    -0.31671
+    {'Stimulus_0.05'                    }         -0.016534    0.033287      -0.4967    6295       0.61942    -0.081787     0.04872
+    {'Stimulus_0.1'                     }          0.094592    0.035817        2.641    6295     0.0082865     0.024379      0.1648
+    {'Stimulus_0.2'                     }          0.034357    0.040831      0.84144    6295       0.40013    -0.045686      0.1144
+    {'Stimulus_0.5'                     }           0.19682    0.057505       3.4227    6295     0.0006239     0.084095     0.30955
+    {'Stimulus_1'                       }           0.24415    0.067764        3.603    6295    0.00031697      0.11131     0.37699
+    {'Stimulus_2'                       }          0.037888    0.078454      0.48294    6295       0.62916     -0.11591     0.19169
+    {'Response_1'                       }           0.48888    0.070746       6.9104    6295    5.3098e-12      0.35019     0.62756
+    {'Baseline:Stimulus_0.05'           }            0.0214    0.040114      0.53347    6295       0.59373    -0.057238     0.10004
+    {'Baseline:Stimulus_0.1'            }           0.05125    0.043556       1.1767    6295       0.23938    -0.034134     0.13663
+    {'Baseline:Stimulus_0.2'            }          0.041272    0.047701      0.86522    6295       0.38695    -0.052238     0.13478
+    {'Baseline:Stimulus_0.5'            }          0.072776    0.061725        1.179    6295       0.23843    -0.048226     0.19378
+    {'Baseline:Stimulus_1'              }          0.095907    0.066674       1.4385    6295       0.15036    -0.034797     0.22661
+    {'Baseline:Stimulus_2'              }         -0.015757    0.078627      -0.2004    6295       0.84117     -0.16989     0.13838
+    {'Baseline:Response_1'              }         -0.034259     0.10724     -0.31947    6295       0.74938     -0.24448     0.17596
+    {'Stimulus_0.05:Response_1'         }          -0.01726    0.097331     -0.17734    6295       0.85925     -0.20806     0.17354
+    {'Stimulus_0.1:Response_1'          }         -0.026865    0.084139     -0.31929    6295       0.74951     -0.19181     0.13808
+    {'Stimulus_0.2:Response_1'          }          0.052275    0.082531      0.63339    6295        0.5265     -0.10951     0.21406
+    {'Stimulus_0.5:Response_1'          }         -0.076468    0.090779     -0.84236    6295       0.39962     -0.25443     0.10149
+    {'Stimulus_1:Response_1'            }          -0.11691    0.097449      -1.1997    6295       0.23029     -0.30795     0.07412
+    {'Stimulus_2:Response_1'            }          0.074867       0.105      0.71305    6295       0.47584     -0.13096     0.28069
+    {'Baseline:Stimulus_0.05:Response_1'}         -0.078292     0.14494     -0.54016    6295       0.58911     -0.36243     0.20584
+    {'Baseline:Stimulus_0.1:Response_1' }        -0.0055502     0.12291    -0.045157    6295       0.96398      -0.2465      0.2354
+    {'Baseline:Stimulus_0.2:Response_1' }         -0.094566     0.12006     -0.78764    6295       0.43094     -0.32993      0.1408
+    {'Baseline:Stimulus_0.5:Response_1' }         -0.095199     0.12473     -0.76326    6295       0.44533     -0.33971     0.14931
+    {'Baseline:Stimulus_1:Response_1'   }           -0.1655       0.127      -1.3032    6295       0.19256     -0.41447    0.083457
+    {'Baseline:Stimulus_2:Response_1'   }         -0.071183     0.13353     -0.53307    6295         0.594     -0.33296     0.19059
+
+Random effects covariance parameters (95% CIs):
+Group: Session (49 Levels)
+    Name1                  Name2                  Type           Estimate    Lower      Upper  
+    {'(Intercept)'}        {'(Intercept)'}        {'std'}        0.1665      0.13204    0.20996
+
+Group: Subject (4 Levels)
+    Name1                  Name2                  Type           Estimate    Lower      Upper 
+    {'(Intercept)'}        {'(Intercept)'}        {'std'}        0.25008     0.12234    0.5112
+
+Group: Error
+    Name               Estimate    Lower      Upper  
+    {'Res Std'}        0.65222     0.64091    0.66373
+
 
 ans = 
 
