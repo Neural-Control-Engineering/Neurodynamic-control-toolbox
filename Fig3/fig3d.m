@@ -79,7 +79,7 @@ function fig3d(data, ver, peak_ver, shuff)
     anova(lmeR)
     % compare(lme, lmeR)
 
-    figure();
+    fig = figure();
     hold on; 
     % for i = 1:length(peaks)
     %     plot((rand(size(peaks{i}))-0.5)*0.1+i, peaks{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', 'w', 'MarkerSize', 2)
@@ -89,5 +89,9 @@ function fig3d(data, ver, peak_ver, shuff)
     xticks(1:4)
     xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm'})
     xtickangle(45)
+    xlabel('Trial Outcome', 'FontSize', 16)
+    ylabel('Correlation Coefficient at 0s Lag', 'FontSize', 16)
+    saveas(fig, 'Figures/fig3d.fig')
+    saveas(fig, 'Figures/fig3d.svg')
     
 end 

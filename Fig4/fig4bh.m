@@ -311,8 +311,8 @@ function fig4bh(data, tbounds, alignTo, ver)
     fprintf('hit and miss s1 by stimulus strength:\n')
     ranova(rm)
 
-    saveas(s1_fig, 'Figures/figb.fig')
-    saveas(s1_fig, 'Figures/figb.svg')
-    saveas(mpfc_fig, 'Figures/figh.fig')
-    saveas(mpfc_fig, 'Figures/figh.svg')
+    saveas(s1_fig, 'Figures/fig4b.fig')
+    saveas(s1_fig, 'Figures/fig4b.svg')
+    saveas(mpfc_fig, 'Figures/fig4h.fig')
+    saveas(mpfc_fig, 'Figures/fig4h.svg')
 end

@@ -71,7 +71,8 @@ function fig2b(data, tbounds, alignTo)
     xticks(1:4)
     xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm'})
     xtickangle(45)
-
+    
+    keyboard 
     saveas(fig, 'Figures/fig2b.fig')
     saveas(fig, 'Figures/fig2b.svg')
 end

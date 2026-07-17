@@ -102,9 +102,9 @@ fig3d(data, 'z-score', 'atzero', shuff_xcor);
 close all
 
 % Figure 4. NE dynamics in S1 and mPFC during the tactile detection task. 
-% A) NE dynamics in S1 evoked by the presentation of different tactile stimuli.
-% B) Task evokded NE dynamics in S1 in hit, miss, correct rejection and miss trials.
-% C) Baseline NE level in S1 in hit, miss, correct rejection and miss trials.
+% A) Baseline NE level in S1 in hit, miss, correct rejection and miss trials.
+% B) NE dynamics in S1 evoked by the presentation of different tactile stimuli.
+% C) Task evokded NE dynamics in S1 in hit, miss, correct rejection and miss trials.
 % D) Mean increase in NE level in S1 in hit, miss, correct rejection and miss trials.
 % E) Reaction times during the high, medium, and low terciles of baseline NE levels in S1.
 % F) Pychometric curves during the high, medium, and low terciles of baseline NE levels in S1.

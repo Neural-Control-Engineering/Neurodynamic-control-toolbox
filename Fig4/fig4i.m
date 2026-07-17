@@ -43,8 +43,8 @@ function fig4i(data, tbounds, alignTo, ver)
     xlabel('Baseline NE in S1 (z-score)', 'FontSize', 16)
     ylabel('Stimulus Evoked Increase in NE (z-score)', 'FontSize', 16)
     xlim([-2.5,5.1])
-    % saveas(fig, 'Figures/fig2e.fig')
-    % saveas(fig, 'Figures/fig2e.svg')
+    saveas(fig, 'Figures/fig4i.fig')
+    saveas(fig, 'Figures/fig4i.svg')
 
     T = table(dilations, baselines, responses, stimuli, sessions, subjects,  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Stimulus', 'Session', 'Subject'});
 

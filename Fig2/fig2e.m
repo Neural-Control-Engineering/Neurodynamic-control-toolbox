@@ -165,7 +165,7 @@ function fig2e(data, tbounds, alignTo)
     xlabel(tl, 'Baseline Pupil Area (z-score)', 'FontSize', 16)
     ylabel(tl, '\Delta Pupil Area (z-score)', 'FontSize', 16)
 
-    saveas(fig, 'Figures/fig2e.fig')
-    saveas(fig, 'Figures/fig2e.svg')
+    saveas(fig, 'Figures/fig2eSupp.fig')
+    saveas(fig, 'Figures/fig2eSupp.svg')
 
 end
