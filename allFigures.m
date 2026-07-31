@@ -155,7 +155,11 @@ close all
 fig6()
 close all
 
-% Figures 7 and 8 
+% State-dependent pupil and NE analyses. Formerly Figures 7 and 8; the figures were
+% cut for the R1 revision because none of the state x time / state x lag contrasts
+% survive Greenhouse-Geisser correction under the corrected GLM-HMM. These calls are
+% retained because the Results text still reports their statistics as negatives,
+% alongside the baseline-by-state effects that do hold.
 dynamicsByState();
 corrByState(shuff_xcor);
 
