@@ -176,12 +176,15 @@ function fig6()
     saveas(cfig, 'Figures/fig6i.fig')
     saveas(cfig, 'Figures/fig6i.svg')
 
-    T = readtable('glmhmm_cv_results.csv');
-    acc = T(T.K == 1,:).accuracy;
-    roc_auc = T(T.K == 1,:).roc_auc;
+    % Cross-validation for the CORRECTED (column-routed) model. The legacy
+    % glmhmm_cv_results.csv held the pre-correction fits (model=='New', pupil
+    % still in the observation GLM), so 6B/6C were showing the superseded model.
+    T = readtable('glmhmm_cv_corrected_full.csv');
+    acc = T(T.K == 1 & strcmp(T.model, 'corrected'),:).accuracy;
+    roc_auc = T(T.K == 1 & strcmp(T.model, 'corrected'),:).roc_auc;
     for k = 2:4
-        acc = [acc, T(T.K == k & strcmp(T.model, 'New'),:).accuracy];
-        roc_auc = [roc_auc, T(T.K == k & strcmp(T.model, 'New'),:).roc_auc];
+        acc = [acc, T(T.K == k & strcmp(T.model, 'corrected'),:).accuracy];
+        roc_auc = [roc_auc, T(T.K == k & strcmp(T.model, 'corrected'),:).roc_auc];
     end
     acc_fig = figure();
     hold on;
@@ -208,37 +211,68 @@ function fig6()
     saveas(roc_auc_fig, 'Figures/fig6c.fig')
     saveas(roc_auc_fig, 'Figures/fig6c.svg')
 
-    jsonFileName = 'glmhmm_K3_per_animal_params.json'; %'glmhmm_K3_params.json';
+    % Per-animal weights from the corrected (column-routed) GLM-HMM: baseline
+    % pupil enters ONLY the transition softmax, stimulus+bias enter ONLY the
+    % choice GLM. The superseded glmhmm_K3_per_animal_params.json carried a
+    % pupil term in its observation weights (the circularity R2 raised), so
+    % pupil is plotted on its own axes here rather than beside the
+    % observation weights -- they are parameters of different sub-models.
+    jsonFileName = 'glmhmm_K3_per_animal_params_corrected.json';
     jsonStr = fileread(jsonFileName);
     jsonData = jsondecode(jsonStr);
-    pupil = {[],[],[]};
-    bias = {[],[],[]};
+    animals = fieldnames(jsonData.animals);
+    nA = length(animals);
     stim = {[],[],[]};
+    bias = {[],[],[]};
+    pupil = {[],[],[]};
+    labels = cell(1,3);
     for s = 1:3
-        animals = fieldnames(jsonData.animals);
-        for a = 1:length(animals)
-            pupil{s} = [pupil{s}; jsonData.animals.(animals{a}).observation_weights.(sprintf('state_%i',s-1)).pupil];
-            bias{s} = [bias{s}; jsonData.animals.(animals{a}).observation_weights.(sprintf('state_%i',s-1)).bias];
-            stim{s} = [stim{s}; jsonData.animals.(animals{a}).observation_weights.(sprintf('state_%i',s-1)).stim];
-        end 
+        fld = sprintf('state_%i', s-1);
+        labels{s} = jsonData.state_labels.(fld);
+        for a = 1:nA
+            A = jsonData.animals.(animals{a});
+            stim{s}  = [stim{s};  A.observation_weights.(fld).stim];
+            bias{s}  = [bias{s};  A.observation_weights.(fld).bias];
+            pupil{s} = [pupil{s}; A.transition_pupil_weight.(fld)];
+        end
     end
-    wfig = figure(); 
-    hold on;
-    plot(repmat(1,4,1)+(rand(4,1)-0.5)*0.2, pupil{1}, 'o', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    plot(repmat(2,4,1)+(rand(4,1)-0.5)*0.2, stim{1}, 'o', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    plot(repmat(3,4,1)+(rand(4,1)-0.5)*0.2, bias{1}, 'o', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    errorbar(1:3, mean([pupil{1}, stim{1}, bias{1}]), ste([pupil{1}, stim{1}, bias{1}]), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    plot(repmat(5,4,1)+(rand(4,1)-0.5)*0.2, pupil{2}, 'o', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    plot(repmat(6,4,1)+(rand(4,1)-0.5)*0.2, stim{2}, 'o', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    plot(repmat(7,4,1)+(rand(4,1)-0.5)*0.2, bias{2}, 'o', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    errorbar(5:7, mean([pupil{2}, stim{2}, bias{2}]), ste([pupil{2}, stim{2}, bias{2}]), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    plot(repmat(9,4,1)+(rand(4,1)-0.5)*0.2, pupil{3}, 'o', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    plot(repmat(10,4,1)+(rand(4,1)-0.5)*0.2, stim{3}, 'o', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    plot(repmat(11,4,1)+(rand(4,1)-0.5)*0.2, bias{3}, 'o', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
-    errorbar(9:11, mean([pupil{3}, stim{3}, bias{3}]), ste([pupil{3}, stim{3}, bias{3}]), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    xticks([1:3, 5:7, 9:11])
-    xticklabels({'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias', 'Pupil', 'Stimulus', 'Bias'})
+    cols = {'b', 'r', 'g'};
+
+    wfig = figure('Position', [100, 100, 1000, 460]);
+    set(wfig, 'PaperPositionMode', 'auto')   % otherwise saveas clips to paper size
+
+    % --- left: observation weights (stimulus, bias) ---
+    subplot(1,2,1); hold on;
+    h = gobjects(1,3);
+    for s = 1:3
+        x0 = (s-1)*3 + 1;   % groups at 1-2, 4-5, 7-8
+        h(s) = plot(repmat(x0,nA,1)+(rand(nA,1)-0.5)*0.2, stim{s}, 'o', 'MarkerFaceColor', cols{s}, 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10);
+        plot(repmat(x0+1,nA,1)+(rand(nA,1)-0.5)*0.2, bias{s}, 'o', 'MarkerFaceColor', cols{s}, 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+        errorbar([x0, x0+1], mean([stim{s}, bias{s}]), ste([stim{s}, bias{s}]), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    end
+    xlim([0.25, 8.75])
+    plot(xlim, [0 0], 'k:')
+    xticks([1:2, 4:5, 7:8])
+    xticklabels({'Stimulus', 'Bias', 'Stimulus', 'Bias', 'Stimulus', 'Bias'})
+    xtickangle(45)
     ylabel('Observation Weight', 'FontSize', 16)
+    title('Choice GLM (stimulus + bias)', 'FontSize', 14)
+    legend(h, labels, 'Location', 'southwest', 'FontSize', 11, 'Box', 'off')
+
+    % --- right: pupil -> transition weights ---
+    subplot(1,2,2); hold on;
+    for s = 1:3
+        plot(repmat(s,nA,1)+(rand(nA,1)-0.5)*0.2, pupil{s}, 'o', 'MarkerFaceColor', cols{s}, 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 10)
+    end
+    errorbar(1:3, cellfun(@mean, pupil), cellfun(@ste, pupil), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    plot(xlim, [0 0], 'k:')
+    xlim([0.5, 3.5])
+    xticks(1:3)
+    xticklabels(labels)
+    xtickangle(45)
+    ylabel('Pupil \rightarrow Transition Weight', 'FontSize', 16)
+    title('Transition GLM (baseline pupil)', 'FontSize', 14)
+
     saveas(wfig, 'Figures/fig6j.fig')
     saveas(wfig, 'Figures/fig6j.svg')
 

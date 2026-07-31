@@ -333,8 +333,7 @@ function dynamicsByState()
     % xlabel('State')
     % unifyYLimits(pbfig)
 
-    % fprintf('Pupil baseline by state\n')
-    % anova1([pupil_baseline{1}{end}, pupil_baseline{2}{end}, pupil_baseline{3}{end}])
+    anovaByGroup('Pupil baseline by state (all outcomes)', {pupil_baseline{1}{end}, pupil_baseline{2}{end}, pupil_baseline{3}{end}});
 
     % sbfig = figure();
     % % tl = tiledlayout(1,4);
@@ -351,8 +350,7 @@ function dynamicsByState()
     % xlabel('State')
     % unifyYLimits(sbfig)
 
-    % fprintf('s1 baseline by state\n')
-    % anova1([s1_ne_baseline{1}{end}, s1_ne_baseline{2}{end}, s1_ne_baseline{3}{end}])
+    anovaByGroup('S1 baseline NE by state (all outcomes)', {s1_ne_baseline{1}{end}, s1_ne_baseline{2}{end}, s1_ne_baseline{3}{end}});
 
     % mbfig = figure();
     % % tl = tiledlayout(1,4);
@@ -369,8 +367,7 @@ function dynamicsByState()
     % xlabel('State')
     % unifyYLimits(mbfig)
 
-    % fprintf('mPFC Baseline by state\n')
-    % anova1([mpfc_ne_baseline{1}{end}, mpfc_ne_baseline{2}{end}, mpfc_ne_baseline{3}{end}])
+    anovaByGroup('mPFC baseline NE by state (all outcomes)', {mpfc_ne_baseline{1}{end}, mpfc_ne_baseline{2}{end}, mpfc_ne_baseline{3}{end}});
     saveas(pupil_fig, 'Figures/fig7.svg')
     saveas(pupil_fig, 'Figures/fig7.fig')
     saveas(s1_fig, 'Figures/fig8b.svg')
@@ -384,8 +381,11 @@ function dynamicsByState()
         axs(o) = nexttile;
         hold on 
         for k = 1:K 
-            plot(repmat(k-1,size(s1_ne_baseline{k}{o},1),1)+(rand(size(s1_ne_baseline{k}{o}))-0.5)*0.1, s1_ne_baseline{k}{o}, 'o', 'MarkerFaceColor', cols(k,:), 'MarkerEdgeColor', [1,1,1])
-            errorbar(repmat(k-1,size(s1_ne_baseline{k}{o},1),1), nanmean(s1_ne_baseline{k}{o}), ste(s1_ne_baseline{k}{o}), 'k.', 'LineWidth', 2, 'CapSize', 15)
+            % flatten: these cells are sometimes row- and sometimes column-shaped,
+            % which made the errorbar x/y sizes disagree and aborted the script
+            v = s1_ne_baseline{k}{o}(:)';
+            plot(repmat(k-1,1,numel(v))+(rand(1,numel(v))-0.5)*0.1, v, 'o', 'MarkerFaceColor', cols(k,:), 'MarkerEdgeColor', [1,1,1])
+            errorbar(k-1, nanmean(v), ste(v), 'k.', 'LineWidth', 2, 'CapSize', 15)
         end
         title(outcomes{o})
     end
@@ -399,8 +399,9 @@ function dynamicsByState()
         axs(o) = nexttile;
         hold on 
         for k = 1:K 
-            plot(repmat(k-1,size(mpfc_ne_baseline{k}{o},1),1)+(rand(size(mpfc_ne_baseline{k}{o}))-0.5)*0.1, mpfc_ne_baseline{k}{o}, 'o', 'MarkerFaceColor', cols(k,:), 'MarkerEdgeColor', [1,1,1])
-            errorbar(repmat(k-1,size(mpfc_ne_baseline{k}{o},1),1), nanmean(mpfc_ne_baseline{k}{o}), ste(mpfc_ne_baseline{k}{o}), 'k.', 'LineWidth', 2, 'CapSize', 15)
+            v = mpfc_ne_baseline{k}{o}(:)';
+            plot(repmat(k-1,1,numel(v))+(rand(1,numel(v))-0.5)*0.1, v, 'o', 'MarkerFaceColor', cols(k,:), 'MarkerEdgeColor', [1,1,1])
+            errorbar(k-1, nanmean(v), ste(v), 'k.', 'LineWidth', 2, 'CapSize', 15)
         end
         title(outcomes{o})
     end
@@ -409,89 +410,51 @@ function dynamicsByState()
     unifyYLimits(mbfig)
     close all
 
-    fprintf('Pupil baseline by state on hit\n')
-    [~,tbl,~] = anova1([pupil_baseline{1}{1}, pupil_baseline{2}{1}, pupil_baseline{3}{1}])
-    close all
+    anovaByGroup('Pupil baseline by state on hit', {pupil_baseline{1}{1}, pupil_baseline{2}{1}, pupil_baseline{3}{1}});
+    anovaByGroup('Pupil baseline by state on miss', {pupil_baseline{1}{2}, pupil_baseline{2}{2}, pupil_baseline{3}{2}});
+    anovaByGroup('Pupil baseline by state on cr', {pupil_baseline{1}{3}, pupil_baseline{2}{3}, pupil_baseline{3}{3}});
+    anovaByGroup('Pupil baseline by state on fa', {pupil_baseline{1}{4}, pupil_baseline{2}{4}, pupil_baseline{3}{4}});
+    anovaByGroup('mPFC baseline by state on hit', {mpfc_ne_baseline{1}{1}, mpfc_ne_baseline{2}{1}, mpfc_ne_baseline{3}{1}});
+    anovaByGroup('mPFC baseline by state on miss', {mpfc_ne_baseline{1}{2}, mpfc_ne_baseline{2}{2}, mpfc_ne_baseline{3}{2}});
+    anovaByGroup('mPFC baseline by state on cr', {mpfc_ne_baseline{1}{3}, mpfc_ne_baseline{2}{3}, mpfc_ne_baseline{3}{3}});
+    anovaByGroup('mPFC baseline by state on fa', {mpfc_ne_baseline{1}{4}, mpfc_ne_baseline{2}{4}, mpfc_ne_baseline{3}{4}});
+    anovaByGroup('S1 baseline by state on hit', {s1_ne_baseline{1}{1}, s1_ne_baseline{2}{1}, s1_ne_baseline{3}{1}});
+    anovaByGroup('S1 baseline by state on miss', {s1_ne_baseline{1}{2}, s1_ne_baseline{2}{2}, s1_ne_baseline{3}{2}});
+    anovaByGroup('S1 baseline by state on cr', {s1_ne_baseline{1}{3}, s1_ne_baseline{2}{3}, s1_ne_baseline{3}{3}});
+    anovaByGroup('S1 baseline by state on fa', {s1_ne_baseline{1}{4}, s1_ne_baseline{2}{4}, s1_ne_baseline{3}{4}});
+    anovaByGroup('Pupil by outcome state 1', {pupil_baseline{1}{1}, pupil_baseline{1}{2}, pupil_baseline{1}{3}, pupil_baseline{1}{4}});
+    anovaByGroup('Pupil by outcome state 2', {pupil_baseline{2}{1}, pupil_baseline{2}{2}, pupil_baseline{2}{3}, pupil_baseline{2}{4}});
+    anovaByGroup('Pupil by outcome state 3', {pupil_baseline{3}{1}, pupil_baseline{3}{2}, pupil_baseline{3}{3}, pupil_baseline{3}{4}});
+    anovaByGroup('mPFC by outcome state 1', {mpfc_ne_baseline{1}{1}, mpfc_ne_baseline{1}{2}, mpfc_ne_baseline{1}{3}, mpfc_ne_baseline{1}{4}});
+    anovaByGroup('mPFC by outcome state 2', {mpfc_ne_baseline{2}{1}, mpfc_ne_baseline{2}{2}, mpfc_ne_baseline{2}{3}, mpfc_ne_baseline{2}{4}});
+    anovaByGroup('mPFC by outcome state 3', {mpfc_ne_baseline{3}{1}, mpfc_ne_baseline{3}{2}, mpfc_ne_baseline{3}{3}, mpfc_ne_baseline{3}{4}});
+    anovaByGroup('S1 by outcome state 1', {s1_ne_baseline{1}{1}, s1_ne_baseline{1}{2}, s1_ne_baseline{1}{3}, s1_ne_baseline{1}{4}});
+    anovaByGroup('S1 by outcome state 2', {s1_ne_baseline{2}{1}, s1_ne_baseline{2}{2}, s1_ne_baseline{2}{3}, s1_ne_baseline{2}{4}});
+    anovaByGroup('S1 by outcome state 3', {s1_ne_baseline{3}{1}, s1_ne_baseline{3}{2}, s1_ne_baseline{3}{3}, s1_ne_baseline{3}{4}});
+end
 
-    fprintf('Pupil baseline by state on miss\n')
-    [~,tbl,~] = anova1([pupil_baseline{1}{2}, pupil_baseline{2}{2}, pupil_baseline{3}{2}])
-    close all
-
-    fprintf('Pupil baseline by state on cr\n')
-    [~,tbl,~] = anova1([pupil_baseline{1}{3}, pupil_baseline{2}{3}, pupil_baseline{3}{3}])
-    close all
-
-    fprintf('Pupil baseline by state on fa\n')
-    [~,tbl,~] = anova1([pupil_baseline{1}{4}, pupil_baseline{2}{4}, pupil_baseline{3}{4}])
-    close all
-
-    fprintf('mPFC baseline by state on hit\n')
-    [~,tbl,~] = anova1([mpfc_ne_baseline{1}{1}, mpfc_ne_baseline{2}{1}, mpfc_ne_baseline{3}{1}])
-    close all
-
-    fprintf('mPFC baseline by state on miss\n')
-    [~,tbl,~] = anova1([mpfc_ne_baseline{1}{2}, mpfc_ne_baseline{2}{2}, mpfc_ne_baseline{3}{2}])
-    close all
-
-    fprintf('mPFC baseline by state on cr\n')
-    [~,tbl,~] = anova1([mpfc_ne_baseline{1}{3}, mpfc_ne_baseline{2}{3}, mpfc_ne_baseline{3}{3}])
-    close all
-
-    fprintf('mPFC baseline by state on fa\n')
-    [~,tbl,~] = anova1([mpfc_ne_baseline{1}{4}, mpfc_ne_baseline{2}{4}, mpfc_ne_baseline{3}{4}])
-    close all
-
-    fprintf('S1 baseline by state on hit\n')
-    [~,tbl,~] = anova1([s1_ne_baseline{1}{1}, s1_ne_baseline{2}{1}, s1_ne_baseline{3}{1}])
-    close all
-
-    fprintf('S1 baseline by state on miss\n')
-    [~,tbl,~] = anova1([s1_ne_baseline{1}{2}, s1_ne_baseline{2}{2}, s1_ne_baseline{3}{2}])
-    close all
-
-    fprintf('S1 baseline by state on cr\n')
-    [~,tbl,~] = anova1([s1_ne_baseline{1}{3}, s1_ne_baseline{2}{3}, s1_ne_baseline{3}{3}])
-    close all
-
-    fprintf('S1 baseline by state on fa\n')
-    [~,tbl,~] = anova1([s1_ne_baseline{1}{4}, s1_ne_baseline{2}{4}, s1_ne_baseline{3}{4}])
-    close all
-
-    fprintf('Pupil by outcome state 1\n')
-    [~,tbl,~] = anova1([pupil_baseline{1}{1}, pupil_baseline{1}{2}, pupil_baseline{1}{3}, pupil_baseline{1}{4}])
-    close all
-
-    fprintf('Pupil by outcome state 2\n')
-    [~,tbl,~] = anova1([pupil_baseline{2}{1}, pupil_baseline{2}{2}, pupil_baseline{2}{3}, pupil_baseline{2}{4}])
-    close all
-
-    fprintf('Pupil by outcome state 3\n')
-    [~,tbl,~] = anova1([pupil_baseline{3}{1}, pupil_baseline{3}{2}, pupil_baseline{3}{3}, pupil_baseline{3}{4}])
-    close all
-
-    fprintf('mPFC by outcome state 1\n')
-    [~,tbl,~] = anova1([mpfc_ne_baseline{1}{1}, mpfc_ne_baseline{1}{2}, mpfc_ne_baseline{1}{3}, mpfc_ne_baseline{1}{4}])
-    close all
-
-    fprintf('mPFC by outcome state 2\n')
-    [~,tbl,~] = anova1([mpfc_ne_baseline{2}{1}, mpfc_ne_baseline{2}{2}, mpfc_ne_baseline{2}{3}, mpfc_ne_baseline{2}{4}])
-    close all
-
-    fprintf('mPFC by outcome state 3\n')
-    [~,tbl,~] = anova1([mpfc_ne_baseline{3}{1}, mpfc_ne_baseline{3}{2}, mpfc_ne_baseline{3}{3}, mpfc_ne_baseline{3}{4}])
-    close all
-
-    fprintf('S1 by outcome state 1\n')
-    [~,tbl,~] = anova1([s1_ne_baseline{1}{1}, s1_ne_baseline{1}{2}, s1_ne_baseline{1}{3}, s1_ne_baseline{1}{4}])
-    close all
-
-    fprintf('S1 by outcome state 2\n')
-    [~,tbl,~] = anova1([s1_ne_baseline{2}{1}, s1_ne_baseline{2}{2}, s1_ne_baseline{2}{3}, s1_ne_baseline{2}{4}])
-    close all
-
-    fprintf('S1 by outcome state 3\n')
-    [~,tbl,~] = anova1([s1_ne_baseline{3}{1}, s1_ne_baseline{3}{2}, s1_ne_baseline{3}{3}, s1_ne_baseline{3}{4}])
-    close all
-
-    keyboard 
+function anovaByGroup(label, groups)
+    % One-way ANOVA across groups of unequal size. The previous form,
+    % anova1([g1, g2, g3]), needed every group to have the same number of
+    % sessions and aborted otherwise; it also printed no df or group sizes,
+    % which the reviewer asked for.
+    v = []; g = [];
+    for i = 1:numel(groups)
+        x = groups{i}(:);
+        x = x(~isnan(x));
+        v = [v; x];
+        g = [g; repmat(i, numel(x), 1)];
+    end
+    ns = zeros(1, numel(groups));
+    for i = 1:numel(groups)
+        ns(i) = sum(g == i);
+    end
+    fprintf('%s -- n per group: %s\n', label, mat2str(ns));
+    if sum(ns > 0) < 2 || numel(v) < 3
+        fprintf('  skipped: insufficient data\n');
+        return
+    end
+    [p, tbl] = anova1(v, g, 'off');
+    fprintf('  ANOVA(group): F(%d,%d) = %.3f, p = %.4g\n', ...
+        tbl{2,3}, tbl{3,3}, tbl{2,5}, p);
 end

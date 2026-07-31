@@ -149,7 +149,7 @@ fprintf('Figure 5b:\n')
 fig5b(data, tbounds, alignTo, 'z-score');
 close all
 
-keyboard
+% keyboard   % debug breakpoint -- left disabled so the script runs end to end
 
 % figure 6 - summary of GLM-HMM modeling
 fig6()
