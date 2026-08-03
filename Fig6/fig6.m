@@ -11,6 +11,18 @@ function fig6()
     outcomes = {'Hit', 'Miss', 'CR', 'FA'};
     rps = {[], [], []};
     stim_strengths = unique(data.stimulus_strength);
+
+    % Semantic state names, read from the corrected fit so the figure and the
+    % model cannot drift apart. The state INDICES differ between the corrected
+    % fit and the superseded pre-correction fit (old 1 <-> new 2), so the panels
+    % are labelled by name rather than by index -- an index-labelled panel would
+    % silently invert if the model were ever refit.
+    jsonFileName = 'glmhmm_K3_per_animal_params_corrected.json';
+    jsonData = jsondecode(fileread(jsonFileName));
+    stateLabels = cell(1,3);
+    for s = 1:3
+        stateLabels{s} = jsonData.state_labels.(sprintf('state_%i', s-1));
+    end
     for s = 1:length(sessions)
         tmp = data(strcmp(data.session_id, sessions{s}),:);
         model_tmp = model(strcmp(model.session, sessions{s}),:);
@@ -25,14 +37,23 @@ function fig6()
             rps{states(ss)+1} = [rps{states(ss)+1}; rp];
         end
     end 
-    cols = distinguishable_colors(length(rps));
+    % Fixed state colours (blue/red/green for state 0/1/2) so every panel,
+    % including 6J, uses the same mapping.
+    cols = [0 0 1; 1 0 0; 0 1 0];
     fig = figure();
     hold on
     for i = 1:length(rps)
-        semshade(rps{i}, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1)
+        semshade(rps{i}, 0.3, cols(i,:), cols(i,:), stim_strengths .* 10, 1, ...
+                 sprintf('%s (n=%i)', stateLabels{i}, size(rps{i},1)))
     end
     xlabel('Stimulus Intensity (PSI)', 'FontSize', 16)
     ylabel('Response Probability', 'FontSize', 16)
+    % R2018a parses legend('Location',...) with no handles as a legend LABEL,
+    % so set the properties after construction instead.
+    leg = legend();
+    leg.Location = 'southeast';
+    leg.FontSize = 11;
+    leg.Box = 'off';
     rp_mat = [];
     state_mat = [];
     for i = 1:length(rps)
@@ -55,11 +76,13 @@ function fig6()
     exampfig = figure();
     % tl = tiledlayout(2,1);
     % axs(1) = nexttile;
-    plot(tmp_model.p_state0, 'b', 'LineWidth', 2, 'DisplayName', 'state 0')
-    hold on; 
-    plot(tmp_model.p_state1, 'r', 'LineWidth', 2, 'DisplayName', 'state 1')
-    plot(tmp_model.p_state2, 'g', 'LineWidth', 2, 'DisplayName', 'state 2')
-    legend()
+    plot(tmp_model.p_state0, 'b', 'LineWidth', 2, 'DisplayName', stateLabels{1})
+    hold on;
+    plot(tmp_model.p_state1, 'r', 'LineWidth', 2, 'DisplayName', stateLabels{2})
+    plot(tmp_model.p_state2, 'g', 'LineWidth', 2, 'DisplayName', stateLabels{3})
+    legF = legend();
+    legF.Box = 'off';
+    xlabel('Trial', 'FontSize', 16)
     ylabel('State Probability', 'FontSize', 16)
     xlim([1,120])
     saveas(exampfig, 'Figures/fig6f.fig')
@@ -80,9 +103,10 @@ function fig6()
     end
     errorbar(0:2, cellfun(@nanmean,fracs), cellfun(@ste,fracs), 'k.', 'CapSize', 15, 'LineWidth', 2)
     xticks(0:2)
+    xticklabels(stateLabels)
+    xtickangle(20)
     yticks([0,1])
-    xlabel('State', 'FontSize', 16)
-    ylabel('Fracion of trials per session', 'FontSize', 16)
+    ylabel('Fraction of trials per session', 'FontSize', 16)
     mat = [fracs{1}, fracs{2}, fracs{3}];
     fprintf('trials per session:\n')
     [p,tbl,stats] = anova1(mat)
@@ -103,13 +127,21 @@ function fig6()
     end
     tfig = figure();
     imagesc(0:2, 0:2, log(transitions));
-    colorbar()
     xticks(0:2)
     yticks(0:2)
+    xticklabels(stateLabels)
+    yticklabels(stateLabels)
+    xtickangle(20)
     xlabel('Current State', 'FontSize', 16)
     ylabel('Next State', 'FontSize', 16)
+    % One colorbar only (this was previously created twice), and label it via
+    % cbar.Label so the rotated text clears the tick numbers instead of
+    % overprinting them.
     cbar = colorbar();
-    ylabel(cbar, 'log Transition Probability', 'FontSize', 16, 'Rotation', 270)
+    cbar.Label.String = 'log Transition Probability';
+    cbar.Label.FontSize = 14;
+    cbar.Label.Rotation = 270;
+    cbar.Label.VerticalAlignment = 'bottom';
     saveas(tfig, 'Figures/fig6g.fig')
     saveas(tfig, 'Figures/fig6g.svg')
 
@@ -135,9 +167,9 @@ function fig6()
     end
     errorbar(0:2, cellfun(@nanmean,fracs), cellfun(@ste,fracs), 'k.', 'CapSize', 15, 'LineWidth', 2)
     xticks(0:2)
-    yticks([0,1])
-    xlabel('State', 'FontSize', 16)
-    ylabel('Response Time (s)', 'FontSize', 16)
+    xticklabels(stateLabels)
+    xtickangle(20)
+    ylabel('Reaction Time (s)', 'FontSize', 16)
     ylim([0,1])
     yticks([0,1])
     mat = [fracs{1}, fracs{2}, fracs{3}];
@@ -169,9 +201,11 @@ function fig6()
     end
     errorbar(0:2, cellfun(@nanmean,fracs), cellfun(@ste,fracs), 'k.', 'CapSize', 15, 'LineWidth', 2)
     xticks(0:2)
-    xlabel('State', 'FontSize', 16)
-    ylabel('Decision Criterion (s)', 'FontSize', 16)
+    xticklabels(stateLabels)
+    xtickangle(20)
+    ylabel('Decision Criterion', 'FontSize', 16)   % SDT criterion c: dimensionless
     mat = [fracs{1}, fracs{2}, fracs{3}];
+    fprintf('Decision criterion:\n')
     [p,tbl,stats] = anova1(mat)
     saveas(cfig, 'Figures/fig6i.fig')
     saveas(cfig, 'Figures/fig6i.svg')
@@ -217,18 +251,14 @@ function fig6()
     % pupil term in its observation weights (the circularity R2 raised), so
     % pupil is plotted on its own axes here rather than beside the
     % observation weights -- they are parameters of different sub-models.
-    jsonFileName = 'glmhmm_K3_per_animal_params_corrected.json';
-    jsonStr = fileread(jsonFileName);
-    jsonData = jsondecode(jsonStr);
     animals = fieldnames(jsonData.animals);
     nA = length(animals);
     stim = {[],[],[]};
     bias = {[],[],[]};
     pupil = {[],[],[]};
-    labels = cell(1,3);
+    labels = stateLabels;   % same source as every other panel
     for s = 1:3
         fld = sprintf('state_%i', s-1);
-        labels{s} = jsonData.state_labels.(fld);
         for a = 1:nA
             A = jsonData.animals.(animals{a});
             stim{s}  = [stim{s};  A.observation_weights.(fld).stim];
