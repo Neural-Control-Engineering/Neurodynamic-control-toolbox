@@ -68,14 +68,27 @@ class PupilTransitions(InputDrivenTransitions):
 
 
 def build_routed_hmm(K, D, M_full, C=2, prior_sigma=2,
-                     transition_alpha=1, transition_kappa=0):
+                     transition_alpha=1, transition_kappa=0,
+                     obs_cols=None, trans_cols=None):
     """
     Construct an ssm.HMM whose observations use stim+bias and whose
     transitions use pupil only. The HMM is built with the full input
     dimensionality, then its observation/transition objects are replaced
     with the column-routed subclasses.
+
+    obs_cols / trans_cols override the default column layout, which assumes
+    the 3-column input [pupil, stim, bias]. They are needed for inputs that
+    carry extra regressors -- e.g. the 5-column [pupil, mPFC_NE, S1_NE, stim,
+    bias] matrix used for the Extended Data 6-1 comparison, where the choice
+    GLM must still see only [stim, bias] (cols 3,4) while the transition GLM
+    sees either [pupil] (col 0) or [pupil, mPFC_NE, S1_NE] (cols 0,1,2).
+    Defaults preserve the original behaviour.
     """
     import ssm
+    if obs_cols is None:
+        obs_cols = OBS_COLS
+    if trans_cols is None:
+        trans_cols = PUPIL_COLS
     hmm = ssm.HMM(K, D, M_full,
                   observations="input_driven_obs",
                   observation_kwargs=dict(C=C, prior_sigma=prior_sigma),
@@ -83,7 +96,8 @@ def build_routed_hmm(K, D, M_full, C=2, prior_sigma=2,
                   transition_kwargs=dict(alpha=transition_alpha,
                                          kappa=transition_kappa))
     hmm.observations = StimBiasObservations(
-        K, D, M_full, C=C, prior_sigma=prior_sigma)
+        K, D, M_full, C=C, prior_sigma=prior_sigma, obs_cols=obs_cols)
     hmm.transitions = PupilTransitions(
-        K, D, M_full, alpha=transition_alpha, kappa=transition_kappa)
+        K, D, M_full, alpha=transition_alpha, kappa=transition_kappa,
+        trans_cols=trans_cols)
     return hmm
