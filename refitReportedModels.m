@@ -38,8 +38,9 @@
 % No local functions: run() evaluates in the caller's context, where R2018a
 % rejects function definitions.
 try
-    cd('D:\eneuro_rerun');
-    addpath(genpath('D:\eneuro_rerun'));
+    % cd('D:\eneuro_rerun');
+    % addpath(genpath('D:\eneuro_rerun'));
+    addpath(genpath('./'))
 
     Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
     data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
