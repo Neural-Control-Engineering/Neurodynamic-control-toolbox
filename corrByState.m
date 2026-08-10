@@ -1,5 +1,5 @@
 function corrByState(shuff)
-
+    ver = 'z-score';
     Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
     data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
     animals = fetchAnimals(data);

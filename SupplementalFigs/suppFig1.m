@@ -33,9 +33,6 @@ function suppFig1(data, tbounds, alignTo)
         pupil = pupil(:,2:end-1);
         t = t(2:end-1);
         b = nanmean(pupil(:,(t > -0.5 & t < 0)), 2);
-        % mean over the post-stimulus window, matching dilationsByOutcome.m and
-        % increase{S1,Mpfc}NeByOutcome.m -- the convention the Methods describes
-        % e = nanmean(pupil(:,(t > 0 & t < 6)), 2);
         e = max(pupil(:,(t > 0 & t < 6)), [], 2);
         d = e - b;
         baselines = [baselines; b];
