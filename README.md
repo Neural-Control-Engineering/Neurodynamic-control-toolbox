@@ -64,8 +64,9 @@ Column layouts (`preprocessed_input`, one cell per session):
 | `pupil_driven_transitions` | 0 = baseline pupil (z-scored within session) | 1 = stim strength, 2 = bias |
 | `pupil_ne_driven_transitions` | 0 = pupil, 1 = mPFC NE, 2 = S1 NE (all z-scored) | 3 = stim strength, 4 = bias |
 
-Both `.mat` files are committed, along with `pupil_transitions_all.mat`.  Pass
-`true` for the fourth argument to build a within-session shuffled control.
+Both `.mat` files are committed, so Step 1 can be skipped unless the data
+change.  Pass `true` for the fourth argument to build a within-session shuffled
+control.
 
 ### Step 2 — fit (Python)
 
