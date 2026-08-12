@@ -20,7 +20,7 @@ function fig5b(data, tbounds, alignTo, ver)
     session = vertcat(sesh{1}, sesh{2}, sesh{3}, sesh{4}, sesh{5});
     s1 = vertcat(s1_baseline{1}, s1_baseline{2}, s1_baseline{3}, s1_baseline{4}, s1_baseline{5});
     pfc = vertcat(pfc_baseline{1}, pfc_baseline{2}, pfc_baseline{3}, pfc_baseline{4}, pfc_baseline{5});
-    ptiles = vertcat(zeros(size(pfc_baseline{1}))+1, zeros(size(pfc_baseline{2}))+2, zeros(size(pfc_baseline{3}))+3, zeros(size(pfc_baseline{4}))+3, zeros(size(pfc_baseline{5}))+5);
+    ptiles = vertcat(zeros(size(pfc_baseline{1}))+1, zeros(size(pfc_baseline{2}))+2, zeros(size(pfc_baseline{3}))+3, zeros(size(pfc_baseline{4}))+4, zeros(size(pfc_baseline{5}))+5);
     subject = {};
     for i = 1:length(session)
         subject{i} = session{i}(1:3);

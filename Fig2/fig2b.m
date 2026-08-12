@@ -68,11 +68,16 @@ function fig2b(data, tbounds, alignTo)
     % end
     bar(1:4, cellfun(@nanmean, baselines), 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
     errorbar(1:4, cellfun(@nanmean, baselines), cellfun(@ste, baselines), 'k.', 'LineWidth', 2, 'CapSize', 25)
-    xticks(1:4)
-    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm'})
+    bar(6:7, [nanmean(vertcat(baselines{1}, baselines{4})), nanmean(vertcat(baselines{2}, baselines{3}))], 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(6:7, [nanmean(vertcat(baselines{1}, baselines{4})), nanmean(vertcat(baselines{2}, baselines{3}))], [ste(vertcat(baselines{1}, baselines{4})), ste(vertcat(baselines{2}, baselines{3}))], 'k.', 'LineWidth', 2, 'CapSize', 25)
+    xticks([1:4, 6:7])
+    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm', 'Responded', 'Withheld'})
     xtickangle(45)
-    
-    keyboard 
+    lims = ylim;
+    plot([5,5], lims, 'k--')
+    ylim(lims)
+    ylabel('Baseline Pupil Area (z-score)', 'FontSize', 16)
+    xlabel('Trial Outcome', 'FontSize', 16)
     saveas(fig, 'Figures/fig2b.fig')
     saveas(fig, 'Figures/fig2b.svg')
 end

@@ -73,9 +73,14 @@ function fig4d(data, tbounds, alignTo, ver)
     % end
     bar(1:4, cellfun(@nanmean, dilations), 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
     errorbar(1:4, cellfun(@nanmean, dilations), cellfun(@ste, dilations), 'k.', 'LineWidth', 2, 'CapSize', 25)
-    xticks(1:4)
-    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm'})
+    bar(6:7, [nanmean(vertcat(dilations{1}, dilations{4})), nanmean(vertcat(dilations{2}, dilations{3}))], 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(6:7, [nanmean(vertcat(dilations{1}, dilations{4})), nanmean(vertcat(dilations{2}, dilations{3}))], [ste(vertcat(dilations{1}, dilations{4})), ste(vertcat(dilations{2}, dilations{3}))], 'k.', 'LineWidth', 2, 'CapSize', 25)
+    xticks([1:4, 6:7])
+    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm', 'Responded', 'Withheld'})
     xtickangle(45)
+    lims = ylim;
+    plot([5,5], lims, 'k--')
+    ylim(lims)
     ylabel('\DeltaNE in S1 (z-score)', 'FontSize', 16)
     xlabel('Outcome', 'FontSize', 16)
 
