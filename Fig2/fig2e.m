@@ -55,7 +55,9 @@ function fig2e(data, tbounds, alignTo)
     saveas(fig, 'Figures/fig2e.fig')
     saveas(fig, 'Figures/fig2e.svg')
 
-    T = table(dilations, baselines, responses, stimuli, sessions, subjects,  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Stimulus', 'Session', 'Subject'});
+    ok = ~isnan(baselines) & ~isnan(dilations);
+
+    T = table(dilations(ok), baselines(ok), responses(ok), stimuli(ok), sessions(ok), subjects(ok),  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Stimulus', 'Session', 'Subject'});
 
     lmeTbl = T(:, {'Dilation', 'Baseline','Stimulus','Response', 'Session', 'Subject'});
 
