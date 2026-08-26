@@ -1519,3 +1519,16 @@ hindering the flow of the paragraph.
 ** dilations and increases were computed with mean over 6s following stimulus 
 *** pupil dilation should definitely be max (way less negative change in area)
 *** open question re NE 
+
+* [2026-8-24 Mon] 
+** for Qi 
+*** Transisions 
+liberal->liberal = 0.994
+liberal->conservative = 0.001
+liberal->engaged = 0.006
+conservative->liberal = 0
+conservative->conservative = 0.919
+conservative->engaged=0.081
+engaged->liberal=0.001
+engaged->conservative=0.021
+engaged->engaged=0.978
