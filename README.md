@@ -3,7 +3,7 @@
 This repository is a collection of code used to analyze pupillometry, fiber photometry recordings of GRABNE, and behavior 
 in mice performing a simple tactile signal detection task.  Required data is available on upon request.  To generate all 
 figures and analyses from our paper, one must first download the data from [FigShare](https://doi.org/10.6084/m9.figshare.32764353)
-and unzip. Next, run the GLM-HMM model (described below).  Then, figures fromn the paper can be reproduced 
+and unzip. Next, run the GLM-HMM model (described below).  Then, figures from the paper can be reproduced 
 by running *allFigures.m*.  Code for running the GLM-HMM model 
 are found in *NT-GLM-HMM/* and subfolders.  Specifically, a global model can be trained by running
 *NT-GLM-HMM/2_fit_models/fit_global_glmhmm/fit_corrected_global.py*, and models for individual animals
