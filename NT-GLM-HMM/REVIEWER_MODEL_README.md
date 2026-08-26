@@ -64,8 +64,15 @@ Column 3: stimulus strength            → observations
 Column 4: ones (bias)                  → observations
 ```
 
-### `NT-GLM-HMM/2_fit_models/fit_global_glmhmm/glm_hmm_utils_v2.py`
-New fitting utilities with `use_input_driven_transitions` parameter.
+### `NT-GLM-HMM/2_fit_models/fit_global_glmhmm/glm_hmm_routed.py`
+Subclasses `InputDrivenObservations` and `InputDrivenTransitions` so each
+sub-model slices its own columns out of the shared input matrix.  This is what
+the paper's fits use.
+
+`glm_hmm_utils_v2.py` was the first attempt and is **superseded**: its
+`M_transition` argument never actually sliced anything, so pupil entered both
+sub-models and the circularity described above was not removed.  The Step 2
+usage shown below is that superseded API and is kept only for the record.
 
 ## Usage
 
@@ -81,6 +88,10 @@ genHmmGlmData(data, 'pupil_ne_transitions_data.mat', 'pupil_ne_driven_transition
 ```
 
 ### Step 2: Fit model (Python)
+
+**Superseded -- see the top-level README for the current procedure**
+(`fit_corrected_global.py`, then `fit_corrected_per_animal.py`).
+
 ```python
 from glm_hmm_utils_v2 import launch_glm_hmm_job
 

@@ -31,9 +31,33 @@
 % Datastore column. Anyone completing the remaining degrees of freedom should
 % take them from anova(lme), which prints DF1 and DF2, inside each function.
 %
+% WHERE THESE DF ENDED UP, AND WHAT STILL NEEDS CHECKING. The DF2 = 6232 above
+% was substituted into four places in the Results, but this script only ever fit
+% three of them:
+%
+%   OK   para 57  baseline pupil ~ response      F(1,6232)=82.5  -> fig2b here
+%   OK   para 63  baseline S1 NE ~ response      F(1,6232)=0.73  -> fig4a here
+%   OK   para 64  baseline mPFC NE ~ response    F(1,6232)=0.43  -> fig4g here
+%   NO   para 61  S1-mPFC correlation ~ response F(1,6232)=9.2   -- never fit
+%                 here; that DF2 was carried over from the models above and
+%                 should be taken from anova(lme) in fig3d instead.
+%
+% Separately, para 58 reports F(3,6230) = 260.9 for the baseline-corrected
+% dilation comparison (Extended Data Fig 2-1). That model lives in
+% SupplementalFigs/suppFig1.m, not here; only its DF2 traces to this
+% extraction. It is also the one result of the group that depends on the
+% evoked-measure definition, and suppFig1.m now computes dilation as max minus
+% baseline, so its F should be re-read from that function's own output. The
+% three models above are unaffected -- their DV is the mean over the 0.5 s
+% pre-stimulus window, which is what the Methods specifies for a baseline.
+%
 % Note also: this extraction yields n = 6,234 trials, while Tables 1-3 report
-% 6,323; and the no-stimulus trials (CR + FA = 854) are 13.7% of the data,
-% where Methods states 40% were catch trials. Both are flagged for the authors.
+% 6,323, so every DF2 above is roughly 89 trials short of the tables'. The
+% trial filter that produces 6,323 is the one to reconcile against.
+%
+% (An earlier version of this comment flagged the no-stimulus trials -- CR + FA
+% = 854, or 13.7% of the data -- against a Methods statement of 40% catch
+% trials. The manuscript now states 14%, so that discrepancy is resolved.)
 %
 % No local functions: run() evaluates in the caller's context, where R2018a
 % rejects function definitions.

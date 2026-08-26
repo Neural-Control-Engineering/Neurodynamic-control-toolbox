@@ -17,8 +17,10 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-CSV = 'glmhmm_pupil_ne_cv_corrected.csv'
-OUT = 'glmhmm_pupil_ne_cv_corrected_figure'
+import os
+_HERE = os.path.dirname(os.path.abspath(__file__))
+CSV = os.path.join(_HERE, 'glmhmm_pupil_ne_cv_corrected.csv')
+OUT = os.path.join(_HERE, 'glmhmm_pupil_ne_cv_corrected_figure')
 
 df = pd.read_csv(CSV)
 
