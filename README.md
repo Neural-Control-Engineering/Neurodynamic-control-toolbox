@@ -2,7 +2,9 @@
 
 This repository is a collection of code used to analyze pupillometry, fiber photometry recordings of GRABNE, and behavior 
 in mice performing a simple tactile signal detection task.  Required data is available on upon request.  To generate all 
-figures and analyses from our paper, simply unzip the data and run *allFigures.m*.  Code for running the GLM-HMM model 
+figures and analyses from our paper, one must first download the data from [FigShare](https://doi.org/10.6084/m9.figshare.32764353)
+and unzip. Next, run the GLM-HMM model (described below).  Then, figures fromn the paper can be reproduced 
+by running *allFigures.m*.  Code for running the GLM-HMM model 
 are found in *NT-GLM-HMM/* and subfolders.  Specifically, a global model can be trained by running
 *NT-GLM-HMM/2_fit_models/fit_global_glmhmm/fit_corrected_global.py*, and models for individual animals
 can be trained by running *NT-GLM-HMM/2_fit_models/fit_global_glmhmm/fit_corrected_per_animal.py*.
@@ -22,11 +24,8 @@ the **observations** (choice) only:
 
     P(z_t = k | z_{t-1} = j, p_t) = softmax_k( A_jk + v_k * p_t )
 
-Routing the inputs this way is what removes the circularity — pupil defines the
-states, so it must not also sit in the choice GLM whose within-state responses
-we then analyze.  The routing is implemented in
-`NT-GLM-HMM/2_fit_models/fit_global_glmhmm/glm_hmm_routed.py`, which subclasses
-`InputDrivenObservations` and `InputDrivenTransitions` so each sub-model slices
+The routing is implemented in `NT-GLM-HMM/2_fit_models/fit_global_glmhmm/glm_hmm_routed.py`, 
+which subclasses `InputDrivenObservations` and `InputDrivenTransitions` so each sub-model slices
 its own columns out of the shared input matrix.  See
 `NT-GLM-HMM/REVIEWER_MODEL_README.md` for the longer rationale behind the
 routing (its *Usage* section describes the superseded `glm_hmm_utils_v2.py`
@@ -106,13 +105,3 @@ Figure 6 is MATLAB.  `Fig6/fig6.m` reads `glmhmm_K3_state_assignments_corrected.
 Extended Data Figure 6-1 is Python:
 
     python plot_pupil_ne_cv_corrected.py    # -> glmhmm_pupil_ne_cv_corrected_figure.svg / .png
-
-### Superseded outputs
-
-Kept for comparison against the pre-correction model; none of these are what the
-paper reports.
-
-    glmhmm_K3_state_assignments.csv      glmhmm_cv_results.csv
-    glmhmm_cv_corrected_results.csv      glmhmm_pupil_ne_cv_results.csv
-    glmhmm_pupil_ne_cv.py                plot_pupil_ne_cv.py
-    glm_hmm_utils_v2.py
