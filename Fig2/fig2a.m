@@ -17,14 +17,14 @@ function fig2a(data)
         pupil = [pupil; data(i,:).pupil_area{1}];
     end
 
-    hist_fig = figure(); 
-    histogram(pupil(:,2), 50, 'Normalization', 'pdf', 'Orientation', 'horizontal', 'FaceColor', [0.5,0.5,0.5])
-    xlabel('Probability Density', 'FontSize', 16)
-    ylabel('Pupil Area (z-score)', 'FontSize', 16)
+    % hist_fig = figure(); 
+    % histogram(pupil(:,2), 50, 'Normalization', 'pdf', 'Orientation', 'horizontal', 'FaceColor', [0.5,0.5,0.5])
+    % xlabel('Probability Density', 'FontSize', 16)
+    % ylabel('Pupil Area (z-score)', 'FontSize', 16)
 
     saveas(trace_fig, 'Figures/fig2a_example.fig')
     saveas(trace_fig, 'Figures/fig2a_example.svg')
-    saveas(hist_fig, 'Figures/fig2a_histogram.fig')
-    saveas(hist_fig, 'Figures/fig2a_histogram.svg')
+    % saveas(hist_fig, 'Figures/fig2a_histogram.fig')
+    % saveas(hist_fig, 'Figures/fig2a_histogram.svg')
 
 end

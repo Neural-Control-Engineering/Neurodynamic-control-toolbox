@@ -1,165 +1,102 @@
-function [animal_peaks, animal_pl, session_peaks, session_pl] = fig3d(data, ver, peak_ver, shuff)
-    animals = fetchAnimals(data);
-    sessions = unique(data.session_id);
-    
-    animal_xcor = {[], [], [], [], [], [], [], []};
-    session_xcor = {[], [], [], [], [], [], [], []};
-    session_sesh = {{}, {}, {}, {}, {}, {}, {}, {}};
+function fig3d(data, ver, peak_ver, shuff)
+
     tbounds = [-4,0];
-
-    outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}, {'Hit', 'CR'}, {'Miss', 'FA'}};
-
-    for a = 1:length(animals)
-        tmp = filterTrials(data, 'animal', num2str(animals(a)));
-        for o = 1:length(outcomes)
-            otmp = filterTrials(tmp, 'categorical_outcome', outcomes{o});
-            [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus', ver);
-            Fs = getFs(data, 'photometry_ch1');
-            Fs = Fs(1);
-            cs = zeros(size(otmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
-            lags = zeros(size(otmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
-            for i = 1:size(mpfc,1)
-                ch1 = mpfc(i,:);
-                ch2 = s1(i,:);
-                % mpfc x s1 
-                [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
-                try
-                    lags(i,:) = lag ./ Fs;
-                    cs(i,:) = c; % ./ length(ch1(2:end-1));
-                catch
-                    lags(i,:) = nan(1, size(lags,2));
-                    cs(i,:) = nan(1,size(cs,2));
-                end
-            end
-            if size(cs,1) > 1
-                animal_xcor{o} = [animal_xcor{o}; nanmean(cs)];
-            else
-                animal_xcor{o} = [animal_xcor{o}; cs];
-            end
-        end
-    end
-    animal_lags = lag ./ Fs;
-
-    for s = 1:length(sessions)
-        tmp = filterTrials(data, 'session_id', num2str(sessions(s)));
-        for o = 1:length(outcomes)
-            otmp = filterTrials(tmp, 'categorical_outcome', outcomes{o});
-            if ~isempty(otmp)
-                [mpfc, s1, t] = avg_photo_traces(otmp, tbounds, 'stimulus', ver);
-                Fs = getFs(data, 'photometry_ch1');
-                Fs = Fs(1);
-                cs = zeros(size(otmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
-                lags = zeros(size(otmp,1), length([tbounds(1):(1/Fs):tbounds(2)])*2-5);
-                for i = 1:size(mpfc,1)
-                    ch1 = mpfc(i,:);
-                    ch2 = s1(i,:);
-                    % mpfc x s1 
-                    [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
-                    try
-                        lags(i,:) = lag ./ Fs;
-                        cs(i,:) = c; % ./ length(ch1(2:end-1));
-                    catch
-                        lags(i,:) = nan(1, size(lags,2));
-                        cs(i,:) = nan(1,size(cs,2));
-                    end
-                end
-                if size(cs,1) > 1
-                    session_xcor{o} = [session_xcor{o}; nanmean(cs)];
-                else
-                    session_xcor{o} = [session_xcor{o}; cs];
-                end
-            else
-                session_xcor{o} = [session_xcor{o}; nan(1,size(session_xcor{o},2))];
-            end
-            session_sesh{o} = vertcat(session_sesh{o}, sessions{s});
-        end
-    end
-    session_lags = lag ./ Fs;
-
-    animal_peaks = {[], [], [], [], [], [], [], []};
-    animal_pl = animal_peaks;
-    session_peaks = animal_peaks;
-    session_pl = session_peaks;
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    Fs = getFs(data, 'photometry_ch1');
+    Fs = Fs(1);
+    peaks = {[],[],[],[]};
+    sesh = {{},{},{},{}};
+    subj = {{},{},{},{}};
+    result = {};
+    count = 1;
 
     for o = 1:length(outcomes)
-        for r = 1:size(animal_xcor{o},1)
-            [peak, ind] = max(animal_xcor{o}(r,:)-nanmean(shuff));
-            % animal_peaks{o} = [animal_peaks{o}; peak];
-            n = floor(length(animal_xcor{o}(r,:))/2);
+        otmp = filterTrials(data, 'categorical_outcome', outcomes{o});
+        [mpfc, s1, ~] = avg_photo_traces(otmp, tbounds, 'stimulus', ver);
+        for i = 1:size(mpfc,1)
+            ch1 = mpfc(i,:);
+            ch2 = s1(i,:);
+            % mpfc x s1 
+            [c, lag] = xcorr(ch1(2:end-1), ch2(2:end-1), 'normalized');
+            [peak, ~] = max(c-nanmean(shuff));
+            n = floor(length(lag)/2);
             if strcmp(peak_ver, 'atzero')
-                animal_peaks{o} = [animal_peaks{o}; animal_xcor{o}(r,n)-nanmean(shuff(:,n))];
+                peaks{o} = [peaks{o}; c(n)-nanmean(shuff(:,n))];
             else
-                animal_peaks{o} = [animal_peaks{o}; peak];
+                peaks{o} = [peaks{o}; peak];
             end
-            animal_pl{o} = [animal_pl{o}; animal_lags(ind)];
-        end
-        for r = 1:size(session_xcor{o},1)
-            [peak, ind] = max(session_xcor{o}(r,:)-nanmean(shuff));
-            n = floor(length(session_xcor{o}(r,:))/2);
-            if strcmp(peak_ver, 'atzero')
-                session_peaks{o} = [session_peaks{o}; session_xcor{o}(r,n)-nanmean(shuff(:,n))];
-            else
-                session_peaks{o} = [session_peaks{o}; peak];
-            end
-            session_pl{o} = [session_pl{o}; session_lags(ind)];
+            sesh{o} = vertcat(sesh{o}, otmp(i,:).session_id{1});
+            result{count} = outcomes{o};
+            count = count + 1;
         end
     end
+    all_peaks = [peaks{1}; peaks{2}; peaks{3}; peaks{4}];
+    session = vertcat(sesh{1}, sesh{2}, sesh{3}, sesh{4});
+    subject = {};
+    for i = 1:length(session)
+        subject{i} = session{i}(1:3);
+    end
+    subject = subject';
+    response = [ones(size(peaks{1})); zeros(size(peaks{2})); zeros(size(peaks{3})); ones(size(peaks{4}))];
+    outcomes = [ones(size(peaks{1})); zeros(size(peaks{2})); ones(size(peaks{3})); zeros(size(peaks{4}))];
 
-    fig_session = figure();
-    hold on 
-    x = [1:4, 6:7, 9:10];
-    for i = 1:length(session_peaks)
-        plot(zeros(1,length(session_peaks{i}))+x(i)+(rand([1,length(session_peaks{i})])-0.5)*0.3, session_peaks{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
-    end
-    errorbar(x, cellfun(@nanmean, session_peaks), cellfun(@ste, session_peaks), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    T = table(all_peaks, result', response, session, subject,  'VariableNames', {'Correlation', 'Result', 'Response', 'Session', 'Subject'});
+
+    lmeTbl = T(:, {'Correlation', 'Result', 'Response', 'Session', 'Subject'});
+
+    % Make sure response is numeric
+    lmeTbl.Correlation = double(lmeTbl.Correlation);
+
+    % Make predictors categorical
+    lmeTbl.Response = categorical(lmeTbl.Response);
+    lmeTbl.Result = categorical(lmeTbl.Result);
+    lmeTbl.Session  = categorical(lmeTbl.Session);
+    lmeTbl.Subject  = categorical(lmeTbl.Subject);
+    % lmeTbl.Outcome  = categorical(lmeTbl.Outcome);
+
+    % Remove rows with missing values in any model variable
+    badRows = isnan(lmeTbl.Correlation) | ...
+            isundefined(lmeTbl.Response) | ...
+            isundefined(lmeTbl.Result) | ...
+            isundefined(lmeTbl.Subject) | ...
+            isundefined(lmeTbl.Session);
+
+    lmeTbl(badRows,:) = [];
+
+    % Optional but useful: remove unused category levels
+    lmeTbl.Response = removecats(lmeTbl.Response);
+    lmeTbl.Session  = removecats(lmeTbl.Session);
+    lmeTbl.Subject  = removecats(lmeTbl.Subject);
+    lmeTbl.Result  = removecats(lmeTbl.Result);
+
+    fprintf('Correlation by response LME\n')
+    lme = fitlme(lmeTbl, ...
+        'Correlation ~ Response + (1|Session) + (1|Subject)');
+    anova(lme)
+    fprintf('Correlation by outcome LME\n')
+    lmeR = fitlme(lmeTbl, ...
+        'Correlation ~ Result + (1|Session) + (1|Subject)');
+    anova(lmeR)
+    % compare(lme, lmeR)
+
+    fig = figure();
+    hold on; 
+    % for i = 1:length(peaks)
+    %     plot((rand(size(peaks{i}))-0.5)*0.1+i, peaks{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', 'w', 'MarkerSize', 2)
+    % end
+    bar(1:4, cellfun(@nanmean, peaks), 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(1:4, cellfun(@nanmean, peaks), cellfun(@ste, peaks), 'k.', 'LineWidth', 2, 'CapSize', 25)
+    bar(6:7, [nanmean(vertcat(peaks{1}, peaks{4})), nanmean(vertcat(peaks{2}, peaks{3}))], 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(6:7, [nanmean(vertcat(peaks{1}, peaks{4})), nanmean(vertcat(peaks{2}, peaks{3}))], [ste(vertcat(peaks{1}, peaks{4})), ste(vertcat(peaks{2}, peaks{3}))], 'k.', 'LineWidth', 2, 'CapSize', 25)
+    xticks([1:4, 6:7])
+    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm', 'Responded', 'Withheld'})
+    xtickangle(45)
     lims = ylim;
     plot([5,5], lims, 'k--')
-    yticks([lims(1), 0, lims(2)])
-    xticks(x)
-    xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Responded', 'Withheld', 'Correct', 'Incorrect'})
-    xtickangle(45)
-    if strcmp(peak_ver, 'atzero')
-        ylabel('Cross Correlation at 0s Lag', 'FontSize', 16)
-    else
-        ylabel('Peak Correlation at 0s Lag', 'FontSize', 16)
-    end
-    % mat = [session_peaks{1}, session_peaks{2}, session_peaks{3}, session_peaks{4}];
-    % [p, ~, stats] = anova1(mat);
-    % fprintf(sprintf('NE mPFC x S1 Outcome anova: p = %d\n', p))
-    % fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{5}, session_peaks{6})))
-    % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(session_peaks{7}, session_peaks{8})))
-    % mc = multcompare(stats)
-    % fig_animal = figure();
-    % errorbar([1:4, 6:7, 9:10], animal_avg, animal_err, 'k.')
-    % hold on
-    % bar([1:4, 6:7, 9:10], animal_avg, 'FaceColor', 'k', 'EdgeColor', 'k')
-    % xticks([1:4, 6:7, 9:10])
-    % xticklabels({'Hit', 'Miss', 'CR', 'FA', 'Responded', 'Withheld', 'Correct', 'Incorrect'})
-    % xtickangle(45)
-    % ylabel('Peak Cross Correlation')
-
-    sesh = vertcat(session_sesh{1}, session_sesh{2}, session_sesh{3}, session_sesh{4});
-    subj = {};
-    for i = 1:length(sesh)
-        subj{i} = sesh{i}(1:3);
-    end
-    tbl = table([session_peaks{1}; session_peaks{2}; session_peaks{3}; session_peaks{4}], ...
-        [ones(size(session_peaks{1})); zeros(size(session_peaks{2})); zeros(size(session_peaks{3})); ones(size(session_peaks{4}))], ...
-        [ones(size(session_peaks{1})); zeros(size(session_peaks{2})); ones(size(session_peaks{3})); zeros(size(session_peaks{4}))], ...
-        sesh, subj', 'VariableNames', {'xcorr', 'response', 'outcome', 'session', 'subject'});
-    tbl.response = categorical(tbl.response);
-    tbl.session = categorical(tbl.session);
-    tbl.subject = categorical(tbl.subject);
-    badRows = isnan(tbl.xcorr) | ...
-        isundefined(tbl.response) | ...
-        isundefined(tbl.subject) | ...
-        isundefined(tbl.session);
-    tbl(badRows,:) = [];
-    lme = fitlme(tbl, ...
-        'xcorr ~ response*outcome + (1|session) + (1|subject)');
-    anova(lme)
-
-    saveas(fig_session, 'Figures/fig3d.fig')
-    saveas(fig_session, 'Figures/fig3d.svg')
-
-end
+    ylim(lims)
+    xlabel('Trial Outcome', 'FontSize', 16)
+    ylabel('Correlation Coefficient at 0s Lag', 'FontSize', 16)
+    saveas(fig, 'Figures/fig3d.fig')
+    saveas(fig, 'Figures/fig3d.svg')
+    
+end 

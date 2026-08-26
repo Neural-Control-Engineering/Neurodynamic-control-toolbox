@@ -169,8 +169,6 @@ function fig2c(data, tbounds, alignTo)
     fprintf('hit and miss pupil_ne_ by stimulus strength:\n')
     ranova(rm)
 
-    keyboard 
-
     saveas(pupil_fig, 'Figures/fig2c.fig')
     saveas(pupil_fig, 'Figures/fig2c.svg')
 end

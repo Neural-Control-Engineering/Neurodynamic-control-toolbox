@@ -1,112 +1,142 @@
-function [baselines_animal, baselines_session] = fig4i(data, tbounds, alignTo, ver)
-    outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
-
-    animals = fetchAnimals(data);
-    sessions = unique(data.session_id);
-    animal = {[], [], [], [], [], []};
-    session = {[], [], [], [], [], []};
-    session_sesh = session;
-
-    if ~exist('alignTo', 'var')
-        alignTo = 'stimulus';
-    end
-
-    for a = 1:length(animals)
-        atmp = filterTrials(data, 'animal', num2str(animals(a)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(atmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [mpfc, ~, t] = avg_photo_traces(otmp, [tbounds(1), tbounds(2)], alignTo, ver);
-                if size(mpfc,1) > 1
-                    animal{o} = [animal{o}; nanmean(mpfc)];
-                else
-                    animal{o} = [animal{o}; mpfc];
-                end
-            end
-        end
-    end
-
-    for s = 1:length(sessions)
-        stmp = filterTrials(data, 'session_id', num2str(sessions(s)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(stmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [mpfc, ~, t] = avg_photo_traces(otmp, [tbounds(1), tbounds(2)], alignTo, ver);
-                if size(mpfc,1) > 1
-                    session{o} = [session{o}; nanmean(mpfc)];
-                else
-                    session{o} = [session{o}; mpfc];
-                end
+function fig4i(data, tbounds, alignTo, ver)
+    stim_strengths = unique(data.stimulus_strength);
+    cols = distinguishable_colors(length(stim_strengths)+1);
+    % tmp = filterTrials(data, 'categorical_outcome', 'Hit');
+    dilations = [];
+    baselines = [];
+    stimuli = [];
+    sessions = {};
+    subjects = {};
+    responses = [];
+    for s = 1:length(stim_strengths)
+        stmp = filterTrials(data, 'stim_strength', stim_strengths(s));
+        [pfc, ~, t] = avg_photo_traces(stmp, [tbounds(1), tbounds(2)], alignTo, ver);
+        pfc = pfc(:,2:end-1);
+        t = t(2:end-1);
+        b =  nanmean(pfc(:,(t > -0.5 & t < 0)),2);
+        % e = nanmean(pfc(:,(t > 0 & t < 2)),2);
+        e = max(pfc(:,(t > 0 & t < 2)),[],2);
+        d = e - b;
+        baselines = [baselines; b];
+        dilations = [dilations; d];
+        stimuli = [stimuli; zeros(size(b)) + stim_strengths(s)];
+        sessions = vertcat(sessions, stmp.session_id);
+        for t = 1:size(stmp,1)
+            if strcmp(stmp(t,:).categorical_outcome{1}, 'Hit') | strcmp(stmp(t,:).categorical_outcome{1}, 'FA')
+                responses = [responses; 1];
             else
-                session{o} = [session{o}; nan(1,size(session{o},2))];
+                responses = [responses; 0];
             end
-            session_sesh{o} = [session_sesh{o}; sessions{s}];
+            subjects = vertcat(subjects, stmp(t,:).session_id{1}(1:3));
         end
+        % plot(b, e, 'o', 'MarkerFaceColor', cols(s,:), 'MarkerSize', 2.0)
+        % hold on
     end
+    fig = figure();
+    plot(baselines, dilations, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 3)
+    x = baselines;
+    y = dilations;
+    mdl = fitlm(x, y)
+    [FM, S]=polyfit(x(~isnan(x)),y(~isnan(y)),1);
+    [FM_vals, delta] = polyval(FM,linspace(min(x),max(x),10), S); 
+    hold on; plot(linspace(min(x),max(x),10), FM_vals, 'k--', 'linewidth',2) 
+    xlabel('Baseline NE in S1 (z-score)', 'FontSize', 16)
+    ylabel('Stimulus Evoked Increase in NE (z-score)', 'FontSize', 16)
+    xlim([-2.5,5.1])
+    saveas(fig, 'Figures/fig4i.fig')
+    saveas(fig, 'Figures/fig4i.svg')
 
-    baselines_animal = {[], [], [], [], [], []};
-    baselines_session = {[], [], [], [], [], []};
-    for o = 1:length(outcomes)
-        baselines_animal{o} =  nanmean(animal{o}(:,(t > -0.5 & t < 0)),2);
-        baselines_session{o} =  nanmean(session{o}(:,(t > -0.5 & t < 0)),2);
-    end
+    T = table(dilations, baselines, responses, stimuli, sessions, subjects,  'VariableNames', {'Dilation', 'Baseline', 'Response', 'Stimulus', 'Session', 'Subject'});
 
-    x = [1:4, 6:7];
-    labels = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold'};
+    lmeTbl = T(:, {'Dilation', 'Baseline','Stimulus','Response','Session', 'Subject'});
 
-    for i = 1:length(baselines_session) 
-        avg(i) = mean(baselines_session{i});
-        err(i) = std(baselines_session{i}) / sqrt(length(baselines_session{i}));
-    end
+    % Make sure response is numeric
+    lmeTbl.Dilation = double(lmeTbl.Dilation);
+
+    % Make predictors categorical
+    lmeTbl.Baseline = double(lmeTbl.Baseline);
+    lmeTbl.Stimulus = categorical(lmeTbl.Stimulus);
+    lmeTbl.Response = categorical(lmeTbl.Response);
+    lmeTbl.Session  = categorical(lmeTbl.Session);
+    lmeTbl.Subject  = categorical(lmeTbl.Subject);
+
+    % Remove rows with missing values in any model variable
+    badRows = isnan(lmeTbl.Dilation) | ...
+            isundefined(lmeTbl.Stimulus) | ...
+            isnan(lmeTbl.Baseline) | ...
+            isundefined(lmeTbl.Response) | ...
+            isundefined(lmeTbl.Subject) | ...
+            isundefined(lmeTbl.Session);
+
+    lmeTbl(badRows,:) = [];
+
+    % Optional but useful: remove unused category levels
+    lmeTbl.Stimulus = removecats(lmeTbl.Stimulus);
+    lmeTbl.Response = removecats(lmeTbl.Response);
+    lmeTbl.Session  = removecats(lmeTbl.Session);
+    lmeTbl.Subject  = removecats(lmeTbl.Subject);
+
+    lme = fitlme(lmeTbl, ...
+        'Dilation ~ Stimulus*Response*Baseline + (1|Session) + (1|Subject)')
     
-    fig_sesh = figure();
-    hold on 
-    for i = 1:length(x)
-        plot(zeros(1,length(baselines_session{i}))+x(i)+(rand([1,length(baselines_session{i})])-0.5)*-0.3, ...
-            baselines_session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
-    end
-    errorbar(x, cellfun(@nanmean, baselines_session), cellfun(@ste, baselines_session), 'k.', 'CapSize', 15, 'LineWidth', 2)
-    lims = ylim;
-    plot([5,5], lims, 'k--')
-    yticks([lims(1), 0, lims(2)])
-    xticks(x)
-    xticklabels(labels)
-    xtickangle(45)
-    ylabel('Baseline NE_{mPFC} (z-score)')
-
-    % mat = [baselines_session{1}, baselines_session{2}, baselines_session{4}, baselines_session{4}];
-    % [p, ~, stats] = anova1(mat);
-    % fprintf('mPFC NE baseline:\n')
-    % fprintf(sprintf('Outcome anova: p = %d\n', p))
-    % fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(baselines_session{5}, baselines_session{6})))
-    % mc = multcompare(stats)
-
-    sesh = cellstr(vertcat(session_sesh{1}, session_sesh{2}, session_sesh{3}, session_sesh{4}));
-    subj = {};
-    for i = 1:length(sesh)
-        subj{i} = sesh{i}(1:3);
-    end
-    tbl = table([baselines_session{1}; baselines_session{2}; baselines_session{3}; baselines_session{4}], ...
-        [ones(size(baselines_session{1})); zeros(size(baselines_session{2})); zeros(size(baselines_session{3})); ones(size(baselines_session{4}))], ...
-        [ones(size(baselines_session{1})); zeros(size(baselines_session{2})); ones(size(baselines_session{3})); zeros(size(baselines_session{4}))], ...
-        sesh, subj', 'VariableNames', {'baseline', 'response', 'outcome', 'session', 'subject'});
-    tbl.response = categorical(tbl.response);
-    tbl.session = categorical(tbl.session);
-    tbl.subject = categorical(tbl.subject);
-    badRows = isnan(tbl.baseline) | ...
-        isundefined(tbl.response) | ...
-        isundefined(tbl.subject) | ...
-        isundefined(tbl.session);
-    tbl(badRows,:) = [];
-    lme = fitlme(tbl, ...
-        'baseline ~ response*outcome + (1|session) + (1|subject)');
-    fprintf('LME Baseline S1 PFC, Response, Outcome\n')
     anova(lme)
 
-    keyboard 
+    x_min = -2; %min(baselines);
+    x_max = 5; %max(baselines);
+    x = linspace(x_min, x_max, 100)';
+    animals = fetchAnimals(data);
+    fig = figure(); hold on;
+    tl = tiledlayout(2,4);
+    for s = 1:length(stim_strengths)
+        axs(s) = nexttile;
+        hold on 
+        ss = stim_strengths(s);
+        for r = 0:1
+            y = [];
+            % tbl = table(x, repmat(ss, size(x)), repmat(r,size(x)), subj', sesh', 'VariableNames', {'Baseline', 'Stimulus', 'Response', 'Subject', 'Session'});
+            for a = 1:length(animals)
+                sessions = unique(data(contains(data.session_id, strcat(num2str(animals(a)), '-R')),:).session_id);
+                for h = 1:length(sessions)
+                    subj = {};
+                    sesh = {};
+                    for i = 1:length(x)
+                        subj{i} = sessions{h}(1:3);
+                        sesh{i} = sessions{h};
+                    end
+                    tbl = table(x, repmat(ss, size(x)), repmat(r,size(x)), subj', sesh', 'VariableNames', {'Baseline', 'Stimulus', 'Response', 'Subject', 'Session'});
+                    % Make predictors categorical
+                    tbl.Baseline = double(tbl.Baseline);
+                    tbl.Stimulus = categorical(tbl.Stimulus);
+                    tbl.Response = categorical(tbl.Response);
+                    tbl.Session  = categorical(tbl.Session);
+                    tbl.Subject  = categorical(tbl.Subject);
+                    % Remove rows with missing values in any model variable
+                    badRows = isundefined(tbl.Stimulus) | ...
+                            isnan(tbl.Baseline) | ...
+                            isundefined(tbl.Response) | ...
+                            isundefined(tbl.Subject) | ...
+                            isundefined(tbl.Session);
+                    tbl(badRows,:) = [];
+                    % Optional but useful: remove unused category levels
+                    tbl.Stimulus = removecats(tbl.Stimulus);
+                    tbl.Response = removecats(tbl.Response);
+                    tbl.Session  = removecats(tbl.Session);
+                    tbl.Subject  = removecats(tbl.Subject);
+                    y = [y; predict(lme, tbl)'];
+                end
+            end
+            if r
+                % semshade(y, 0.3, cols(s,:), cols(s,:), x, 1, '', '-');
+                % plot(baselines(responses == r & stimuli == ss), dilations(responses == r & stimuli == ss), 'o', 'Color', cols(s,:))
+                plot(x, mean(y), '-', 'Color', cols(s,:), 'LineWidth', 2)
+            else
+                % semshade(y, 0.3, cols(s,:), cols(s,:), x, 1, '', '--');
+                % plot(baselines(responses == r & stimuli == ss), dilations(responses == r & stimuli == ss), 'x', 'Color', cols(s,:))
+                plot(x, mean(y), ':', 'Color', cols(s,:), 'LineWidth', 2)
+            end
+        end
+        xlim([-2,5])
+    end
+ 
 
-    saveas(fig_sesh, 'Figures/fig4i.fig')
-    saveas(fig_sesh, 'Figures/fig4i.svg')
 end

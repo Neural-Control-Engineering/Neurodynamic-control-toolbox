@@ -310,10 +310,9 @@ function fig4bh(data, tbounds, alignTo, ver)
     rm = fitrm(s1_tbl, sprintf('t0-t%i ~ intensity*response',c-1), 'WithinDesign', time);
     fprintf('hit and miss s1 by stimulus strength:\n')
     ranova(rm)
-    keyboard 
 
-    saveas(s1_fig, 'Figures/figb.fig')
-    saveas(s1_fig, 'Figures/figb.svg')
-    saveas(mpfc_fig, 'Figures/figh.fig')
-    saveas(mpfc_fig, 'Figures/figh.svg')
+    saveas(s1_fig, 'Figures/fig4b.fig')
+    saveas(s1_fig, 'Figures/fig4b.svg')
+    saveas(mpfc_fig, 'Figures/fig4h.fig')
+    saveas(mpfc_fig, 'Figures/fig4h.svg')
 end

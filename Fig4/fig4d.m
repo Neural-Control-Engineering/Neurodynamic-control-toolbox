@@ -1,92 +1,90 @@
-function [dilations_animal, dilations_session] = fig4d(data, tbounds, alignTo, ver)
-    outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
+function fig4d(data, tbounds, alignTo, ver)
 
-    animals = fetchAnimals(data);
-    sessions = unique(data.session_id);
-    animal = {[], [], [], [], [], []};
-    session = {[], [], [], [], [], []};
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    dilations = {[],[],[],[]};
+    sesh = {{},{},{},{}};
 
-    if ~exist('alignTo', 'var')
-        alignTo = 'stimulus';
-    end
-
-    for a = 1:length(animals)
-        atmp = filterTrials(data, 'animal', num2str(animals(a)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(atmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [~, s1, t] = avg_photo_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo, ver);
-                if size(s1,1) > 1
-                    animal{o} = [animal{o}; nanmean(s1)];
-                else
-                    animal{o} = [animal{o}; s1];
-                end
-            end
-        end
-    end
-
-    for s = 1:length(sessions)
-        stmp = filterTrials(data, 'session_id', num2str(sessions(s)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(stmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [~, s1, t] = avg_photo_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo, ver);
-                if size(s1,1) > 1
-                    session{o} = [session{o}; nanmean(s1)];
-                else
-                    session{o} = [session{o}; s1];
-                end
-            else
-                session{o} = [session{o}; nan(1,size(session{o},2))];
-            end
-        end
-    end
-
-    dilations_animal = {[], [], [], []};
-    dilations_session = {[], [], [], []};
     for o = 1:length(outcomes)
-        baselines_animal =  nanmean(animal{o}(:,(t > -0.5 & t < 0)),2);
-        evoked_animal = nanmean(animal{o}(:,(t > 0 & t < 6)),2);
-        baselines_session =  nanmean(session{o}(:,(t > -0.5 & t < 0)),2);
-        evoked_session = nanmean(session{o}(:,(t > 0 & t < 6)),2);
-        dilations_animal{o} = evoked_animal - baselines_animal;
-        dilations_session{o} = evoked_session - baselines_session;
-    end
-
-    x = [1:4, 6:7];
-    labels = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold'};
-
-    for i = 1:length(dilations_session) 
-        avg(i) = mean(dilations_session{i});
-        err(i) = std(dilations_session{i}) / sqrt(length(dilations_session{i}));
+        outcome = outcomes{o};
+        otmp = filterTrials(data, 'categorical_outcome', outcome);
+        if ~isempty(otmp)
+            [~, s1, t] = avg_photo_traces(otmp, [tbounds(1), tbounds(2)], alignTo, ver);
+            b = nanmean(s1(:,(t > -0.5 & t < 0)),2);
+            e = max(s1(:,(t > 0 & t < 2)),[],2);
+            dilations{o} = e - b;
+        end
+        sesh{o} = otmp.session_id;
     end
     
-    fig_sesh = figure();
-    hold on 
-    for i = 1:length(x)
-        plot(zeros(1,length(dilations_session{i}))+x(i)+(rand([1,length(dilations_session{i})])-0.5)*-0.3, ...
-            dilations_session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
+    all_dilations = [dilations{1}; dilations{2}; dilations{3}; dilations{4}];
+    session = vertcat(sesh{1}, sesh{2}, sesh{3}, sesh{4});
+    subject = {};
+    for i = 1:length(session)
+        subject{i} = session{i}(1:3);
     end
-    errorbar(x, cellfun(@nanmean, dilations_session), cellfun(@ste, dilations_session), 'k.', 'CapSize', 15, 'LineWidth', 2)
+    subject = subject';
+    response = [ones(size(dilations{1})); zeros(size(dilations{2})); zeros(size(dilations{3})); ones(size(dilations{4}))];
+    outcomes = [zeros(size(dilations{1})); zeros(size(dilations{2}))+1; zeros(size(dilations{3}))+2; zeros(size(dilations{4}))+3];
+
+    T = table(all_dilations, response, outcomes, session, subject,  'VariableNames', {'Dilation', 'Response', 'Outcome', 'Session', 'Subject'});
+
+    lmeTbl = T(:, {'Dilation','Response', 'Outcome', 'Session', 'Subject'});
+
+    % Make sure response is numeric
+    lmeTbl.Dilation = double(lmeTbl.Dilation);
+
+    % Make predictors categorical
+    lmeTbl.Response = categorical(lmeTbl.Response);
+    lmeTbl.Session  = categorical(lmeTbl.Session);
+    lmeTbl.Subject  = categorical(lmeTbl.Subject);
+    lmeTbl.Outcome  = categorical(lmeTbl.Outcome);
+
+    % Remove rows with missing values in any model variable
+    badRows = isnan(lmeTbl.Dilation) | ...
+            isundefined(lmeTbl.Response) | ...
+            isundefined(lmeTbl.Outcome) | ...
+            isundefined(lmeTbl.Subject) | ...
+            isundefined(lmeTbl.Session);
+
+    lmeTbl(badRows,:) = [];
+
+    % Optional but useful: remove unused category levels
+    lmeTbl.Response = removecats(lmeTbl.Response);
+    lmeTbl.Session  = removecats(lmeTbl.Session);
+    lmeTbl.Subject  = removecats(lmeTbl.Subject);
+    lmeTbl.Outcome  = removecats(lmeTbl.Outcome);
+
+    fprintf('Increase in S1 NE response LME\n')
+    lme = fitlme(lmeTbl, ...
+        'Dilation ~ Response + (1|Session) + (1|Subject)');
+    anova(lme)
+
+    fprintf('Increase in S1 NE outcome LME\n')
+    lmeo = fitlme(lmeTbl, ...
+        'Dilation ~ Outcome + (1|Session) + (1|Subject)');
+    anova(lmeo)
+
+    % compare(lme, lmeo)
+
+    fig = figure();
+    hold on; 
+    % for i = 1:length(dilations)
+    %     plot((rand(size(dilations{i}))-0.5)*0.1+i, dilations{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', 'w', 'MarkerSize', 2)
+    % end
+    bar(1:4, cellfun(@nanmean, dilations), 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(1:4, cellfun(@nanmean, dilations), cellfun(@ste, dilations), 'k.', 'LineWidth', 2, 'CapSize', 25)
+    bar(6:7, [nanmean(vertcat(dilations{1}, dilations{4})), nanmean(vertcat(dilations{2}, dilations{3}))], 'FaceColor', [0.5,0.5,0.5], 'EdgeColor', 'k')
+    errorbar(6:7, [nanmean(vertcat(dilations{1}, dilations{4})), nanmean(vertcat(dilations{2}, dilations{3}))], [ste(vertcat(dilations{1}, dilations{4})), ste(vertcat(dilations{2}, dilations{3}))], 'k.', 'LineWidth', 2, 'CapSize', 25)
+    xticks([1:4, 6:7])
+    xticklabels({'Hit', 'Miss', 'Correct Rejection', 'False Alarm', 'Responded', 'Withheld'})
+    xtickangle(45)
     lims = ylim;
     plot([5,5], lims, 'k--')
-    yticks([lims(1), 0, lims(2)])
-    xticks(x)
-    xticklabels(labels)
-    xtickangle(45)
-    ylabel('Mean Increase in NE_{s1} (z-score)')
+    ylim(lims)
+    ylabel('\DeltaNE in S1 (z-score)', 'FontSize', 16)
+    xlabel('Outcome', 'FontSize', 16)
 
-    saveas(fig_sesh, 'Figures/fig4d.fig')
-    saveas(fig_sesh, 'Figures/fig4d.svg')
-
-    mat = [dilations_session{1}, dilations_session{2}, dilations_session{3}, dilations_session{4}];
-    [p, ~, stats] = anova1(mat);
-    fprintf('S1 NE stim induced increase:\n')
-    fprintf(sprintf('Outcome anova: p = %d\n', p))
-    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
-    mc = multcompare(stats)
-    % fprintf(sprintf('Correct vs. Incorrect, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{7}, dilations_session{8})))
+    saveas(fig, 'Figures/fig4d.fig')
+    saveas(fig, 'Figures/fig4d.svg')
 
 end

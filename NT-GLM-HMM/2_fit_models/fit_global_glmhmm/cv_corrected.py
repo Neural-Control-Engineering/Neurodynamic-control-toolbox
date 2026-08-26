@@ -8,13 +8,15 @@ GLM-HMM. Two purposes:
 Writes: glmhmm_cv_corrected_results.csv
 """
 import sys
-sys.path.insert(0, '/Users/sleeper/Projects/Neurodynamic-control-toolbox/NT-GLM-HMM/2_fit_models/fit_global_glmhmm')
+import os
+_HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.normpath(os.path.join(_HERE, '..', '..', '..')) + os.sep
+sys.path.insert(0, _HERE)
 import numpy as np, scipy.io as sio, ssm, csv
 from sklearn.model_selection import KFold
 import warnings; warnings.filterwarnings('ignore')
 from glm_hmm_routed import build_routed_hmm
 
-REPO = '/Users/sleeper/Projects/Neurodynamic-control-toolbox/'
 d = sio.loadmat(REPO + 'pupil_transitions_data.mat')
 ri, rl = d['preprocessed_input'], d['preprocessed_label']
 n = ri.shape[0]

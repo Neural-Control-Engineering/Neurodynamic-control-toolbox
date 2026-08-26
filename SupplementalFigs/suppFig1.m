@@ -1,109 +1,106 @@
 function suppFig1(data, tbounds, alignTo)
-    stim_strengths = unique(data.stimulus_strength);
-    cols = distinguishable_colors(length(stim_strengths)+1);
-    tmp = filterTrials(data, 'categorical_outcome', 'Hit');
-    dilations = [];
-    baselines = [];
-    for s = 2:length(stim_strengths)
-        stmp = filterTrials(tmp, 'stim_strength', stim_strengths(s));
-        [pupil, t] = avg_pupil_traces(stmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-        pupil = pupil(:,2:end-1);
-        t = t(2:end-1);
-        b =  nanmean(pupil(:,(t > -0.5 & t < 0)),2);
-        e = nanmean(pupil(:,(t > 0 & t < 6)),2);
-        d = e - b;
-        baselines = [baselines; b];
-        dilations = [dilations; d];
-    end
-    x = baselines;
-    y = dilations;
-    mdl = fitlm(x, y);
-    outcomes = {'Hit', 'Miss', 'CR', 'FA', {'Hit', 'FA'}, {'Miss', 'CR'}};
-
-    animals = fetchAnimals(data);
-    sessions = unique(data.session_id);
-    animal = {[], [], [], [], [], []};
-    session = {[], [], [], [], [], []};
+    % Reviewer (R1) asked us to regress trial-wise baseline pupil size OUT of
+    % trial-wise evoked pupil responses and run the test on the residuals.
+    %
+    % The previous version did not do that. It fit the baseline->dilation model
+    % on Hit trials only and then called predict(mdl, d), passing the dilation
+    % where the predictor (baseline) belongs, so the "residual" was an affine
+    % rescaling of the dilation itself with no baseline removed. It also had no
+    % test in the file at all -- it stopped at a keyboard breakpoint, so the
+    % reported ANOVA was run by hand and was not reproducible from this repo.
+    %
+    % This version pools the regression across all four outcomes, residualises
+    % trial-wise, and runs the test in code.
 
     if ~exist('alignTo', 'var')
         alignTo = 'stimulus';
     end
 
-    for a = 1:length(animals)
-        atmp = filterTrials(data, 'animal', num2str(animals(a)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(atmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    animal{o} = [animal{o}; nanmean(pupil)];
-                else
-                    animal{o} = [animal{o}; pupil];
-                end
-            end
-        end
-    end
+    outcomes = {'Hit', 'Miss', 'CR', 'FA'};
+    outcome_names = {'Hit', 'Miss', 'Correct Rejection', 'False Alarm'};
 
-    for s = 1:length(sessions)
-        stmp = filterTrials(data, 'session_id', num2str(sessions(s)));
-        for o = 1:length(outcomes)
-            outcome = outcomes{o};
-            otmp = filterTrials(stmp, 'categorical_outcome', outcome);
-            if ~isempty(otmp)
-                [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
-                if size(pupil,1) > 1
-                    session{o} = [session{o}; nanmean(pupil)];
-                else
-                    session{o} = [session{o}; pupil];
-                end
-            else
-                session{o} = [session{o}; nan(1,size(session{o},2))];
-            end
-        end
-    end
-
-    dilations_animal = {[], [], [], []};
-    dilations_sessions = {[], [], [], []};
+    baselines = [];
+    dilations = [];
+    group = [];
+    sess = {};
+    subj = {};
     for o = 1:length(outcomes)
-        baselines_animal =  nanmean(animal{o}(:,(t > -0.5 & t < 0)),2);
-        evoked_animal = nanmean(animal{o}(:,(t > 0 & t < 6)),2);
-        baselines_session =  nanmean(session{o}(:,(t > -0.5 & t < 0)),2);
-        evoked_session = nanmean(session{o}(:,(t > 0 & t < 6)),2);
-        dilations_animal{o} = (evoked_animal - baselines_animal) - predict(mdl, baselines_animal);
-        dilations_session{o} = (evoked_session - baselines_session) - predict(mdl, baselines_session);
+        otmp = filterTrials(data, 'categorical_outcome', outcomes{o});
+        if isempty(otmp)
+            continue
+        end
+        [pupil, t] = avg_pupil_traces(otmp, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
+        pupil = pupil(:,2:end-1);
+        t = t(2:end-1);
+        b = nanmean(pupil(:,(t > -0.5 & t < 0)), 2);
+        e = max(pupil(:,(t > 0 & t < 6)), [], 2);
+        d = e - b;
+        baselines = [baselines; b];
+        dilations = [dilations; d];
+        group = [group; repmat(o, numel(d), 1)];
+        % avg_pupil_traces returns one row per input trial, so these stay aligned.
+        % animal id is the first field of session_id (see fetchAnimals.m)
+        sid = string(otmp.session_id);
+        sess = [sess; cellstr(sid)];
+        subj = [subj; cellstr(extractBefore(sid, '-'))];
     end
 
-    x = [1:4, 6:7];
-    labels = {'Hit', 'Miss', 'CR', 'FA', 'Action', 'Withhold'};
+    % --- residualise: regress trial-wise baseline out of trial-wise evoked ---
+    ok = ~isnan(baselines) & ~isnan(dilations);
+    mdl = fitlm(baselines(ok), dilations(ok));
+    fprintf('\nBaseline -> dilation regression (pooled across outcomes, n = %i trials):\n', sum(ok));
+    disp(mdl)
 
-    for i = 1:length(dilations_session) 
-        avg(i) = mean(dilations_session{i});
-        err(i) = std(dilations_session{i}) / sqrt(length(dilations_session{i}));
+    resid = nan(size(dilations));
+    resid(ok) = dilations(ok) - predict(mdl, baselines(ok));
+
+    residuals = cell(1, length(outcomes));
+    for o = 1:length(outcomes)
+        residuals{o} = resid(group == o & ok);
     end
-    
-    fig_sesh = figure();
-    hold on 
-    for i = 1:length(x)
-        plot(zeros(1,length(dilations_session{i}))+x(i)+(rand([1,length(dilations_session{i})])-0.5)*-0.3, ...
-            dilations_session{i}, 'o', 'MarkerFaceColor', [0.5,0.5,0.5], 'MarkerEdgeColor', [1,1,1], 'MarkerSize', 5)
+
+    % --- test on the residuals (what the reviewer asked for) ---
+    fprintf('\nANOVA on baseline-residualised evoked pupil dilation, by trial outcome:\n');
+    [p_anova, tbl_anova, stats_anova] = anova1(resid(ok), group(ok), 'off');
+    disp(tbl_anova)
+    fprintf('ANOVA(outcome) on residuals: F(%i,%i) = %.3f, p = %.4g\n', ...
+        tbl_anova{2,3}, tbl_anova{3,3}, tbl_anova{2,5}, p_anova);
+    fprintf('\nTukey-Kramer post hoc:\n');
+    c = multcompare(stats_anova, 'Display', 'off');
+    for i = 1:size(c,1)
+        fprintf('  %-18s vs %-18s  diff %7.4f  p = %.4g\n', ...
+            outcome_names{c(i,1)}, outcome_names{c(i,2)}, c(i,4), c(i,6));
     end
-    errorbar(x, cellfun(@nanmean, dilations_session), cellfun(@ste, dilations_session), 'k.', 'CapSize', 15, 'LineWidth', 2)
-    lims = ylim;
-    plot([5,5], lims, 'k--')
-    yticks([lims(1), 0, lims(2)])
-    xticks(x)
-    xticklabels(labels)
+
+    % --- same contrast as a mixed model, matching the LME approach used
+    %     elsewhere in the revision (random intercepts for subject + session) ---
+    try
+        tblLME = table(resid(ok), categorical(group(ok)), categorical(sess(ok)), ...
+                       categorical(subj(ok)), ...
+                       'VariableNames', {'Residual', 'Outcome', 'Session', 'Subject'});
+        lme = fitlme(tblLME, 'Residual ~ 1 + Outcome + (1|Session) + (1|Subject)');
+        lme0 = fitlme(tblLME, 'Residual ~ 1 + (1|Session) + (1|Subject)');
+        fprintf('\nLinear mixed-effects model (random intercepts: session, subject):\n');
+        disp(lme)
+        fprintf('\nLikelihood ratio test vs intercept-only:\n');
+        disp(compare(lme0, lme))
+    catch ME
+        fprintf('LME skipped: %s\n', ME.message);
+    end
+
+    % --- figure ---
+    fig = figure();
+    bar(1:4, cellfun(@nanmean, residuals), 'FaceColor', [0.5,0.5,0.5]);
+    hold on
+    errorbar(1:4, cellfun(@nanmean, residuals), cellfun(@ste, residuals), 'k.')
+    plot(xlim, [0 0], 'k:')
+    xticks(1:4)
+    xticklabels(outcome_names)
     xtickangle(45)
-    ylabel('Baseline-Corrected Pupil Dilation')
+    ylabel('Baseline-Residualised Pupil Dilation', 'FontSize', 16)
+    xlabel('Trial Outcome', 'FontSize', 16)
+    set(fig, 'PaperPositionMode', 'auto')
+    saveas(fig, 'Figures/suppFig1.fig')
+    saveas(fig, 'Figures/suppFig1.svg')
 
-    mat = [dilations_session{1}, dilations_session{2}, dilations_session{3}, dilations_session{4}];
-    [p, tbl, stats] = anova1(mat)
-    fprintf('Pupil dilations:\n')
-    fprintf(sprintf('Outcome anova: p = %d\n', p))
-    fprintf(sprintf('Responded vs. Withheld, Wilcoxon signed-rank: p = %d\n', signrank(dilations_session{5}, dilations_session{6})))
-    mc = multcompare(stats)
-
-    saveas(fig_sesh, 'Figures/suppFig1.fig')
-    saveas(fig_sesh, 'Figures/suppFig1.svg')
 end

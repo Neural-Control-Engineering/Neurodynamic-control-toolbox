@@ -1,4 +1,4 @@
-function fig5ab(data, tbounds, alignTo, ver)
+function fig5a(data, tbounds, alignTo, ver)
     ptiles = [20,40,60,80,100];
     low = prctile(data.pupil_base_before_stimulus, 0);
     stim_strengths = unique(data.stimulus_strength);
@@ -14,9 +14,9 @@ function fig5ab(data, tbounds, alignTo, ver)
     fas = {};
     s1_baseline = {};
     mpfc_baseline = {};
-    fig = figure();
-    tl = tiledlayout(2,4);
-    for i = 1:8
+    fig = figure('Position', [1 1 477 658]);
+    tl = tiledlayout(2,1);
+    for i = 1:2
         ax(i) = nexttile; hold on;
     end
     for i = 1:length(ptiles)
@@ -81,28 +81,29 @@ function fig5ab(data, tbounds, alignTo, ver)
         l = sprintf('%ith quintile', i);
         axes(ax(1)); hold on;
         semshade(s1_rppa_hit{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('Hit', 'FontSize', 16)
+        title('Hit Trials', 'FontSize', 16)
         ylabel('NE in S1 (z-score)', 'FontSize', 16)
+        % axes(ax(2)); hold on;
+        % semshade(s1_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
+        % title('Miss', 'FontSize', 16)
+        % axes(ax(3)); hold on;
+        % semshade(s1_rppa_cr{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
+        % title('Correct Rejection', 'FontSize', 16)
+        % axes(ax(4)); hold on;
+        % semshade(s1_rppa_fa{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
+        % title('False Alarm', 'FontSize', 16)
+        % axes(ax(5)); hold on;
         axes(ax(2)); hold on;
-        semshade(s1_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('Miss', 'FontSize', 16)
-        axes(ax(3)); hold on;
-        semshade(s1_rppa_cr{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('Correct Rejection', 'FontSize', 16)
-        axes(ax(4)); hold on;
-        semshade(s1_rppa_fa{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        title('False Alarm', 'FontSize', 16)
-        axes(ax(5)); hold on;
         semshade(mpfc_rppa_hit{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
         ylabel('NE in mPFC (z-score)', 'FontSize', 16)
-        axes(ax(6)); hold on;
-        semshade(mpfc_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        axes(ax(7)); hold on;
-        semshade(mpfc_rppa_cr{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
-        axes(ax(8)); hold on;
-        semshade(mpfc_rppa_fa{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
+        % axes(ax(6)); hold on;
+        % semshade(mpfc_rppa_miss{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
+        % axes(ax(7)); hold on;
+        % semshade(mpfc_rppa_cr{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
+        % axes(ax(8)); hold on;
+        % semshade(mpfc_rppa_fa{i}, 0.3, cols(i,:), cols(i,:), t, 1, sprintf('%s', l));
     end
-    for i = 1:8
+    for i = 1:2
         axes(ax(i)); xlim([-0.5,6])
     end
     unifyYLimits(fig)
@@ -213,43 +214,43 @@ function fig5ab(data, tbounds, alignTo, ver)
     fprintf('mPFC FA:\n')
     ranova(rm)
 
-    bfig = figure();
-    tl = tiledlayout(1,2);
-    bax(1) = nexttile;
-    hold on;
-    for i = 1:length(s1_baseline)
-        plot(zeros(size(s1_baseline{i},1),1)+i+(rand(size(s1_baseline{i},1),1)-0.5)*0.1, s1_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
-    end
-    errorbar(1:length(ptiles), cellfun(@nanmean,s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    title('S1', 'FontSize', 16)
-    xticks(1:length(ptiles))
-    bax(2) = nexttile;
-    hold on;
-    for i = 1:length(mpfc_baseline)
-        plot(zeros(size(mpfc_baseline{i},1),1)+i+(rand(size(mpfc_baseline{i},1),1)-0.5)*0.1, mpfc_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
-    end
-    errorbar(1:length(ptiles), cellfun(@nanmean,mpfc_baseline), cellfun(@ste, mpfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
-    title('mPFC', 'FontSize', 16)
-    xticks(1:length(ptiles))
-    xlabel(tl, 'Baseline Pupil Area Quintile', 'FontSize', 16)
-    unifyYLimits(bfig)
-    ylabel(tl, 'Baseline NE (z-score)', 'FontSize', 16)
+    % bfig = figure();
+    % tl = tiledlayout(1,2);
+    % bax(1) = nexttile;
+    % hold on;
+    % for i = 1:length(s1_baseline)
+    %     plot(zeros(size(s1_baseline{i},1),1)+i+(rand(size(s1_baseline{i},1),1)-0.5)*0.1, s1_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
+    % end
+    % errorbar(1:length(ptiles), cellfun(@nanmean,s1_baseline), cellfun(@ste, s1_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    % title('S1', 'FontSize', 16)
+    % xticks(1:length(ptiles))
+    % bax(2) = nexttile;
+    % hold on;
+    % for i = 1:length(mpfc_baseline)
+    %     plot(zeros(size(mpfc_baseline{i},1),1)+i+(rand(size(mpfc_baseline{i},1),1)-0.5)*0.1, mpfc_baseline{i}, 'o', 'MarkerFaceColor', cols(i,:), 'MarkerEdgeColor', [1,1,1]);
+    % end
+    % errorbar(1:length(ptiles), cellfun(@nanmean,mpfc_baseline), cellfun(@ste, mpfc_baseline), 'k.', 'LineWidth', 2, 'CapSize', 15)
+    % title('mPFC', 'FontSize', 16)
+    % xticks(1:length(ptiles))
+    % xlabel(tl, 'Baseline Pupil Area Quintile', 'FontSize', 16)
+    % unifyYLimits(bfig)
+    % ylabel(tl, 'Baseline NE (z-score)', 'FontSize', 16)
     
-    mat = [];
-    for i = 1:length(s1_baseline)
-        mat = [mat, s1_baseline{i}];
-    end
-    fprintf('Basline S1 NE by baseline pupil area\n')
-    [p,tbl,stats] = anova1(mat)
-    mat = [];
-    for i = 1:length(mpfc_baseline)
-        mat = [mat, mpfc_baseline{i}];
-    end
-    fprintf('Basline mPFC NE by baseline pupil area\n')
-    [p,tbl,stats] = anova1(mat)
+    % mat = [];
+    % for i = 1:length(s1_baseline)
+    %     mat = [mat, s1_baseline{i}];
+    % end
+    % fprintf('Basline S1 NE by baseline pupil area\n')
+    % [p,tbl,stats] = anova1(mat)
+    % mat = [];
+    % for i = 1:length(mpfc_baseline)
+    %     mat = [mat, mpfc_baseline{i}];
+    % end
+    % fprintf('Basline mPFC NE by baseline pupil area\n')
+    % [p,tbl,stats] = anova1(mat)
 
-    saveas(bfig, 'Figures/fig5b.svg')
-    saveas(bfig, 'Figures/fig5b.fig')
+    % saveas(bfig, 'Figures/fig5b.svg')
+    % saveas(bfig, 'Figures/fig5b.fig')
     saveas(fig, 'Figures/fig5a.fig')
     saveas(fig, 'Figures/fig5a.svg')
     

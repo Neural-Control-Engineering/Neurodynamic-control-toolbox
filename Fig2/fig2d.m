@@ -79,25 +79,25 @@ function [animal, session, t] = fig2d(data, tbounds, alignTo)
     axes(axs_sesh(1))
     legend()
 
-    percentile = [];
-    ocm = [];
-    mat = [];
-    for o = 1:length(outcomes)
-        for i = 1:length(session{o})
-            percentile = [percentile; zeros(size(session{o}{i},1),1)+i-1];
-            mat = [mat; session{o}{i}];
-            ocm = [ocm; zeros(size(session{o}{i},1),1)+i-1];
-        end
-    end
-    mat = mat(:, t>0 & t<=5);
-    time =t(:, t>0 & t<=5);
-    tbl = table(percentile, ocm, mat(:,1), 'VariableNames', {'percentile', 'outcome', 't0'});
-    for c = 2:size(mat,2)
-        tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
-    end
-    rm = fitrm(tbl, sprintf('t0-t%i ~ percentile*outcome',c-1), 'WithinDesign', time);
-    fprintf(sprintf('Pupil dynamics by pupil baseline across outcomes\n', outcomes{o}))
-    ranova(rm)
+    % percentile = [];
+    % ocm = [];
+    % mat = [];
+    % for o = 1:length(outcomes)
+    %     for i = 1:length(session{o})
+    %         percentile = [percentile; zeros(size(session{o}{i},1),1)+i-1];
+    %         mat = [mat; session{o}{i}];
+    %         ocm = [ocm; zeros(size(session{o}{i},1),1)+i-1];
+    %     end
+    % end
+    % mat = mat(:, t>0 & t<=5);
+    % time =t(:, t>0 & t<=5);
+    % tbl = table(percentile, ocm, mat(:,1), 'VariableNames', {'percentile', 'outcome', 't0'});
+    % for c = 2:size(mat,2)
+    %     tbl = [tbl, table(mat(:,c), 'VariableNames', {sprintf('t%i',c-1)})];
+    % end
+    % rm = fitrm(tbl, sprintf('t0-t%i ~ percentile*outcome',c-1), 'WithinDesign', time);
+    % fprintf(sprintf('Pupil dynamics by pupil baseline across outcomes\n', outcomes{o}))
+    % ranova(rm)
 
     saveas(fig_sesh, 'Figures/fig2d.fig')
     saveas(fig_sesh, 'Figures/fig2d.svg')

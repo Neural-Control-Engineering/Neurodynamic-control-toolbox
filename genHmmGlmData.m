@@ -194,9 +194,13 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
         %   Col 2: stimulus strength (normalized)           -> observations
         %   Col 3: ones (bias term)                         -> observations
         %
-        % The Python GLM-HMM code (glm_hmm_utils_v2.py) expects:
-        %   - Column 0 (pupil): used by InputDrivenTransitions (M_transition=1)
-        %   - Columns 1-2 (stimulus + bias): used by observations
+        % Consumed by NT-GLM-HMM/2_fit_models/fit_global_glmhmm/glm_hmm_routed.py
+        % (fit_corrected_global.py, fit_corrected_per_animal.py, cv_corrected_full.py),
+        % which slices these columns explicitly:
+        %   - Column 0 (pupil): InputDrivenTransitions only
+        %   - Columns 1-2 (stimulus + bias): InputDrivenObservations only
+        % The earlier glm_hmm_utils_v2.py is superseded -- its M_transition argument
+        % never sliced anything, so pupil reached both sub-models.
         %
         for i = 1:length(sessions)
             tmp = filterTrials(data, 'session_id', sessions{i});
@@ -234,6 +238,9 @@ function genHmmGlmData(data, outfile, version, shuffle, seed)
         %   Col 3: baseline S1 NE (z-scored)           -> transitions
         %   Col 4: stimulus strength (normalized)      -> observations
         %   Col 5: ones (bias term)                    -> observations
+        %
+        % Consumed by cv_pupil_ne_corrected.py (Extended Data Fig 6-1), which routes
+        % cols 0-2 to the transitions and cols 3-4 to the observations.
         %
         for i = 1:length(sessions)
             tmp = filterTrials(data, 'session_id', sessions{i});

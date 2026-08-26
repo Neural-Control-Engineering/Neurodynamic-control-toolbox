@@ -1,10 +1,14 @@
 % load and preprocess data 
+set(0, 'DefaultFigureWindowStyle', 'normal');
+delete ssd_stats.txt
 diary ssd_stats.txt
 addpath(genpath('./'))
 Datastore = load('Combined-Datastore_created_14-Jan-2024.mat');
 data = filterTrials(Datastore.Datastore, 'recording_location', 'mPFC-S1');
 animals = fetchAnimals(data);
 data(cellfun(@isempty, data.photometry_ch1),:) = [];
+data.categorical_outcome = strrep(data.categorical_outcome, 'Delayed FA (CR)', 'CR');
+data.categorical_outcome = strrep(data.categorical_outcome, 'Near Hit (Miss)', 'Miss');
 tbounds = [-0.5, 6.0];
 alignTo = 'stimulus';
 ssd_version = 'v3';
@@ -54,14 +58,14 @@ close all
 % figure 2
 % Figure 2. Pupil size dependent behavior. 
 % A) Example segmentation of mouse pupil contour by DLC (top) and the histogram of pupil fluctuations (bottom).
+% B) Baseline pupil area across outcomes 
 % B) Pupil dilation evoked by the presentation of different tactile stimuli.
 % C) Pupil dynamics around stimulus presentation for four different behavioral outcomes.
 % D) Pupil dilation with different baseline pupil size.
 % E) Scatter plot showing negative correlation between baseline pupil size and pupil dilation for an example session.
-% F) Pearson’s correlation coefficients between baseline pupil size and pupil dilation for different behavioral outcomes.
-% G-H) Quantification of baseline pupil size and dilation for different behavioral outcomes.
-% I) Response time during low, medium, and high pupil-linked arousal levels.
-% J-K) Response probablity and perceptual sensitivity during low, medium, and high pupil-linked arousal levels
+% F) Pupil dilation across different outcomes 
+% G) Response time by pupil-linked arousal levels.
+% H-I) Response probablity and perceptual sensitivity during by pupil-linked arousal levels
 fprintf('Figure 2:\n')
 fprintf('Figure 2a:\n')
 fig2a(data)
@@ -76,15 +80,11 @@ fig2e(data, tbounds, alignTo);
 fprintf('Figure 2f:\n')
 fig2f(data, tbounds, alignTo);
 fprintf('Figure 2g:\n')
-fig2g(data, tbounds, alignTo);
+fig2g(data);
 fprintf('Figure 2h:\n')
-fig2h(data, tbounds, alignTo);
+fig2h(data);
 fprintf('Figure 2i:\n')
 fig2i(data);
-fprintf('Figure 2j:\n')
-fig2j(data);
-fprintf('Figure 2k:\n')
-fig2k(data);
 close all
 
 % Figure 3. NE dynamics in S1 and mPFC during the tactile detection task. 
@@ -104,9 +104,9 @@ fig3d(data, 'z-score', 'atzero', shuff_xcor);
 close all
 
 % Figure 4. NE dynamics in S1 and mPFC during the tactile detection task. 
-% A) NE dynamics in S1 evoked by the presentation of different tactile stimuli.
-% B) Task evokded NE dynamics in S1 in hit, miss, correct rejection and miss trials.
-% C) Baseline NE level in S1 in hit, miss, correct rejection and miss trials.
+% A) Baseline NE level in S1 in hit, miss, correct rejection and miss trials.
+% B) NE dynamics in S1 evoked by the presentation of different tactile stimuli.
+% C) Task evokded NE dynamics in S1 in hit, miss, correct rejection and miss trials.
 % D) Mean increase in NE level in S1 in hit, miss, correct rejection and miss trials.
 % E) Reaction times during the high, medium, and low terciles of baseline NE levels in S1.
 % F) Pychometric curves during the high, medium, and low terciles of baseline NE levels in S1.
@@ -120,7 +120,7 @@ close all
 fprintf('Figure 4:\n')
 fprintf('Figure 4a:\n')
 fig4a(data, tbounds, alignTo, 'z-score');
-fprintf('Figure 4b:\n')
+fprintf('Figure 4b and 4h:\n')
 fig4bh(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4c:\n')
 fig4c(data, tbounds, alignTo, 'z-score');
@@ -133,8 +133,6 @@ fig4f(data, 'z-score');
 %% s2
 fprintf('Figure 4g:\n')
 fig4g(data, tbounds, alignTo, 'z-score');
-fprintf('Figure 4h:\n')
-fig4h(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4i:\n')
 fig4i(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 4j:\n')
@@ -147,18 +145,29 @@ close all
 
 % figure 5 - grab NE signals for different baseline pupil area levels
 fprintf('Figure 5:\n')
-fprintf('Figure 5a and 5b:\n')
-fig5ab(data, tbounds, alignTo, 'z-score');
+fprintf('Figure 5a:\n')
+fig5a(data, tbounds, alignTo, 'z-score');
+fprintf('Figure 5b:\n')
+fig5b(data, tbounds, alignTo, 'z-score');
 close all
 
-% figure 6 - summary of GLM-HMM modeling
-fig6()
-close all
+% keyboard   % debug breakpoint -- left disabled so the script runs end to end
 
-% Figures 7 and 8 
-dynamicsByState();
-corrByState(shuff_xcor);
+try
+    % figure 6 - summary of GLM-HMM modeling
+    fig6()
+    close all
 
+    % State-dependent pupil and NE analyses. Formerly Figures 7 and 8; the figures were
+    % cut for the R1 revision because none of the state x time / state x lag contrasts
+    % survive Greenhouse-Geisser correction under the corrected GLM-HMM. These calls are
+    % retained because the Results text still reports their statistics as negatives,
+    % alongside the baseline-by-state effects that do hold.
+    dynamicsByState();
+    corrByState(shuff_xcor);
+catch
+    fprintf('You must run the GLM-HMM model before plotting Figure 6 and NE/pupil dynamics ny state\n')
+end
 % Supplemental Figures 
 suppFig1(data, tbounds, alignTo);
 suppFig2(data);

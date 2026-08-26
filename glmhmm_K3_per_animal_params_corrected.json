@@ -1,0 +1,242 @@
+{
+  "description": "Per-animal corrected GLM-HMM (K=3): baseline pupil drives ONLY the transition softmax, stimulus+bias drive ONLY the choice GLM. Initialized from the global corrected fit. Replaces glmhmm_K3_per_animal_params.json, whose observation weights contained a pupil term (circular).",
+  "config": {
+    "K": 3,
+    "C": 2,
+    "M_full": 3,
+    "obs_inputs": [
+      "stim",
+      "bias"
+    ],
+    "transition_inputs": [
+      "pupil"
+    ],
+    "N_em_iters": 250,
+    "prior_sigma": 2.0,
+    "init": "global corrected fit",
+    "global_log_likelihood": -2384.7619441240004
+  },
+  "state_labels": {
+    "state_0": "Liberal",
+    "state_1": "Conservative",
+    "state_2": "Engaged"
+  },
+  "animals": {
+    "240": {
+      "n_sessions": 17,
+      "n_trials": 2129,
+      "observation_weights": {
+        "state_0": {
+          "stim": -4.361296617491972,
+          "bias": -1.1126339885867655
+        },
+        "state_1": {
+          "stim": -2.799925899468265,
+          "bias": 3.529663499630648
+        },
+        "state_2": {
+          "stim": -18.095332872875062,
+          "bias": 2.0676327774809233
+        }
+      },
+      "transition_pupil_weight": {
+        "state_0": 0.10807084265125057,
+        "state_1": 0.753783965779803,
+        "state_2": 0.46891721355905597
+      },
+      "transition_matrix_at_u0": [
+        [
+          0.9956019147254678,
+          0.0021368423180548025,
+          0.0022612429564773267
+        ],
+        [
+          0.00010524719469453765,
+          0.9943816149553955,
+          0.005513137849910132
+        ],
+        [
+          0.00010387715220531303,
+          0.0036556725570398197,
+          0.9962404502907549
+        ]
+      ],
+      "state_response_rate": {
+        "state_0": 0.8609467455621301,
+        "state_1": 0.08470588235294117,
+        "state_2": 0.5468521229868228
+      },
+      "state_trial_count": {
+        "state_0": 338,
+        "state_1": 425,
+        "state_2": 1366
+      },
+      "log_likelihood": -702.3041280615441,
+      "per_trial_log_likelihood": -0.3298751188640414,
+      "n_em_iters": 22,
+      "states_aligned_with_global": true
+    },
+    "241": {
+      "n_sessions": 7,
+      "n_trials": 722,
+      "observation_weights": {
+        "state_0": {
+          "stim": -2.8227256964148246,
+          "bias": -0.5163340288509344
+        },
+        "state_1": {
+          "stim": -5.026727979009951,
+          "bias": 2.639791820241859
+        },
+        "state_2": {
+          "stim": -12.412909150621243,
+          "bias": 1.6161941185356772
+        }
+      },
+      "transition_pupil_weight": {
+        "state_0": 0.40300801057886604,
+        "state_1": 1.0457933704019182,
+        "state_2": -0.11802935899082623
+      },
+      "transition_matrix_at_u0": [
+        [
+          0.9936180990694584,
+          0.0005966049990083754,
+          0.005785295931533172
+        ],
+        [
+          0.00026643134095126405,
+          0.9691084612291867,
+          0.03062510742986196
+        ],
+        [
+          0.0001407649475023363,
+          0.007491679579564236,
+          0.9923675554729335
+        ]
+      ],
+      "state_response_rate": {
+        "state_0": 0.7592592592592593,
+        "state_1": 0.24858757062146894,
+        "state_2": 0.5987780040733197
+      },
+      "state_trial_count": {
+        "state_0": 54,
+        "state_1": 177,
+        "state_2": 491
+      },
+      "log_likelihood": -286.4033290697051,
+      "per_trial_log_likelihood": -0.39668051117687686,
+      "n_em_iters": 42,
+      "states_aligned_with_global": true
+    },
+    "242": {
+      "n_sessions": 12,
+      "n_trials": 1678,
+      "observation_weights": {
+        "state_0": {
+          "stim": -1.3720213384022346,
+          "bias": -2.4416905546710006
+        },
+        "state_1": {
+          "stim": -3.5831838722102796,
+          "bias": 3.2929142329142125
+        },
+        "state_2": {
+          "stim": -16.9500878742716,
+          "bias": 2.0005798590297665
+        }
+      },
+      "transition_pupil_weight": {
+        "state_0": -1.1276981031795252,
+        "state_1": 1.7416962661646413,
+        "state_2": 0.7167738590048128
+      },
+      "transition_matrix_at_u0": [
+        [
+          0.914585004276411,
+          0.0018747017765633448,
+          0.08354029394702564
+        ],
+        [
+          0.00012330503411509588,
+          0.8981339604272821,
+          0.10174273453860279
+        ],
+        [
+          5.810740072173238e-05,
+          0.022756355529499523,
+          0.9771855370697787
+        ]
+      ],
+      "state_response_rate": {
+        "state_0": 0.9642857142857143,
+        "state_1": 0.12064343163538874,
+        "state_2": 0.5661707126076743
+      },
+      "state_trial_count": {
+        "state_0": 28,
+        "state_1": 373,
+        "state_2": 1277
+      },
+      "log_likelihood": -652.9355211350545,
+      "per_trial_log_likelihood": -0.3891153284475891,
+      "n_em_iters": 184,
+      "states_aligned_with_global": true
+    },
+    "243": {
+      "n_sessions": 16,
+      "n_trials": 2142,
+      "observation_weights": {
+        "state_0": {
+          "stim": -7.367466681681371,
+          "bias": -0.7822717789347808
+        },
+        "state_1": {
+          "stim": 0.23740066404749177,
+          "bias": 3.019074165570125
+        },
+        "state_2": {
+          "stim": -17.49851952310104,
+          "bias": 1.9567938258060216
+        }
+      },
+      "transition_pupil_weight": {
+        "state_0": 0.06906911951318058,
+        "state_1": 1.1450826948315358,
+        "state_2": 0.11662020764554877
+      },
+      "transition_matrix_at_u0": [
+        [
+          0.9951196135799047,
+          0.0030442647231679375,
+          0.00183612169692723
+        ],
+        [
+          0.01972774787161325,
+          0.3094855452942484,
+          0.6707867068341384
+        ],
+        [
+          0.00215201798206225,
+          0.018820948329338963,
+          0.9790270336885988
+        ]
+      ],
+      "state_response_rate": {
+        "state_0": 0.8477611940298507,
+        "state_1": 0.014705882352941176,
+        "state_2": 0.561965811965812
+      },
+      "state_trial_count": {
+        "state_0": 670,
+        "state_1": 68,
+        "state_2": 1404
+      },
+      "log_likelihood": -826.629211004927,
+      "per_trial_log_likelihood": -0.38591466433469984,
+      "n_em_iters": 196,
+      "states_aligned_with_global": true
+    }
+  }
+}

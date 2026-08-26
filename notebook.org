@@ -1484,4 +1484,51 @@ effects of evoked and baseline NE signals are reported in an intermixed manner,
 hindering the flow of the paragraph.
 
 * [2026-7-14 Tue] - working through figures / stats 
-** 
+** changes to figures 
+*** Figure 1 - no changes 
+*** Figure 2
+**** remove current B
+***** a bit deceptive since only holds if ignoring response and baseline
+***** same information captured in next panel 
+**** G -> B 
+***** makes more sense to start of with baseline vs outcome 
+**** remove F (maybe supplemental figure)
+***** don't think it adds anything to the narrative 
+**** H-K -> F-I
+*** Figure 3 - no changes 
+*** Figure 4 
+**** remove A 
+**** B-C -> A-B 
+**** new C - increase by baseline 
+**** D-F no changes 
+**** remove G 
+**** H-I -> G-H 
+**** new I - increase by baseline 
+**** J-L no change 
+*** Figure 5
+**** B - trial-wise now  
+*** Figure 6 - need to update H response time 
+*** Figure 7 - maybe add baseline NE 
+** open questions 
+*** Figures 2-4: get rid of response vs. withhold 
+*** trial-wise lme's for metrics other than dilation / NE xcorr / change in NE
+** TODOS 
+*** TODO: check time in anova for pupil (61 and 67 in different places)
+
+* [2026-7-16 Thu] 
+** dilations and increases were computed with mean over 6s following stimulus 
+*** pupil dilation should definitely be max (way less negative change in area)
+*** open question re NE 
+
+* [2026-8-24 Mon] 
+** for Qi 
+*** Transisions 
+liberal->liberal = 0.994
+liberal->conservative = 0.001
+liberal->engaged = 0.006
+conservative->liberal = 0
+conservative->conservative = 0.919
+conservative->engaged=0.081
+engaged->liberal=0.001
+engaged->conservative=0.021
+engaged->engaged=0.978
