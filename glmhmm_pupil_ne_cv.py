@@ -7,7 +7,11 @@ Output: glmhmm_pupil_ne_cv_results.csv
 """
 import sys
 import time
-sys.path.insert(0, '/Users/sleeper/Projects/Neurodynamic-control-toolbox/NT-GLM-HMM/2_fit_models/fit_global_glmhmm')
+import os
+_HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = _HERE + os.sep
+sys.path.insert(0, os.path.join(_HERE, 'NT-GLM-HMM', '2_fit_models',
+                                'fit_global_glmhmm'))
 
 import numpy as np
 import pandas as pd
@@ -18,8 +22,8 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 import warnings
 warnings.filterwarnings('ignore')
 
-DATA = '/Users/sleeper/Projects/Neurodynamic-control-toolbox/pupil_ne_transitions_data.mat'
-OUT = '/Users/sleeper/Projects/Neurodynamic-control-toolbox/glmhmm_pupil_ne_cv_results.csv'
+DATA = REPO + 'pupil_ne_transitions_data.mat'
+OUT = REPO + 'glmhmm_pupil_ne_cv_results.csv'
 
 N_EM = 200
 N_INIT = 2

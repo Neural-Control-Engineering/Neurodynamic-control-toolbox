@@ -7,7 +7,10 @@ Quick predictive accuracy check for pupil-driven transitions GLM-HMM.
   4. Input-driven transitions GLM-HMM (reviewer model, K=2,3)
 """
 import sys
-sys.path.insert(0, '/Users/sleeper/Projects/Neurodynamic-control-toolbox/NT-GLM-HMM/2_fit_models/fit_global_glmhmm')
+import os
+_HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.normpath(os.path.join(_HERE, '..', '..', '..')) + os.sep
+sys.path.insert(0, _HERE)
 
 import numpy as np
 import scipy.io as sio
@@ -17,7 +20,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # ── Load data ──
-d = sio.loadmat('/Users/sleeper/Projects/Neurodynamic-control-toolbox/pupil_transitions_data.mat')
+d = sio.loadmat(REPO + 'pupil_transitions_data.mat')
 raw_inputs = d['preprocessed_input']
 raw_labels = d['preprocessed_label']
 

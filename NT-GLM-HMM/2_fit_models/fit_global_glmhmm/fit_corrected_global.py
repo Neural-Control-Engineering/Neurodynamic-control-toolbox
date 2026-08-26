@@ -8,13 +8,15 @@ Outputs (written to repo root):
     glmhmm_K3_state_assignments_corrected.csv
 """
 import sys, json
-sys.path.insert(0, '/Users/sleeper/Projects/Neurodynamic-control-toolbox/NT-GLM-HMM/2_fit_models/fit_global_glmhmm')
+import os
+_HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.normpath(os.path.join(_HERE, '..', '..', '..')) + os.sep
+sys.path.insert(0, _HERE)
 import numpy as np
 import scipy.io as sio
 import warnings; warnings.filterwarnings('ignore')
 from glm_hmm_routed import build_routed_hmm
 
-REPO = '/Users/sleeper/Projects/Neurodynamic-control-toolbox/'
 K, D, C, M = 3, 1, 2, 3
 N_INITS = 8
 N_EM = 250

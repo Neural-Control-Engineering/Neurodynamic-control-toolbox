@@ -47,10 +47,9 @@ Then install version 0.0.1 of the Linderman lab `ssm` package from
 then `pip install -e .` from the `ssm` directory).  The cross-validation and
 plotting scripts additionally need `scikit-learn`, `pandas`, and `matplotlib`.
 
-The fitting and cross-validation scripts each set a `REPO` constant at the top
-to an absolute path -- currently the path on the machine they were run on, so
-**point it at your own checkout before running**.  The plotting script uses
-relative paths instead and must be run from the repository root.
+Every Python script resolves its paths from its own location (`__file__`), so it
+reads and writes the repository root no matter which directory you launch it
+from.  Nothing needs editing after cloning.
 
 ### Step 1 — build the design matrices (MATLAB)
 
@@ -104,8 +103,7 @@ Figure 6 is MATLAB.  `Fig6/fig6.m` reads `glmhmm_K3_state_assignments_corrected.
 `glmhmm_cv_corrected_full.csv` (panels 6B and 6C).  It is called from
 `allFigures.m` and takes no arguments.
 
-Extended Data Figure 6-1 is Python, run from the repository root (not from the
-fitting directory -- it reads its CSV by relative path):
+Extended Data Figure 6-1 is Python:
 
     python plot_pupil_ne_cv_corrected.py    # -> glmhmm_pupil_ne_cv_corrected_figure.svg / .png
 

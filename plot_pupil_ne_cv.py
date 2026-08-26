@@ -4,8 +4,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-CSV = 'glmhmm_pupil_ne_cv_results.csv'
-OUT = 'glmhmm_pupil_ne_cv_figure.svg'
+import os
+_HERE = os.path.dirname(os.path.abspath(__file__))
+CSV = os.path.join(_HERE, 'glmhmm_pupil_ne_cv_results.csv')
+OUT = os.path.join(_HERE, 'glmhmm_pupil_ne_cv_figure.svg')
 
 df = pd.read_csv(CSV)
 
