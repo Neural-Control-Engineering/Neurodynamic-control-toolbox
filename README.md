@@ -12,8 +12,8 @@ The section below walks through the full procedure.
 
 The GLM-HMM is fit in Python and its outputs are consumed by MATLAB.  The fit
 products are committed at the repository root, so `allFigures.m` regenerates
-Figure 6 and Extended Data Figure 6-1 without refitting.  Refit only if the
-underlying data change.
+Figure 6 without refitting; Extended Data Figure 6-1 is drawn by a Python script
+(Step 3) from a committed CSV.  Refit only if the underlying data change.
 
 ### The model
 
@@ -28,7 +28,9 @@ we then analyze.  The routing is implemented in
 `NT-GLM-HMM/2_fit_models/fit_global_glmhmm/glm_hmm_routed.py`, which subclasses
 `InputDrivenObservations` and `InputDrivenTransitions` so each sub-model slices
 its own columns out of the shared input matrix.  See
-`NT-GLM-HMM/REVIEWER_MODEL_README.md` for the longer rationale.
+`NT-GLM-HMM/REVIEWER_MODEL_README.md` for the longer rationale behind the
+routing (its *Usage* section describes the superseded `glm_hmm_utils_v2.py`
+API; use the scripts below instead).
 
 `glm_hmm_utils_v2.py` is the earlier attempt at this and is **superseded**: its
 `M_transition` argument never sliced anything, so pupil entered both sub-models.
@@ -45,8 +47,10 @@ Then install version 0.0.1 of the Linderman lab `ssm` package from
 then `pip install -e .` from the `ssm` directory).  The cross-validation and
 plotting scripts additionally need `scikit-learn`, `pandas`, and `matplotlib`.
 
-Each Python script sets a `REPO` constant at the top to an absolute path; point
-it at your checkout before running.
+The fitting and cross-validation scripts each set a `REPO` constant at the top
+to an absolute path -- currently the path on the machine they were run on, so
+**point it at your own checkout before running**.  The plotting script uses
+relative paths instead and must be run from the repository root.
 
 ### Step 1 — build the design matrices (MATLAB)
 
@@ -79,7 +83,7 @@ Run from `NT-GLM-HMM/2_fit_models/fit_global_glmhmm/`:
 | --- | --- | --- |
 | `fit_corrected_global.py` | K=3 global fit, best of 8 EM restarts | `glmhmm_K3_params_corrected.json`, `glmhmm_K3_state_assignments_corrected.csv` |
 | `fit_corrected_per_animal.py` | K=3 per animal, each initialized from the global fit so state *k* means the same thing across animals | `glmhmm_K3_per_animal_params_corrected.json` |
-| `cv_corrected_full.py` | session-level 5-fold CV, K = 1–4, routed model vs a pupil-in-observations arm; accuracy, ROC-AUC, PR-AUC, bits/trial | `glmhmm_cv_corrected_full.csv` |
+| `cv_corrected_full.py` | session-level 5-fold CV: routed model at K = 1–4, plus a single pupil-in-observations arm at K = 3 for comparison; accuracy, ROC-AUC, PR-AUC, bits/trial | `glmhmm_cv_corrected_full.csv` |
 | `cv_pupil_ne_corrected.py` | same splitter and seed, K = 2–4, pupil vs pupil+NE as transition drivers (identical choice GLM in both arms) | `glmhmm_pupil_ne_cv_corrected.csv` |
 
 Run the global fit first — the per-animal script initializes from it.  The two
@@ -100,7 +104,8 @@ Figure 6 is MATLAB.  `Fig6/fig6.m` reads `glmhmm_K3_state_assignments_corrected.
 `glmhmm_cv_corrected_full.csv` (panels 6B and 6C).  It is called from
 `allFigures.m` and takes no arguments.
 
-Extended Data Figure 6-1 is Python:
+Extended Data Figure 6-1 is Python, run from the repository root (not from the
+fitting directory -- it reads its CSV by relative path):
 
     python plot_pupil_ne_cv_corrected.py    # -> glmhmm_pupil_ne_cv_corrected_figure.svg / .png
 
@@ -110,5 +115,6 @@ Kept for comparison against the pre-correction model; none of these are what the
 paper reports.
 
     glmhmm_K3_state_assignments.csv      glmhmm_cv_results.csv
-    glmhmm_pupil_ne_cv_results.csv       glmhmm_pupil_ne_cv.py
-    plot_pupil_ne_cv.py                  glm_hmm_utils_v2.py
+    glmhmm_cv_corrected_results.csv      glmhmm_pupil_ne_cv_results.csv
+    glmhmm_pupil_ne_cv.py                plot_pupil_ne_cv.py
+    glm_hmm_utils_v2.py
