@@ -1532,3 +1532,29 @@ conservative->engaged=0.081
 engaged->liberal=0.001
 engaged->conservative=0.021
 engaged->engaged=0.978
+
+* [2026-9-24 Thu] - third round of comments 
+** I appreciate the care taken to clarify the methodological details and justify the analytical approaches. 
+The revised manuscript is now much clearer and provides a compelling account of the relationships between 
+pupil-linked arousal, cortical noradrenergic dynamics, and behavior.
+*** baseline 
+
+** There seems to be no comparison between GRAB-NE in the PFC or S1 cortex and pupil diameter. Given that the
+authors discuss having a different relationship between baseline pupil size and behavior (line 495) it would 
+be beneficial to report the relationship between GRAB-NE signal in the PFC vs S1 and pupil size during baseline 
+conditions and during the response window.
+
+** The authors discuss (and have added discussion) the relation between GRAB-NE signal and reward (e.g. line 503). 
+Reward is still a confound, especially since motor movement (licking) is temporally linked with the sucrose-water reward. 
+This confound is evident in false alarm trials where licking occurs and no reward is given, though a time-out tone is 
+given. Thus, "Cortical NE levels following reward" is misleading since time-out tones produce similar NE responses in the 
+PFC and S1. Clearly, the NE response is biphasic: an initial response to the stimuli or response to precipitate a 
+goal-directed behavior that peaks at 1 sec post-stimulus, coincident with the peak licking frequency. This is in addition 
+to a late component 4+/-2seconds post stimuli that is not clearly linked to a behavior and roughly 2 seconds after 
+licking/reward terminates.
+
+** The authors name the states as "liberal" etc. It is unclear why the authors chose this instead of "labile", "vigilant", 
+etc., first proposed by Aston-Jones. Consider renaming these states.
+
+** The Y-axis on Figure 3g is mislabeled as "NE in S1".
+

@@ -31,8 +31,10 @@ function [pupil, time] = avg_pupil_traces(data, tbounds, alignTo)
             pupilTraceSeg = pupilTrace(segIndexStart:segIndexStop,:);
             pupil(i,:) = pupilTraceSeg(:,2);
         catch 
-            pupilTraceSeg = pupilTrace(segIndexStart:end,:);
-            pupil(i,1:size(pupilTraceSeg,1)) = pupilTraceSeg(:,2);
+            try
+                pupilTraceSeg = pupilTrace(segIndexStart:end,:);
+                pupil(i,1:size(pupilTraceSeg,1)) = pupilTraceSeg(:,2);
+            end
         end
         
     end
