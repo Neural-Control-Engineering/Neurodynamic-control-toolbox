@@ -26,22 +26,25 @@ function fig5b(data, tbounds, alignTo, ver)
         subject{i} = session{i}(1:3);
     end    
 
-    T = table(s1, ptiles, session, subject',  'VariableNames', {'Baseline', 'Ptile', 'Session', 'Subject'});
+    T = table(s1, ptiles, ptiles.^2, session, subject',  'VariableNames', {'Baseline', 'Ptile', 'Ptile2', 'Session', 'Subject'});
 
-    lmeTbl = T(:, {'Baseline', 'Ptile', 'Session', 'Subject'});
+    lmeTbl = T(:, {'Baseline', 'Ptile', 'Ptile2', 'Session', 'Subject'});
 
     % Make sure response is numeric
     lmeTbl.Baseline = double(lmeTbl.Baseline);
 
     % Make predictors categorical
-    lmeTbl.Ptile = categorical(lmeTbl.Ptile);
+    lmeTbl.Ptile = double(lmeTbl.Ptile);
+    lmeTbl.Ptile2 = double(lmeTbl.Ptile2);
     lmeTbl.Session  = categorical(lmeTbl.Session);
     lmeTbl.Subject  = categorical(lmeTbl.Subject);
     % lmeTbl.Outcome  = categorical(lmeTbl.Outcome);
 
     % Remove rows with missing values in any model variable
     badRows = isnan(lmeTbl.Baseline) | ...
-            isundefined(lmeTbl.Ptile) | ...
+            isnan(lmeTbl.Ptile) | ...
+            isnan(lmeTbl.Ptile) | ...
+            isnan(lmeTbl.Ptile2) | ...
             isundefined(lmeTbl.Subject) | ...
             isundefined(lmeTbl.Session);
 
@@ -50,29 +53,31 @@ function fig5b(data, tbounds, alignTo, ver)
     % Optional but useful: remove unused category levels
     lmeTbl.Session  = removecats(lmeTbl.Session);
     lmeTbl.Subject  = removecats(lmeTbl.Subject);
-    lmeTbl.Ptile  = removecats(lmeTbl.Ptile);
+    % lmeTbl.Ptile  = removecats(lmeTbl.Ptile);
 
     fprintf('Baseline S1 NE by baseline pupil LME\n')
     lme = fitlme(lmeTbl, ...
-        'Baseline ~ Ptile + (1|Session) + (1|Subject)');
+        'Baseline ~ Ptile + Ptile2 + (1|Session) + (1|Subject)');
     anova(lme)
 
-    T = table(pfc, ptiles, session, subject',  'VariableNames', {'Baseline', 'Ptile', 'Session', 'Subject'});
+    T = table(pfc, ptiles, ptiles.^2, session, subject',  'VariableNames', {'Baseline', 'Ptile', 'Ptile2', 'Session', 'Subject'});
 
-    lmeTbl = T(:, {'Baseline', 'Ptile', 'Session', 'Subject'});
+    lmeTbl = T(:, {'Baseline', 'Ptile', 'Ptile2', 'Session', 'Subject'});
 
     % Make sure response is numeric
     lmeTbl.Baseline = double(lmeTbl.Baseline);
 
     % Make predictors categorical
-    lmeTbl.Ptile = categorical(lmeTbl.Ptile);
+    lmeTbl.Ptile = double(lmeTbl.Ptile);
+    lmeTbl.Ptile2 = double(lmeTbl.Ptile2);
     lmeTbl.Session  = categorical(lmeTbl.Session);
     lmeTbl.Subject  = categorical(lmeTbl.Subject);
     % lmeTbl.Outcome  = categorical(lmeTbl.Outcome);
 
     % Remove rows with missing values in any model variable
     badRows = isnan(lmeTbl.Baseline) | ...
-            isundefined(lmeTbl.Ptile) | ...
+            isnan(lmeTbl.Ptile) | ...
+            isnan(lmeTbl.Ptile2) | ...
             isundefined(lmeTbl.Subject) | ...
             isundefined(lmeTbl.Session);
 
@@ -81,11 +86,11 @@ function fig5b(data, tbounds, alignTo, ver)
     % Optional but useful: remove unused category levels
     lmeTbl.Session  = removecats(lmeTbl.Session);
     lmeTbl.Subject  = removecats(lmeTbl.Subject);
-    lmeTbl.Ptile  = removecats(lmeTbl.Ptile);
+    % lmeTbl.Ptile  = removecats(lmeTbl.Ptile);
 
     fprintf('Baseline PFC NE by baseline pupil LME\n')
     lme = fitlme(lmeTbl, ...
-        'Baseline ~ Ptile + (1|Session) + (1|Subject)');
+        'Baseline ~ Ptile + Ptile2 + (1|Session) + (1|Subject)');
     anova(lme)
 
     fig = figure('Position', [1 1 477 658]);
@@ -111,5 +116,5 @@ function fig5b(data, tbounds, alignTo, ver)
 
     saveas(fig, 'Figures/fig5b.fig')
     saveas(fig, 'Figures/fig5b.svg')
-    
+
 end
