@@ -189,6 +189,22 @@ function [mpfc_ds, s1_ds, pupil, pupil_t] = ...
     s1   = s1(1:nTrials,:);
     pupil = p(1:nTrials,:);
 
+    Fs_photo = 1 / median(diff(t));
+    Fs_pupil = 1 / median(diff(pupil_t));
+
+    % Anti-alias cutoff safely below new Nyquist
+    Fc = 0.8 * (Fs_pupil / 2);
+
+    [b,a] = butter(4, Fc/(Fs_photo/2), 'low');
+
+    for i = 1:nTrials
+        mpfc_filt = filtfilt(b, a, mpfc(i,:));
+        s1_filt   = filtfilt(b, a, s1(i,:));
+
+        mpfc_ds(i,:) = interp1(t, mpfc_filt, pupil_t, 'linear');
+        s1_ds(i,:)   = interp1(t, s1_filt,   pupil_t, 'linear');
+    end
+
     % If pt was returned as one row per trial, use the first row as the
     % common pupil time vector.
     if ~isvector(pt)
