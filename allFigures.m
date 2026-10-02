@@ -149,6 +149,7 @@ fprintf('Figure 5a:\n')
 fig5a(data, tbounds, alignTo, 'z-score');
 fprintf('Figure 5b:\n')
 fig5b(data, tbounds, alignTo, 'z-score');
+fig5c(data, tbounds, alignTo, 'z-score');
 close all
 
 % keyboard   % debug breakpoint -- left disabled so the script runs end to end
