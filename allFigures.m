@@ -171,5 +171,7 @@ end
 % Supplemental Figures 
 suppFig1(data, tbounds, alignTo);
 suppFig2(data);
+suppFig4cd(data, 'z-score', 'baseline')
+suppFig4cd(data, 'z-score', 'task')
 
 diary off 

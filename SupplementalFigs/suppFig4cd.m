@@ -1,4 +1,4 @@
-function results = fig3b_pupil(data, ver, baselineOrTask)
+function results = suppFig4cd(data, ver, baselineOrTask)
 %FIG3B_PUPIL Cross-correlate mPFC and S1 photometry with pupil.
 %
 %   results = fig3b_pupil(data, ver)
@@ -146,8 +146,13 @@ function results = fig3b_pupil(data, ver, baselineOrTask)
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel({'NE_{mPFC} x pupil', ...
             'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
-    saveas(fig_mpfc, 'Figures/fig3b_mpfc_pupil.fig')
-    saveas(fig_mpfc, 'Figures/fig3b_mpfc_pupil.svg')
+    if strcmp(baselineOrTask, 'baseline')
+        label = 'c';
+    else
+        label = 'd';
+    end
+    saveas(fig_mpfc, sprintf('Figures/suppFig4%s_mpfc.fig', label))
+    saveas(fig_mpfc, sprintf('Figures/suppFig4%s_mpfc.svg', label))
 
     %% Plot: S1 x pupil
     fig_s1 = figure();
@@ -158,8 +163,8 @@ function results = fig3b_pupil(data, ver, baselineOrTask)
     xlabel('Lag (s)', 'FontSize', 16)
     ylabel({'NE_{S1} x pupil', ...
             'Shuffle Corrected Cross Correlation'}, 'FontSize', 16)
-    saveas(fig_s1, 'Figures/fig3b_s1_pupil.fig')
-    saveas(fig_s1, 'Figures/fig3b_s1_pupil.svg')
+    saveas(fig_s1, sprintf('Figures/suppFig4%s_s1.fig', label))
+    saveas(fig_s1, sprintf('Figures/suppFig4%s_s1.svg', label))
 
     %% Return all useful outputs
     results.lags = session_lags;
@@ -173,6 +178,7 @@ function results = fig3b_pupil(data, ver, baselineOrTask)
 
     results.corrected_mpfc_pupil = session_xcor_mpfc_pupil_corrected;
     results.corrected_s1_pupil   = session_xcor_s1_pupil_corrected;
+
 end
 
 
