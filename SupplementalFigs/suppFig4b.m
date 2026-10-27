@@ -1,4 +1,4 @@
-function suppFig4a(data, tbounds, alignTo, ver)
+function suppFig4b(data, tbounds, alignTo, ver)
     ptiles = [20,40,60,80,100];
     [pupil, t] = avg_pupil_traces(data, [tbounds(1)-0.1, tbounds(2)+0.1], alignTo);
     pupil = pupil(:,2:end-1);
